@@ -21,17 +21,15 @@ tayyor storyboard JSON qo'ysangiz, AI umuman ishlatilmaydi.
 ## Server (Timeweb, Ubuntu)
 
 ```bash
-git clone <repo> shorts-studio && cd shorts-studio
-sudo bash deploy/install.sh          # venv, kutubxonalar, .env, systemd xizmat
-nano .env                            # OPENROUTER_API_KEY va boshqalarni yozing
-sudo systemctl restart shorts-studio
+git clone -b claude/ai-video-creation-izxplk https://github.com/najotsoati/smart-helper-bot.git ~/shorts-studio
+cd ~/shorts-studio
+bash deploy/install.sh     # venv, kutubxonalar, .env, bo'sh port (8090+), systemd xizmat
+nano .env                  # OPENROUTER_API_KEY=... ni yozing
+systemctl restart shorts-studio
+bash deploy/add_https.sh   # https://studio.<ip>.sslip.io manzil; boshqa saytlarga tegmaydi
 ```
 
-HTTPS uchun Caddy: `apt install caddy`, `deploy/Caddyfile`dagi manzilni o'z IP'ingizga almashtiring
-(`185-12-34-56.sslip.io` ko'rinishida), `/etc/caddy/Caddyfile`ga qo'ying, `systemctl reload caddy`.
-Panel parolsiz ochilmaydi; parolni HTTPS'siz ishlatmang.
-
-Xotira: panel ~100 MB RAM oladi, Telegram bot bilan birga 2 GB serverga sig'adi.
+Panel parolsiz ochilmaydi; parol `install.sh` oxirida chiqadi. Xotira: ~100 MB RAM.
 
 ## Noutbuk agenti (Windows)
 

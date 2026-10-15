@@ -1,8 +1,0 @@
-# HTTPS in front of the panel.  Without a domain, use your IP with dashes + .sslip.io,
-# e.g. server 185.12.34.56 -> 185-12-34-56.sslip.io  (Caddy gets the certificate itself).
-185-12-34-56.sslip.io {
-	reverse_proxy 127.0.0.1:8080
-	request_body {
-		max_size 200MB
-	}
-}
