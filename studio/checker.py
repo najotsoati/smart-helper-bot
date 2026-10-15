@@ -31,6 +31,7 @@ def check(sb):
     lines = line_map(sb)
     for ln in sb["lines"]:
         need(ln["speaker"], vocab.VOICES, "speaker", f"line {ln['id']}")
+        need(ln.get("mood"), vocab.MOODS, "mood", f"line {ln['id']}")
         if not ln["text"]:
             errors.append(f"line {ln['id']}: empty text")
         elif len(ln["text"]) > 220:

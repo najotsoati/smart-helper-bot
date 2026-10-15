@@ -90,11 +90,13 @@ Rules:
 - Use music_stop on the shock moment; the twist sits at 40-70% of the runtime.
 - Last shot: the punchline, or an end_card shot with end_text (2 short lines).
 - Keep every spoken line word for word; one line per shot at most.
+- Give every line a mood that matches the moment (excited, shout, scared, sad, whisper, smug, deadpan,
+  confused, normal); comedy lives in contrast, e.g. a deadpan line after a shout.
 - Total length must stay under {vocab.MAX_SECONDS} s."""
 
 STORYBOARD_SHAPE = """Return JSON exactly in this shape:
 {"title": "...", "video_name": "...", "set": "none", "backdrop": "room", "music": "sneaky", "holds_phone": true,
- "lines": [{"id": "S01", "speaker": "sticky", "text": "..."}],
+ "lines": [{"id": "S01", "speaker": "sticky", "text": "...", "mood": "excited"}],
  "shots": [{"camera": "open_zoom", "seconds": 2.0, "line": "S01", "line_at": 0.1, "pose": "shock",
             "eyes": "wide", "mouth": "open", "brows": "worried", "look": "camera", "action": "punch",
             "shake": false, "music_stop": false, "caption": {"text": "...", "color": "red", "pos": "top"},

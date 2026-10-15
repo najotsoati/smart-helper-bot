@@ -129,3 +129,26 @@ def test_forbidden_model_tries_next(monkeypatch, tmp_path):
         return httpx.Response(200, json={"choices": [{"message": {"content": '{"ok": 1}'}}]})
     monkeypatch.setattr(httpx, "post", fake_post)
     assert llm.chat("s", "u") == {"ok": 1}
+
+
+def test_voices_page_and_choice(client, monkeypatch):
+    auth = ("admin", "pw")
+    assert "Ovozlar" in client.get("/voices", auth=auth).text
+    r = client.post("/voices", data={"sticky": "en-US-GuyNeural", "phone": "nope"}, auth=auth,
+                    follow_redirects=False)
+    assert r.status_code == 303
+    assert store.settings()["voices"] == {"sticky": "en-US-GuyNeural"}
+    assert tts.edge_voice("sticky") == "en-US-GuyNeural"
+    assert client.get("/voices/sample.mp3?voice=bad&mood=normal", auth=auth).status_code == 400
+
+    calls = []
+    monkeypatch.setattr(tts, "_edge", lambda text, voice, path, mood="normal": (calls.append((voice, mood)),
+                                                                            path.write_bytes(b"ID3")))
+    r = client.get("/voices/sample.mp3?voice=en-US-GuyNeural&mood=shout", auth=auth)
+    assert r.status_code == 200 and calls == [("en-US-GuyNeural", "shout")]
+
+
+def test_unknown_mood_falls_back():
+    from studio.storyboard import normalize
+    sb = normalize({"lines": [{"id": "S01", "text": "hi", "mood": "furious"}], "shots": []})
+    assert sb["lines"][0]["mood"] == "normal"

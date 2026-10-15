@@ -103,3 +103,16 @@ def usage_today():
     f = _usage_file()
     data = json.loads(f.read_text()) if f.exists() else {}
     return data.get(dt.date.today().isoformat(), {})
+
+
+# --- panel settings (e.g. chosen voices) ---
+
+def settings():
+    f = config.DATA_DIR / "settings.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
+def save_settings(data):
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with _lock:
+        _write_json(config.DATA_DIR / "settings.json", data)

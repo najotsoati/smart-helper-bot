@@ -110,11 +110,33 @@ CAPTION_POS = ["top", "bottom", "big"]
 
 VOICES = {
     # speaker: ElevenLabs voice id, edge-tts voice
-    "sticky": ("TX3LPaxmHKxFdv7VOQHJ", "en-US-AndrewNeural"),   # Liam
-    "phone": ("JBFqnCBsd6RMkjVDRZzb", "en-GB-RyanNeural"),      # George
-    "rick": ("JBFqnCBsd6RMkjVDRZzb", "en-GB-RyanNeural"),
-    "narrator": ("nPczCjzI2devNBz1zQrb", "en-US-BrianNeural"),  # Brian
+    "sticky": ("TX3LPaxmHKxFdv7VOQHJ", "en-US-AndrewMultilingualNeural"),   # Liam
+    "phone": ("JBFqnCBsd6RMkjVDRZzb", "en-GB-RyanNeural"),                  # George
+    "rick": ("JBFqnCBsd6RMkjVDRZzb", "en-GB-ThomasNeural"),
+    "narrator": ("nPczCjzI2devNBz1zQrb", "en-US-BrianMultilingualNeural"),  # Brian
 }
+
+# How a line is said with the free voice: (rate, pitch, volume) for edge-tts.
+MOODS = {
+    "normal": ("+6%", "+0Hz", "+0%"),
+    "excited": ("+16%", "+22Hz", "+10%"),
+    "shout": ("+10%", "+32Hz", "+25%"),
+    "scared": ("+20%", "+28Hz", "+0%"),
+    "sad": ("-14%", "-18Hz", "-8%"),
+    "whisper": ("-6%", "-8Hz", "-35%"),
+    "smug": ("-6%", "-14Hz", "+0%"),
+    "deadpan": ("-10%", "-6Hz", "-5%"),
+    "confused": ("-4%", "+12Hz", "+0%"),
+}
+
+# Free English voices worth auditioning in the panel.
+VOICE_CHOICES = [
+    "en-US-AndrewMultilingualNeural", "en-US-BrianMultilingualNeural", "en-US-AndrewNeural",
+    "en-US-BrianNeural", "en-US-ChristopherNeural", "en-US-EricNeural", "en-US-GuyNeural",
+    "en-US-RogerNeural", "en-US-SteffanNeural", "en-GB-RyanNeural", "en-GB-ThomasNeural",
+    "en-AU-WilliamNeural", "en-US-AvaMultilingualNeural", "en-US-EmmaMultilingualNeural",
+    "en-US-AriaNeural", "en-US-JennyNeural", "en-GB-SoniaNeural",
+]
 
 
 def vocabulary_text():
@@ -136,4 +158,5 @@ sfx (real recorded sounds, nothing else exists): {", ".join(SFX)}
 music: {", ".join(MUSIC)}
 caption color: {", ".join(CAPTION_COLORS)}; caption pos: top (under the title), bottom (on a cream plate), big (huge number in the middle)
 set: {", ".join(SETS)}
-speakers: {", ".join(VOICES)}"""
+speakers: {", ".join(VOICES)}
+line mood (how it is said): {", ".join(MOODS)}"""

@@ -9,19 +9,39 @@ import asyncio
 import httpx
 from mutagen.mp3 import MP3
 
-from . import config, vocab
+from . import config, store, vocab
 
 
 class TTSError(Exception):
     pass
 
 
-def _edge(text, voice, path):
+def edge_voice(speaker):
+    chosen = store.settings().get("voices", {}).get(speaker)
+    return chosen or vocab.VOICES.get(speaker, vocab.VOICES["sticky"])[1]
+
+
+def _edge(text, voice, path, mood="normal"):
     import edge_tts
+    rate, pitch, volume = vocab.MOODS.get(mood, vocab.MOODS["normal"])
 
     async def run():
-        await edge_tts.Communicate(text, voice, rate="+6%").save(str(path))
+        await edge_tts.Communicate(text, voice, rate=rate, pitch=pitch, volume=volume).save(str(path))
     asyncio.run(run())
+
+
+SAMPLE = "Payday! I'm rich! ... Wait. Where did all my money go?"
+
+
+def sample(voice, mood, folder):
+    """Audition clip for the voices page; cached per voice and mood."""
+    if voice not in vocab.VOICE_CHOICES or mood not in vocab.MOODS:
+        raise TTSError("unknown voice or mood")
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{voice}_{mood}.mp3"
+    if not path.exists():
+        _edge(SAMPLE, voice, path, mood)
+    return path
 
 
 def _elevenlabs(text, voice_id, path):
@@ -43,15 +63,15 @@ def voice_lines(sb, audio_dir, provider=None, only_missing=True):
     audio_dir.mkdir(parents=True, exist_ok=True)
     for ln in sb["lines"]:
         path = audio_dir / f"{ln['id']}.mp3"
-        same = ln.get("voiced_text") == ln["text"] and ln.get("voiced_by") == provider
-        if not (only_missing and path.exists() and same):
-            el_id, edge_voice = vocab.VOICES.get(ln["speaker"], vocab.VOICES["sticky"])
+        el_id = vocab.VOICES.get(ln["speaker"], vocab.VOICES["sticky"])[0]
+        who = el_id if provider == "elevenlabs" else edge_voice(ln["speaker"])
+        stamp = f"{provider}|{who}|{ln.get('mood', 'normal')}|{ln['text']}"
+        if not (only_missing and path.exists() and ln.get("voiced") == stamp):
             if provider == "elevenlabs":
                 _elevenlabs(ln["text"], el_id, path)
             else:
-                _edge(ln["text"], edge_voice, path)
+                _edge(ln["text"], who, path, ln.get("mood", "normal"))
         ln["file"] = path.name
         ln["seconds"] = round(MP3(str(path)).info.length, 2)
-        ln["voiced_text"] = ln["text"]
-        ln["voiced_by"] = provider
+        ln["voiced"] = stamp
     return sb

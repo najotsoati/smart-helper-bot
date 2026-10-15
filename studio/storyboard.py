@@ -64,6 +64,9 @@ def normalize(sb):
         ln.setdefault("id", f"L{i + 1:02d}")
         ln["speaker"] = str(ln.get("speaker", "sticky")).lower()
         ln["text"] = str(ln.get("text", "")).strip()
+        ln["mood"] = str(ln.get("mood") or "normal").lower()
+        if ln["mood"] not in vocab.MOODS:
+            ln["mood"] = "normal"
         lines.append(ln)
     sb["lines"] = lines
     shots = []

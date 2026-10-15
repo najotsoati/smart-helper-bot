@@ -85,7 +85,7 @@
 <div class="card">
   <h2>5 · Ovoz <span class="dim">({{ tts_provider }})</span></h2>
   {% for ln in sb.lines %}
-    <div style="margin-bottom:8px"><b>{{ ln.id }} · {{ ln.speaker }}</b>{% if ln.seconds %} <span class="dim">{{ ln.seconds }} s</span>{% endif %}: {{ ln.text }}
+    <div style="margin-bottom:8px"><b>{{ ln.id }} · {{ ln.speaker }}</b> <span class="badge">{{ ln.mood or "normal" }}</span>{% if ln.seconds %} <span class="dim">{{ ln.seconds }} s</span>{% endif %}: {{ ln.text }}
     {% if ln.file %}<br><audio controls preload="none" src="/p/{{ p.id }}/audio/{{ ln.file }}"></audio>{% endif %}</div>
   {% endfor %}
   <form method="post" action="/p/{{ p.id }}/do/voice"><button class="btn {% if p.state == 'storyboard' %}{% else %}ghost{% endif %}">🎙 Ovoz yarat</button></form>

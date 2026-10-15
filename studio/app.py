@@ -258,6 +258,31 @@ def settings(request: Request):
                 usage=store.usage_today(), vocab_text=vocab.vocabulary_text())
 
 
+@app.get("/voices", response_class=HTMLResponse, dependencies=[Depends(panel_auth)])
+def voices(request: Request):
+    chosen = {sp: tts.edge_voice(sp) for sp in vocab.VOICES}
+    return page(request, "voices.html", chosen=chosen, choices=vocab.VOICE_CHOICES, moods=list(vocab.MOODS),
+                provider=config.TTS_PROVIDER, sample_text=tts.SAMPLE)
+
+
+@app.get("/voices/sample.mp3", dependencies=[Depends(panel_auth)])
+def voice_sample(voice: str, mood: str = "normal"):
+    try:
+        path = tts.sample(voice, mood, config.DATA_DIR / "voice_samples")
+    except tts.TTSError as e:
+        raise HTTPException(400, str(e))
+    return FileResponse(path, media_type="audio/mpeg")
+
+
+@app.post("/voices", dependencies=[Depends(panel_auth)])
+async def voices_save(request: Request):
+    form = await request.form()
+    st = store.settings()
+    st["voices"] = {sp: form[sp] for sp in vocab.VOICES if form.get(sp) in vocab.VOICE_CHOICES}
+    store.save_settings(st)
+    return RedirectResponse("/voices?saved=1", 303)
+
+
 def _audio(pid, name):
     if "/" in name or "\\" in name or not name.endswith(".mp3"):
         raise HTTPException(404)
