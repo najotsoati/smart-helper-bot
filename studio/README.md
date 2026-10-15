@@ -33,9 +33,11 @@ Panel parolsiz ochilmaydi; parol `install.sh` oxirida chiqadi. Xotira: ~100 MB R
 
 ## Noutbuk agenti (Windows)
 
-1. Python o'rnating (python.org, "Add to PATH" belgisini qo'ying).
-2. `agent/` papkasini noutbukka ko'chiring.
-3. `agent.ini.example` → `agent.ini`, ichiga server manzili va serverdagi `AGENT_TOKEN`ni yozing.
+Python o'rnatish shart emas: `start_agent.bat` Blender ichidagi Python'ni ishlatadi.
+
+1. `agent/` papkasini noutbukka ko'chiring (GitHub'dan zip).
+2. `agent.ini` yarating: `server_url`, serverdagi `AGENT_TOKEN`, Blender va Stickman papkasi yo'li (`agent.ini.example`ga qarang).
+3. Panel HTTPS'siz bo'lsa, tunnel oching: `ssh -N -L 8090:127.0.0.1:8090 root@SERVER_IP` (`server_url = http://127.0.0.1:8090`).
 4. `start_agent.bat` ni ishga tushiring. Agent har 15 soniyada navbatni tekshiradi.
 
 Agent `stickman_shablon.blend`ni Blender'da oynasiz ochadi, keyingi `video_NN.blend`ni yaratadi,
