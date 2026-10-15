@@ -12,6 +12,7 @@ if [ ! -f "$APP_DIR/.env" ]; then
   sed -i "s/^PANEL_PASSWORD=.*/PANEL_PASSWORD=$(openssl rand -hex 12)/" "$APP_DIR/.env"
   sed -i "s/^AGENT_TOKEN=.*/AGENT_TOKEN=$(openssl rand -hex 32)/" "$APP_DIR/.env"
   echo "Created .env with a random panel password and agent token."
+  echo "Login: admin / $(grep ^PANEL_PASSWORD "$APP_DIR/.env" | cut -d= -f2)   (shown only this once)"
 fi
 
 # Port: keep the one chosen earlier, otherwise the first free one from 8090.
@@ -36,5 +37,4 @@ if systemctl is-active --quiet shorts-studio; then
 else
   echo "ERROR: service did not start:"; journalctl -u shorts-studio -n 20 --no-pager; exit 1
 fi
-echo "Login: $(grep ^PANEL_USER "$APP_DIR/.env" | cut -d= -f2) / $(grep ^PANEL_PASSWORD "$APP_DIR/.env" | cut -d= -f2)"
 echo "Next: bash deploy/add_https.sh   (adds an HTTPS address without touching other sites)"
