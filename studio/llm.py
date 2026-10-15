@@ -49,6 +49,7 @@ def _candidates(strong=False):
     # the free OpenRouter models stay as the backup.
     if config.XAI_API_KEY and strong and config.XAI_FIRST:
         out.append(xai)
+    out.extend(config.FREE_PROVIDERS)
     if config.OPENROUTER_API_KEY:
         for m in models:
             out.append(("openrouter", "https://openrouter.ai/api/v1/chat/completions", config.OPENROUTER_API_KEY, m))
@@ -87,7 +88,7 @@ def chat(system, user, want_json=True, strong=False, temperature=0.8, log=None):
                 store.count_usage(provider, model, r.status_code)
                 if r.status_code == 401:
                     bad_key.add(provider)
-                    name = "OPENROUTER_API_KEY" if provider == "openrouter" else "XAI_API_KEY"
+                    name = f"{provider.upper()}_API_KEY"
                     tried.append(f"{provider}: kalit qabul qilinmadi (HTTP 401) - .env dagi {name} ni tekshiring")
                     break
                 if r.status_code == 429:

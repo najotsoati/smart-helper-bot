@@ -43,6 +43,18 @@ XAI_MODEL = os.environ.get("XAI_MODEL", "grok-4-1-fast-non-reasoning")
 # Use Grok first for the creative steps when its key is set (XAI_FIRST=no keeps it as backup only).
 XAI_FIRST = os.environ.get("XAI_FIRST", "yes").strip().lower() not in ("no", "0", "false")
 
+# More free providers (all speak the OpenAI chat format).  Put a key to switch one on;
+# the model can be changed with <NAME>_MODEL.  Order = order of use for the creative steps.
+FREE_PROVIDERS = []
+for _name, _url, _model in (
+        ("gemini", "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-flash-latest"),
+        ("mistral", "https://api.mistral.ai/v1/chat/completions", "mistral-large-latest"),
+        ("groq", "https://api.groq.com/openai/v1/chat/completions", "llama-3.3-70b-versatile"),
+        ("cerebras", "https://api.cerebras.ai/v1/chat/completions", "llama-3.3-70b")):
+    _key = "".join(os.environ.get(f"{_name.upper()}_API_KEY", "").split())
+    if _key:
+        FREE_PROVIDERS.append((_name, _url, _key, os.environ.get(f"{_name.upper()}_MODEL", _model)))
+
 # Voice: "edge" (free) or "elevenlabs" (Sticky's Liam voice, paid plan for monetised channels).
 TTS_PROVIDER = os.environ.get("TTS_PROVIDER", "edge")
 ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY", "")

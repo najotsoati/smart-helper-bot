@@ -164,3 +164,12 @@ def test_grok_writes_first_when_key_set(monkeypatch):
     assert [c[0] for c in llm._candidates(strong=False)] == ["openrouter", "xai"]
     monkeypatch.setattr(config, "XAI_FIRST", False)
     assert [c[0] for c in llm._candidates(strong=True)] == ["openrouter", "xai"]
+
+
+def test_free_providers_come_before_openrouter(monkeypatch):
+    from studio import llm
+    monkeypatch.setattr(config, "OPENROUTER_API_KEY", "or")
+    monkeypatch.setattr(config, "OPENROUTER_MODELS", ["a:free"])
+    monkeypatch.setattr(config, "XAI_API_KEY", "")
+    monkeypatch.setattr(config, "FREE_PROVIDERS", [("gemini", "u", "k", "gemini-flash-latest")])
+    assert [c[0] for c in llm._candidates(strong=True)] == ["gemini", "openrouter"]
