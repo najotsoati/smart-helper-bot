@@ -152,3 +152,15 @@ def test_unknown_mood_falls_back():
     from studio.storyboard import normalize
     sb = normalize({"lines": [{"id": "S01", "text": "hi", "mood": "furious"}], "shots": []})
     assert sb["lines"][0]["mood"] == "normal"
+
+
+def test_grok_writes_first_when_key_set(monkeypatch):
+    from studio import llm
+    monkeypatch.setattr(config, "OPENROUTER_API_KEY", "or")
+    monkeypatch.setattr(config, "OPENROUTER_MODELS", ["a:free"])
+    monkeypatch.setattr(config, "XAI_API_KEY", "xk")
+    monkeypatch.setattr(config, "XAI_FIRST", True)
+    assert [c[0] for c in llm._candidates(strong=True)] == ["xai", "openrouter"]
+    assert [c[0] for c in llm._candidates(strong=False)] == ["openrouter", "xai"]
+    monkeypatch.setattr(config, "XAI_FIRST", False)
+    assert [c[0] for c in llm._candidates(strong=True)] == ["openrouter", "xai"]

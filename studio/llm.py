@@ -44,11 +44,16 @@ def _candidates(strong=False):
     models = list(config.OPENROUTER_MODELS) or (free_models() if config.OPENROUTER_API_KEY else [])
     if strong:
         models = list(config.OPENROUTER_STRONG_MODELS) + models
+    xai = ("xai", "https://api.x.ai/v1/chat/completions", config.XAI_API_KEY, config.XAI_MODEL)
+    # Grok writes the creative parts (hooks, script, storyboard) when its key is set;
+    # the free OpenRouter models stay as the backup.
+    if config.XAI_API_KEY and strong and config.XAI_FIRST:
+        out.append(xai)
     if config.OPENROUTER_API_KEY:
         for m in models:
             out.append(("openrouter", "https://openrouter.ai/api/v1/chat/completions", config.OPENROUTER_API_KEY, m))
-    if config.XAI_API_KEY:
-        out.append(("xai", "https://api.x.ai/v1/chat/completions", config.XAI_API_KEY, config.XAI_MODEL))
+    if config.XAI_API_KEY and xai not in out:
+        out.append(xai)
     return out
 
 

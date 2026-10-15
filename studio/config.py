@@ -40,6 +40,8 @@ OPENROUTER_DAILY_FREE = int(os.environ.get("OPENROUTER_DAILY_FREE", "50"))
 
 XAI_API_KEY = "".join(os.environ.get("XAI_API_KEY", "").split())
 XAI_MODEL = os.environ.get("XAI_MODEL", "grok-4-1-fast-non-reasoning")
+# Use Grok first for the creative steps when its key is set (XAI_FIRST=no keeps it as backup only).
+XAI_FIRST = os.environ.get("XAI_FIRST", "yes").strip().lower() not in ("no", "0", "false")
 
 # Voice: "edge" (free) or "elevenlabs" (Sticky's Liam voice, paid plan for monetised channels).
 TTS_PROVIDER = os.environ.get("TTS_PROVIDER", "edge")
