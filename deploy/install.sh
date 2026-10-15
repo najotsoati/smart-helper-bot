@@ -24,8 +24,11 @@ fi
 
 sed -e "s#__APP_DIR__#$APP_DIR#g" -e "s#__PORT__#$PORT#g" "$APP_DIR/deploy/shorts-studio.service" \
   > /etc/systemd/system/shorts-studio.service
+sed "s#__APP_DIR__#$APP_DIR#g" "$APP_DIR/deploy/shorts-studio-update.service" > /etc/systemd/system/shorts-studio-update.service
+cp "$APP_DIR/deploy/shorts-studio-update.timer" /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable shorts-studio >/dev/null
+systemctl enable --now shorts-studio-update.timer >/dev/null
 systemctl restart shorts-studio
 sleep 2
 if systemctl is-active --quiet shorts-studio; then

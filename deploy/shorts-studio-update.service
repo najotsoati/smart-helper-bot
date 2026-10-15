@@ -1,0 +1,6 @@
+[Unit]
+Description=Shorts Studio auto update
+
+[Service]
+Type=oneshot
+ExecStart=__APP_DIR__/deploy/auto_update.sh
