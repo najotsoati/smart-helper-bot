@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, Redirect
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 
-from . import blender_script, checker, config, llm, roles, store, tts, vocab
+from . import blender_script, checker, config, editor, llm, roles, store, tts, vocab
 from .storyboard import normalize, timeline, total_seconds
 
 app = FastAPI(title="Shorts Studio", docs_url=None, redoc_url=None)
@@ -62,9 +62,23 @@ def run_bg(pid, label, fn):
     threading.Thread(target=work, daemon=True).start()
 
 
+def _assets():
+    return store.settings().get("assets", {})
+
+
+def _music_ctx():
+    st = store.settings()
+    return list(editor.music_pool(st.get("assets"))), st.get("music_history", [])[-2:]
+
+
+def _polish(sb):
+    st = store.settings()
+    return editor.polish(sb, st.get("music_history", []), st.get("assets"))
+
+
 def _check(p):
     sb = p["storyboard"]
-    p["check"] = checker.check(sb)
+    p["check"] = checker.check(sb, _assets().get("sfx", []))
     return p["check"]
 
 
@@ -79,14 +93,16 @@ def step_script(p, log):
 
 
 def step_direct(p, log):
-    sb = roles.direct(p["script"], p["brief"], log=log)
+    music, recent = _music_ctx()
+    sb = _polish(roles.direct(p["script"], p["brief"], log=log, music=music, recent=recent))
     sb.setdefault("upload", (p["script"] or {}).get("upload"))
     p["storyboard"], p["state"], p["review"] = sb, "storyboard", None
     _check(p)
 
 
 def step_own(p, log):
-    p["storyboard"] = roles.direct_own_script(p["brief"]["own_script"], log=log)
+    music, recent = _music_ctx()
+    p["storyboard"] = _polish(roles.direct_own_script(p["brief"]["own_script"], log=log, music=music, recent=recent))
     p["state"], p["review"] = "storyboard", None
     _check(p)
 
@@ -97,7 +113,7 @@ def step_review(p, log):
 
 def step_revise(p, log):
     notes = (p.get("review") or {}).get("fix", []) + (p.get("check") or {}).get("errors", [])
-    p["storyboard"] = roles.revise(p["storyboard"], notes, log=log)
+    p["storyboard"] = _polish(roles.revise(p["storyboard"], notes, log=log))
     p["review"] = None
     _check(p)
 
@@ -150,7 +166,7 @@ def own_create(text: str = Form(...)):
         sb = json.loads(text)   # a finished storyboard JSON skips the AI completely
         if isinstance(sb, dict) and sb.get("shots"):
             p = store.load(p["id"])
-            p["storyboard"], p["state"] = normalize(sb), "storyboard"
+            p["storyboard"], p["state"] = _polish(sb), "storyboard"
             _check(p)
             store.save(p)
             return RedirectResponse(f"/p/{p['id']}", 303)
@@ -225,6 +241,11 @@ async def project_action(pid: str, action: str, request: Request):
             p["error"] = "Avval ovoz yarating"
         else:
             p["state"], p["error"], p["agent_msg"] = "queued", None, "Noutbuk agentini kutyapti"
+            st = store.settings()
+            mf = p["storyboard"].get("music_file")
+            if mf:
+                st["music_history"] = (st.get("music_history", []) + [mf])[-8:]
+                store.save_settings(st)
         store.save(p)
     elif action == "delete":
         store.delete(pid)
@@ -311,6 +332,17 @@ def agent_next():
 @app.get("/api/agent/{pid}/audio/{name}", dependencies=[Depends(agent_auth)])
 def agent_audio(pid: str, name: str):
     return _audio(pid, name)
+
+
+@app.post("/api/agent/assets", dependencies=[Depends(agent_auth)])
+async def agent_assets(request: Request):
+    """The laptop reports which musiqa_*.wav and sfx/*.wav files exist, so new ones get used."""
+    data = await request.json()
+    clean = lambda xs: sorted({str(x)[:80] for x in xs if str(x).replace("_", "").replace(".", "").replace("-", "").isalnum()})
+    st = store.settings()
+    st["assets"] = {"music": clean(data.get("music", []))[:60], "sfx": clean(data.get("sfx", []))[:200]}
+    store.save_settings(st)
+    return {"ok": True, "music": len(st["assets"]["music"]), "sfx": len(st["assets"]["sfx"])}
 
 
 @app.post("/api/agent/{pid}/status", dependencies=[Depends(agent_auth)])

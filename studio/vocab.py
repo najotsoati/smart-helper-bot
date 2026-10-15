@@ -65,6 +65,10 @@ ACTIONS = {
     "hop": ("small hop", 0.3),
     "fall_flat": ("falls face down on the floor with a star", 0.6),
     "coin_rain": ("gold coins rain from the top", 0.8),
+    "money_fly": ("banknotes fly away from Sticky out of the frame", 1.2),
+    "bills_chase": ("an angry bill with legs runs in from the door, grabs a banknote and runs off (set label)", 1.3),
+    "fly_buzz": ("a fly buzzes out of his empty pocket/wallet: broke", 1.1),
+    "knock": ("loud knocking on the door, the door shakes", 0.8),
 }
 
 SFX = {
@@ -103,7 +107,19 @@ CAMERAS = {
     "phone_push": {"desc": "phone screen with a gentle push-in", "at": lambda X: (PHONE_X, 2.45, 6.0),
                    "zoom_to": lambda X: (PHONE_X, 2.85, 4.9)},
     "end_card": {"desc": "dark end card for the last line", "at": lambda X: (60.0, 2.3, 7.0)},
+    "crash_zoom": {"desc": "violent fast zoom into the face (shock moment)", "at": lambda X: (X, 2.5, 5.2),
+                   "zoom_to": lambda X: (X + 0.08, 2.78, 2.3), "zoom_frames": (1, 5)},
+    "pull_back": {"desc": "starts on the face and pulls back to reveal the room (reveal moment)",
+                  "at": lambda X: (X + 0.08, 2.75, 2.6), "zoom_to": lambda X: (0.0, 2.3, 7.0)},
 }
+
+# Cameras used for automatic extra cuts inside long shots, by situation.
+COVERAGE = {
+    "room": ["face", "medium", "medium_wide"],
+    "phone": ["face", "phone_push"],
+    "floor": ["floor"],
+}
+COVERAGE_EVERY = 50     # frames between automatic cuts (about 1.7 s)
 
 CAPTION_COLORS = ["black", "white", "red", "green", "gold", "cream", "grey", "blue"]
 CAPTION_POS = ["top", "bottom", "big"]

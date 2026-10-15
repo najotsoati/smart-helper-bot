@@ -176,7 +176,7 @@ def generate(sb, audio_dir="audio"):
         if "zoom_to" in cam:
             zx, zz, zs = cam["zoom_to"](X)
             a, b = cam.get("zoom_frames", (0, None))
-            end = f"c0 + {b}" if b else "e - 1"
+            end = f"c0 + {b}" if b else ("min(e - 1, c0 + %d)" % (vocab.COVERAGE_EVERY - 3) if sh.get("coverage") else "e - 1")
             w(f"st.zoom(c0 + {a}, {end}, x={_f(zx)}, z={_f(zz)}, scale={_f(zs)})")
 
         # action
@@ -209,6 +209,27 @@ def generate(sb, audio_dir="audio"):
             w('    st.place("Coin_%d" % (_i + 1), _f0, x=_x, z=6.1, scale=1.0, step=True)')
             w('    st.place("Coin_%d" % (_i + 1), _f0 + 22, z=-0.7)')
             w('    st.place("Coin_%d" % (_i + 1), _f0 + 23, scale=0.0, step=True)')
+        elif act == "money_fly":
+            w('st.sfx("whoosh", c0 + 2, 0.7)')
+            w("for _i, (_dx, _x1, _z1) in enumerate(((-0.3, -2.4, 3.6), (0.3, 2.4, 4.2), (0.5, 2.4, 3.2))):")
+            w('    _n = "Note_%d" % (_i + 1); _f = c0 + 2 + _i * 5')
+            w("    st.place(_n, _f, x=X + _dx, z=1.6, scale=1.0, step=True); st.place(_n, _f + 30, x=_x1, z=_z1)")
+            w("    st.place(_n, _f + 32, scale=0.0, step=True)")
+        elif act == "bills_chase":
+            label = str(sh.get("label") or "RENT").upper()[:8]
+            w(f'bpy.data.objects["Bill_1_Label"].data.body = {label!r}')
+            w('st.place("Bill_1", c0 + 1, x=1.45, z=1.43, scale=0.05, step=True); st.place("Bill_1", c0 + 5, scale=1.5)')
+            w('st.sfx("whoosh", c0 + 3, 0.9); st.run("Bill_1", c0 + 5, c0 + 17, X + 1.0)')
+            w('st.place("Note_1", c0 + 17, x=X + 0.1, z=2.0, scale=1.0, step=True); st.place("Note_1", c0 + 21, x=X + 0.6, z=1.64)')
+            w('st.sfx("drop", c0 + 19, 0.8); st.fx("star", c0 + 22, X + 0.15, 2.0, 1.0)')
+            w('st.run("Bill_1", c0 + 21, c0 + 36, -3.4); st.place("Note_1", c0 + 36, x=-4.2, z=1.64)')
+            w('st.place("Note_1", c0 + 37, scale=0.0, step=True)')
+        elif act == "fly_buzz":
+            w('st.flutter("FX_Fly", c0 + 4, c0 + 34, X + 0.36, 2.12, X + 0.75, 3.7); st.sfx("buzz", c0 + 4, 0.5)')
+        elif act == "knock":
+            w('st.sfx("knock3", c0 + 1, 1.0); st.punch(c0 + 1, 0.06)')
+            w("for _f, _dx in ((1, 0.0), (2, 0.05), (4, 0.0), (6, 0.0), (7, 0.05), (9, 0.0), (12, 0.0), (13, 0.05), (15, 0.0)):")
+            w('    st.place("Set_Door", c0 + _f, x=1.92 + _dx)')
         if sh.get("shake") and act != "fall_flat":
             w("st.shake(c0 + 1, c0 + 9, 0.05)")
 
@@ -253,10 +274,22 @@ def generate(sb, audio_dir="audio"):
             w(f"st.sfx({s['name']!r}, c0 + {int(round(float(s.get('at', 0)) * vocab.FPS))}, {vol})")
         if sh.get("music_stop"):
             w('music_cuts.append(c0); st.sfx("scratch", c0, 0.8)')
+
+        # automatic extra cuts inside a long shot (the shot length is known only now)
+        cov = sh.get("coverage") or []
+        if cov:
+            spots = [tuple(round(v, 3) for v in vocab.CAMERAS[c]["at"](X)) for c in cov if c in vocab.CAMERAS]
+            w(f"_cov = {spots!r}; _f = c0 + {vocab.COVERAGE_EVERY}; _k = 0")
+            w("while _f <= e - 30:")
+            w("    _x, _z, _s = _cov[_k % len(_cov)]; st.cut(_f, _x, _z, _s)")
+            w(f"    st.zoom(_f + 1, min(_f + {vocab.COVERAGE_EVERY - 2}, e - 1), x=_x, z=_z, scale=_s * 0.93)")
+            w(f"    _f += {vocab.COVERAGE_EVERY}; _k += 1")
         w("c = e")
 
     # --- ending: length, music, mix, breathing ---
     music_file, music_vol = vocab.MUSIC.get(sb["music"], (None, 0))
+    if sb.get("music_file"):
+        music_file, music_vol = sb["music_file"], float(sb.get("music_volume") or 0.12)
     w("")
     w("END = c; S.frame_end = END")
     if music_file:

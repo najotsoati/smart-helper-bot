@@ -12,7 +12,7 @@ PHONE_CAMERAS = {"phone_screen", "phone_push"}
 MOVING_CAMERAS = {"open_zoom", "room_push", "face", "extreme_closeup", "phone_push"}
 
 
-def check(sb):
+def check(sb, extra_sfx=()):
     errors, warnings = [], []
 
     def need(value, allowed, what, where):
@@ -24,7 +24,8 @@ def check(sb):
 
     need(sb.get("set"), vocab.SETS, "set", "video")
     need(sb.get("backdrop"), vocab.BACKDROPS, "backdrop", "video")
-    need(sb.get("music"), vocab.MUSIC, "music", "video")
+    if not sb.get("music_file"):
+        need(sb.get("music"), vocab.MUSIC, "music", "video")
     if len(sb.get("title", "")) > 46:
         errors.append("Title is longer than 46 characters (two lines of 23)")
 
@@ -52,7 +53,7 @@ def check(sb):
         for p in sh["props"]:
             need(p, vocab.PROPS, "prop", w)
         for s in sh["sfx"]:
-            need(s.get("name"), vocab.SFX, "sfx", w)
+            need(s.get("name"), set(vocab.SFX) | set(extra_sfx), "sfx", w)
             if float(s.get("at", 0)) > sh["seconds"] + 2:
                 warnings.append(f"{w}: sfx '{s.get('name')}' starts after the shot")
         if sh.get("line"):
@@ -75,10 +76,11 @@ def check(sb):
         length = (t["end"] - t["start"]) / vocab.FPS
         if sh["seconds"] < 0.4:
             errors.append(f"{w}: shorter than 0.4 s")
-        busy = sh.get("action") in ("walk", "shiver", "tears") or sh["camera"] in MOVING_CAMERAS
+        busy = (sh.get("action") in ("walk", "shiver", "tears") or sh["camera"] in MOVING_CAMERAS
+                or bool(sh.get("coverage")))
         if length > 3.0 and not busy:
             warnings.append(f"{w}: {length:.1f} s without a cut or motion; something should change every 2-3 s")
-        if length > 4.5:
+        if length > 4.5 and not sh.get("coverage"):
             warnings.append(f"{w}: {length:.1f} s is a long hold; split it into two shots")
 
     for ln in sb["lines"]:

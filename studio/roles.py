@@ -95,7 +95,7 @@ Rules:
 - Total length must stay under {vocab.MAX_SECONDS} s."""
 
 STORYBOARD_SHAPE = """Return JSON exactly in this shape:
-{"title": "...", "video_name": "...", "set": "none", "backdrop": "room", "music": "sneaky", "holds_phone": true,
+{"title": "...", "video_name": "...", "hook_text": "ON-SCREEN HOOK, max 5 words", "set": "none", "backdrop": "room", "music": "sneaky", "holds_phone": true,
  "lines": [{"id": "S01", "speaker": "sticky", "text": "...", "mood": "excited"}],
  "shots": [{"camera": "open_zoom", "seconds": 2.0, "line": "S01", "line_at": 0.1, "pose": "shock",
             "eyes": "wide", "mouth": "open", "brows": "worried", "look": "camera", "action": "punch",
@@ -106,22 +106,38 @@ STORYBOARD_SHAPE = """Return JSON exactly in this shape:
 Line ids: S01, S02... for sticky, P01... for phone, N01... for narrator, R01... for rick."""
 
 
-def direct(script, brief=None, log=None):
+def _extras(seconds, music=None, recent=None):
+    n = max(8, round(float(seconds) / 1.8))
+    out = f"""Use at least {n} shots (a new picture every 1.5-2 s) and at least 4 different actions or props
+across the video (bounce, money_fly, bills_chase, fly_buzz, knock, coin_rain, spin, fall_flat, sweat...).
+Use crash_zoom for the shock and pull_back for a reveal."""
+    if music:
+        out += f"\nmusic available: {', '.join(music)}. Pick the one that fits the mood."
+    if recent:
+        out += f" Recently used, avoid: {', '.join(recent)}."
+    return out
+
+
+def direct(script, brief=None, log=None, music=None, recent=None):
+    seconds = (brief or {}).get('seconds', 35)
     user = f"""Sketch to film (JSON or text):
 {script if isinstance(script, str) else json.dumps(script, ensure_ascii=False)}
 
-Target length: about {(brief or {}).get('seconds', 35)} seconds.
+Target length: about {seconds} seconds.
+{_extras(seconds, music, recent)}
 {STORYBOARD_SHAPE}"""
     return normalize(chat(DIRECTOR_RULES, user, strong=True, temperature=0.5, log=log))
 
 
-def direct_own_script(text, log=None):
+def direct_own_script(text, log=None, music=None, recent=None):
     """The creator's own script: keep his words, only add the filming."""
     user = f"""This is the creator's OWN finished script. Keep every spoken line and the title word for word,
 keep his order of events and his jokes; only decide cameras, poses, faces, captions and sounds.
 If he wrote timings, follow them.
 
 {text}
+
+{_extras(35, music, recent)}
 
 {STORYBOARD_SHAPE}"""
     return normalize(chat(DIRECTOR_RULES, user, strong=True, temperature=0.3, log=log))

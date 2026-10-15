@@ -32,7 +32,8 @@ def fake_blender(st):
     scene = types.SimpleNamespace(frame_end=0, render=types.SimpleNamespace(filepath=""), frame_set=lambda f: None)
     bpy = types.SimpleNamespace(
         data=types.SimpleNamespace(texts={"stickman_tools.py": types.SimpleNamespace(as_module=lambda: st)},
-                                   objects={"Set_Blanket": obj}),
+                                   objects={"Set_Blanket": obj,
+                                            "Bill_1_Label": types.SimpleNamespace(data=types.SimpleNamespace(body=""))}),
         context=types.SimpleNamespace(scene=scene),
         path=types.SimpleNamespace(abspath=lambda p: p),
         app=types.SimpleNamespace(driver_namespace={}))

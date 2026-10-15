@@ -91,6 +91,18 @@ def upload(pid, mp4):
     api("POST", f"/api/agent/{pid}/video", raw=body, ctype=f"multipart/form-data; boundary={boundary}", timeout=600)
 
 
+def report_assets():
+    """Tell the panel which music and sound files exist, so new ones you drop in get used."""
+    music = sorted(f.name for pat in ("musiqa_*.wav", "musiqa_*.mp3") for f in FOLDER.glob(pat)
+                   if not f.stem.endswith("_asl"))
+    sfx = sorted(f.stem for f in (FOLDER / "sfx").glob("*.wav"))
+    try:
+        r = json.loads(api("POST", "/api/agent/assets", {"music": music, "sfx": sfx}))
+        log(f"assets: {r.get('music')} music, {r.get('sfx')} sfx")
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        log("assets not sent:", e)
+
+
 def next_number():
     nums = [int(m.group(1)) for f in FOLDER.glob("video_*.blend") if (m := re.match(r"video_(\d+)\.blend$", f.name))]
     return max(nums, default=0) + 1
@@ -124,6 +136,7 @@ def run_job(job):
     status(pid, f"Yuklanmoqda: {mp4.name} ({res['frames']} kadr)")
     upload(pid, mp4)
     log("done", res)
+    report_assets()
 
 
 def main():
@@ -135,6 +148,7 @@ def main():
         sys.exit(f"Blender not found: {BLENDER}")
     log("agent started, server", SERVER)
     keep_tunnel()
+    report_assets()
     if "--open" in sys.argv:
         import webbrowser
         webbrowser.open(SERVER)
