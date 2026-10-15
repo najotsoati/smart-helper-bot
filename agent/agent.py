@@ -48,6 +48,9 @@ def keep_tunnel():
     cmd = ["ssh", "-N", "-L", f"{port}:127.0.0.1:{port}", "-o", "BatchMode=yes",
            "-o", "ExitOnForwardFailure=yes", "-o", "ServerAliveInterval=30",
            "-o", "StrictHostKeyChecking=accept-new", SSH_HOST]
+    key = Path.home() / ".ssh" / "studio_key"
+    if key.exists():
+        cmd[1:1] = ["-i", str(key)]
     log("tunnel:", " ".join(cmd[1:4]), SSH_HOST)
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
     _tunnel["proc"] = subprocess.Popen(cmd, creationflags=flags)
