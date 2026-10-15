@@ -8,15 +8,19 @@ IP=$(curl -4 -s ifconfig.me)
 HOST="studio.$(echo "$IP" | tr . -).sslip.io"
 CF=/etc/caddy/Caddyfile
 
+# Only go on when 80/443 are free or already served by the system Caddy.
+if ss -ltnp | grep -E ':(80|443)\s' | grep -qv '"caddy"' || \
+   { ss -ltnp | grep -qE ':(80|443)\s' && ! systemctl is-active --quiet caddy; }; then
+  echo "Ports 80/443 are used by another web server (not the system Caddy):"
+  ss -ltnp | grep -E ':(80|443)\s'
+  command -v docker >/dev/null && docker ps --format '{{.Names}}  {{.Image}}  {{.Ports}}'
+  echo "Send this output to Claude; nothing was changed."; exit 1
+fi
 if ! command -v caddy >/dev/null; then
-  if ss -ltnp | grep -qE ':(80|443)\s'; then
-    echo "Ports 80/443 are used by another web server (not Caddy):"
-    ss -ltnp | grep -E ':(80|443)\s'
-    echo "Send this output to Claude; nothing was changed."; exit 1
-  fi
   apt-get install -y caddy
   : > "$CF"
 fi
+systemctl is-active --quiet caddy || systemctl start caddy
 
 if grep -q "^$HOST" "$CF" 2>/dev/null; then
   echo "Already configured."
