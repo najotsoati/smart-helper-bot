@@ -73,12 +73,14 @@ SFX = {
     "fall": 0.3, "hit": 0.45, "spring": 0.45, "trombone": 0.55, "boom": 0.4, "rumble": 0.4,
     "buzz": 0.5, "type": 0.7, "error": 0.4, "glitch": 0.32, "scratch": 0.8, "rewind": 0.6,
     "ffwd": 0.6, "heart": 0.45, "heart_fast": 0.3, "riser": 0.18, "riser2": 0.6,
+    "shopbell": 0.5, "shimmer": 0.4, "flush": 0.5, "clink": 0.5, "pickaxe": 0.5, "crowd": 0.35,
 }
 
 MUSIC = {
     "lofi": ("musiqa_01.wav", 0.16),
     "epic": ("musiqa_02_epic.wav", 0.10),
     "sneaky": ("musiqa_03_sneaky.wav", 0.12),
+    "western": ("musiqa_04_western.wav", 0.12),
     "none": (None, 0.0),
 }
 
