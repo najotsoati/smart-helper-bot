@@ -1,0 +1,129 @@
+"""Shorts Studio render agent for the Windows laptop.
+
+It asks the server for a queued video, downloads the voice clips, runs Blender in
+the background on stickman_shablon.blend, copies the MP4 into TAYYOR/ and sends it
+back to the panel.  Only the Python standard library is used.
+
+    python agent.py            # keeps running, checks every 15 s
+    python agent.py --once     # one job and exit
+"""
+
+import configparser
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+import uuid
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+cfg = configparser.ConfigParser()
+cfg.read(HERE / "agent.ini", encoding="utf-8")
+C = cfg["agent"] if cfg.has_section("agent") else {}
+
+SERVER = C.get("server_url", "http://127.0.0.1:8080").rstrip("/")
+TOKEN = C.get("agent_token", "")
+BLENDER = C.get("blender_exe", r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe")
+FOLDER = Path(C.get("stickman_dir", r"C:\Users\sasis\Documents\Stickman"))
+TEMPLATE = FOLDER / C.get("template", "stickman_shablon.blend")
+POLL = int(C.get("poll_seconds", "15"))
+
+
+def log(*a):
+    print(time.strftime("%H:%M:%S"), *a, flush=True)
+
+
+def api(method, path, data=None, raw=None, ctype=None, timeout=60):
+    headers = {"Authorization": f"Bearer {TOKEN}"}
+    body = None
+    if data is not None:
+        body = json.dumps(data).encode()
+        headers["Content-Type"] = "application/json"
+    elif raw is not None:
+        body, headers["Content-Type"] = raw, ctype
+    req = urllib.request.Request(SERVER + path, data=body, method=method, headers=headers)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read()
+
+
+def status(pid, message, state=None):
+    try:
+        api("POST", f"/api/agent/{pid}/status", {"message": message, "state": state})
+    except urllib.error.URLError as e:
+        log("status not sent:", e)
+
+
+def upload(pid, mp4):
+    boundary = uuid.uuid4().hex
+    head = (f"--{boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"video.mp4\"\r\n"
+            f"Content-Type: video/mp4\r\n\r\n").encode()
+    body = head + mp4.read_bytes() + f"\r\n--{boundary}--\r\n".encode()
+    api("POST", f"/api/agent/{pid}/video", raw=body, ctype=f"multipart/form-data; boundary={boundary}", timeout=600)
+
+
+def next_number():
+    nums = [int(m.group(1)) for f in FOLDER.glob("video_*.blend") if (m := re.match(r"video_(\d+)\.blend$", f.name))]
+    return max(nums, default=0) + 1
+
+
+def run_job(job):
+    pid = job["id"]
+    log("job", pid, job["video_name"], f"{job['seconds']} s")
+    adir = FOLDER / "studio_audio" / pid
+    adir.mkdir(parents=True, exist_ok=True)
+    for name in job["audio"]:
+        (adir / name).write_bytes(api("GET", f"/api/agent/{pid}/audio/{name}"))
+    jdir = FOLDER / "studio_jobs" / pid
+    jdir.mkdir(parents=True, exist_ok=True)
+    (jdir / "script.py").write_text(job["script"], encoding="utf-8")
+    nn = next_number()
+    result = jdir / "result.json"
+    result.unlink(missing_ok=True)
+    status(pid, f"Blender: video_{nn:02d} qurilmoqda va render qilinmoqda (~{int(job['seconds'] / 6) + 1} daqiqa)")
+    cmd = [BLENDER, "-b", str(TEMPLATE), "--python", str(HERE / "blender_job.py"), "--",
+           str(jdir), f"{nn:02d}"]
+    with (jdir / "blender.log").open("w", encoding="utf-8", errors="replace") as lf:
+        rc = subprocess.call(cmd, stdout=lf, stderr=subprocess.STDOUT)
+    if not result.exists():
+        tail = (jdir / "blender.log").read_text(encoding="utf-8", errors="replace")[-800:]
+        raise RuntimeError(f"Blender exited with {rc} and no result. Log end: {tail}")
+    res = json.loads(result.read_text(encoding="utf-8"))
+    if not res.get("ok"):
+        raise RuntimeError(res.get("error", "unknown error"))
+    mp4 = Path(res["mp4"])
+    status(pid, f"Yuklanmoqda: {mp4.name} ({res['frames']} kadr)")
+    upload(pid, mp4)
+    log("done", res)
+
+
+def main():
+    if not TOKEN:
+        sys.exit("agent.ini: agent_token is empty")
+    if not TEMPLATE.exists():
+        sys.exit(f"Template not found: {TEMPLATE}")
+    if not Path(BLENDER).exists():
+        sys.exit(f"Blender not found: {BLENDER}")
+    log("agent started, server", SERVER)
+    while True:
+        try:
+            job = json.loads(api("GET", "/api/agent/next")).get("job")
+        except (urllib.error.URLError, OSError, ValueError) as e:
+            log("server not reachable:", e)
+            job = None
+        if job:
+            try:
+                run_job(job)
+            except Exception as e:
+                log("FAILED", e)
+                status(job["id"], str(e)[-480:], state="failed")
+        if "--once" in sys.argv:
+            break
+        time.sleep(POLL if not job else 1)
+
+
+if __name__ == "__main__":
+    main()

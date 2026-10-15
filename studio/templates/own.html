@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>📝 O'z ssenariyimdan</h1>
+<form class="card" method="post" action="/own">
+  <p class="dim">Ssenariyni inglizcha yozing: sarlavha, sahnalar, gaplar, tovushlar. Gaplar so'zma-so'z qoladi.
+  Vaqtlarni yozsangiz (0-2s, 2-5s...), rejissyor shunga amal qiladi. Tayyor storyboard JSON qo'ysangiz, AI umuman ishlatilmaydi.</p>
+  <textarea name="text" rows="18" required placeholder="TITLE: LEFT ON READ
+0-2s  Sticky stares at his phone. STICKY: &quot;She read it two hours ago.&quot;  (whoosh)
+2-4s  Phone screen: 'Read 2h ago'. (ding)
+..."></textarea>
+  <p><button class="btn">Kadrlarni rejala →</button></p>
+</form>
+{% endblock %}

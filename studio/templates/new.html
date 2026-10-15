@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>➕ Yangi video</h1>
+<form class="card" method="post" action="/new">
+  <label>Mavzu (inglizcha yoki o'zbekcha — video baribir inglizcha bo'ladi)</label>
+  <input type="text" name="topic" required placeholder="Payday is gone in 5 minutes">
+  <label>Janr</label>
+  <select name="genre">
+    <option>comedy sketch</option><option>money myth vs reality</option><option>what if</option>
+    <option>choice: which would you take</option><option>countdown</option>
+  </select>
+  <label>Davomiylik (soniya)</label>
+  <select name="seconds"><option>20</option><option>30</option><option selected>35</option><option>45</option><option>55</option></select>
+  <label>Qo'shimcha istaklar (ixtiyoriy)</label>
+  <textarea name="notes" rows="3" placeholder="Telefon gapirsin, oxirida twist bo'lsin..."></textarea>
+  <p><button class="btn">Hook variantlarini yarat →</button></p>
+</form>
+{% endblock %}

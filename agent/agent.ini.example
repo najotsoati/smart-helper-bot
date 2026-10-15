@@ -1,0 +1,8 @@
+; Copy to agent.ini and fill in.  Never commit agent.ini (it holds the token).
+[agent]
+server_url = https://your-server-address
+agent_token = paste-the-same-AGENT_TOKEN-as-on-the-server
+blender_exe = C:\Program Files\Blender Foundation\Blender 5.2\blender.exe
+stickman_dir = C:\Users\sasis\Documents\Stickman
+template = stickman_shablon.blend
+poll_seconds = 15
