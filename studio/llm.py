@@ -79,10 +79,10 @@ def chat(system, user, want_json=True, strong=False, temperature=0.8, log=None):
             try:
                 r = httpx.post(url, json=body, headers=headers, timeout=120)
                 store.count_usage(provider, model, r.status_code)
-                if r.status_code in (401, 403):
+                if r.status_code == 401:
                     bad_key.add(provider)
                     name = "OPENROUTER_API_KEY" if provider == "openrouter" else "XAI_API_KEY"
-                    tried.append(f"{provider}: kalit qabul qilinmadi (HTTP {r.status_code}) - .env dagi {name} ni tekshiring")
+                    tried.append(f"{provider}: kalit qabul qilinmadi (HTTP 401) - .env dagi {name} ni tekshiring")
                     break
                 if r.status_code == 429:
                     tried.append(f"{model}: rate limited")

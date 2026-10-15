@@ -114,3 +114,18 @@ def test_rejected_key_is_reported_once(monkeypatch, tmp_path):
         llm.chat("s", "u")
     assert calls == ["a:free"]
     assert "OPENROUTER_API_KEY" in str(e.value)
+
+
+def test_forbidden_model_tries_next(monkeypatch, tmp_path):
+    import httpx
+    from studio import llm
+    monkeypatch.setattr(config, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(config, "OPENROUTER_API_KEY", "sk-or-v1-x")
+    monkeypatch.setattr(config, "OPENROUTER_MODELS", ["a:free", "b:free"])
+
+    def fake_post(url, **kw):
+        if kw["json"]["model"] == "a:free":
+            return httpx.Response(403, json={"error": {"message": "model not available"}})
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"ok": 1}'}}]})
+    monkeypatch.setattr(httpx, "post", fake_post)
+    assert llm.chat("s", "u") == {"ok": 1}
