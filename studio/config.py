@@ -31,14 +31,14 @@ PANEL_PASSWORD = os.environ.get("PANEL_PASSWORD", "")
 AGENT_TOKEN = os.environ.get("AGENT_TOKEN", "")
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "")
 
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+OPENROUTER_API_KEY = "".join(os.environ.get("OPENROUTER_API_KEY", "").split())
 # Empty = pick the free models OpenRouter lists right now.
 OPENROUTER_MODELS = _list("OPENROUTER_MODELS")
 # Optional paid model for the writer and director (better jokes), e.g. a top model on OpenRouter.
 OPENROUTER_STRONG_MODELS = _list("OPENROUTER_STRONG_MODELS")
 OPENROUTER_DAILY_FREE = int(os.environ.get("OPENROUTER_DAILY_FREE", "50"))
 
-XAI_API_KEY = os.environ.get("XAI_API_KEY", "")
+XAI_API_KEY = "".join(os.environ.get("XAI_API_KEY", "").split())
 XAI_MODEL = os.environ.get("XAI_MODEL", "grok-4-1-fast-non-reasoning")
 
 # Voice: "edge" (free) or "elevenlabs" (Sticky's Liam voice, paid plan for monetised channels).

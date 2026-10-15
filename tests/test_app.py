@@ -96,3 +96,21 @@ def test_ai_step_without_key_shows_error(client):
     p = wait_idle(pid)
     assert "OPENROUTER_API_KEY" in p["error"]
     assert "OPENROUTER_API_KEY" in client.get(f"/p/{pid}", auth=auth).text
+
+
+def test_rejected_key_is_reported_once(monkeypatch, tmp_path):
+    import httpx
+    from studio import llm
+    monkeypatch.setattr(config, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(config, "OPENROUTER_API_KEY", "sk-or-v1-x")
+    monkeypatch.setattr(config, "OPENROUTER_MODELS", ["a:free", "b:free", "c:free"])
+    calls = []
+
+    def fake_post(url, **kw):
+        calls.append(kw["json"]["model"])
+        return httpx.Response(401, json={"error": {"message": "Missing Authentication header"}})
+    monkeypatch.setattr(httpx, "post", fake_post)
+    with pytest.raises(llm.LLMError) as e:
+        llm.chat("s", "u")
+    assert calls == ["a:free"]
+    assert "OPENROUTER_API_KEY" in str(e.value)
