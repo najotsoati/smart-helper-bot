@@ -31,6 +31,29 @@ BLENDER = C.get("blender_exe", r"C:\Program Files\Blender Foundation\Blender 5.2
 FOLDER = Path(C.get("stickman_dir", r"C:\Users\sasis\Documents\Stickman"))
 TEMPLATE = FOLDER / C.get("template", "stickman_shablon.blend")
 POLL = int(C.get("poll_seconds", "15"))
+# Optional: "root@1.2.3.4".  The agent then keeps an SSH tunnel to the panel open itself
+# (needs a key without a password: run setup_ssh_key.bat once).
+SSH_HOST = C.get("ssh_host", "").strip()
+_tunnel = {"proc": None}
+
+
+def keep_tunnel():
+    """Start or restart `ssh -N -L port:127.0.0.1:port host` when it is not running."""
+    if not SSH_HOST:
+        return
+    p = _tunnel["proc"]
+    if p is not None and p.poll() is None:
+        return
+    port = SERVER.rsplit(":", 1)[-1].split("/")[0]
+    cmd = ["ssh", "-N", "-L", f"{port}:127.0.0.1:{port}", "-o", "BatchMode=yes",
+           "-o", "ExitOnForwardFailure=yes", "-o", "ServerAliveInterval=30",
+           "-o", "StrictHostKeyChecking=accept-new", SSH_HOST]
+    log("tunnel:", " ".join(cmd[1:4]), SSH_HOST)
+    flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    _tunnel["proc"] = subprocess.Popen(cmd, creationflags=flags)
+    time.sleep(3)
+    if _tunnel["proc"].poll() is not None:
+        log("tunnel failed: run setup_ssh_key.bat once, or check ssh_host in agent.ini")
 
 
 def log(*a):
@@ -108,11 +131,16 @@ def main():
     if not Path(BLENDER).exists():
         sys.exit(f"Blender not found: {BLENDER}")
     log("agent started, server", SERVER)
+    keep_tunnel()
+    if "--open" in sys.argv:
+        import webbrowser
+        webbrowser.open(SERVER)
     while True:
         try:
             job = json.loads(api("GET", "/api/agent/next")).get("job")
         except (urllib.error.URLError, OSError, ValueError) as e:
             log("server not reachable:", e)
+            keep_tunnel()
             job = None
         if job:
             try:
