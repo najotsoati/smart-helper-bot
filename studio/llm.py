@@ -19,12 +19,13 @@ class LLMError(Exception):
 
 
 _free_cache = {"at": 0.0, "models": []}
+_blocked = set()   # models that answered 403 (e.g. "only available on agentic harnesses")
 
 
 def free_models():
     """Free chat models OpenRouter lists now (they change often), biggest context first."""
     if time.time() - _free_cache["at"] < 6 * 3600 and _free_cache["models"]:
-        return _free_cache["models"]
+        return [m for m in _free_cache["models"] if m not in _blocked][:5]
     try:
         r = httpx.get("https://openrouter.ai/api/v1/models", timeout=30)
         rows = r.json().get("data", [])
@@ -34,8 +35,8 @@ def free_models():
             and str(m.get("pricing", {}).get("prompt", "1")) in ("0", "0.0")
             and "text" in str(m.get("architecture", {}).get("output_modalities", ["text"]))]
     free.sort(key=lambda m: m.get("context_length") or 0, reverse=True)
-    _free_cache.update(at=time.time(), models=[m["id"] for m in free[:5]])
-    return _free_cache["models"]
+    _free_cache.update(at=time.time(), models=[m["id"] for m in free[:10]])
+    return [m for m in _free_cache["models"] if m not in _blocked][:5]
 
 
 def _candidates(strong=False):
@@ -66,7 +67,7 @@ def chat(system, user, want_json=True, strong=False, temperature=0.8, log=None):
     """Return parsed JSON (or text).  `log` collects which model answered."""
     tried, bad_key = [], set()
     for provider, url, key, model in _candidates(strong):
-        if provider in bad_key:
+        if provider in bad_key or model in _blocked:
             continue
         body = {"model": model, "temperature": temperature,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
@@ -87,6 +88,8 @@ def chat(system, user, want_json=True, strong=False, temperature=0.8, log=None):
                 if r.status_code == 429:
                     tried.append(f"{model}: rate limited")
                     break
+                if r.status_code == 403:
+                    _blocked.add(model)
                 if r.status_code >= 400:
                     tried.append(f"{model}: HTTP {r.status_code} {r.text[:160]}")
                     if r.status_code == 400 and "response_format" in r.text and "response_format" in body:
