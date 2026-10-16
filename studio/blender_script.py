@@ -109,7 +109,7 @@ def generate(sb, audio_dir="audio"):
     if uses_phone_face:
         w('on("Phone_ScreenOff", 1)')
 
-    first_pose = next((sh["pose"] for sh in sb["shots"] if sh.get("pose")), "phone")
+    first_pose = next((sh["pose"] for sh in sb["shots"] if sh.get("pose")), "phone" if sb["holds_phone"] else "stand")
     w(f'st.move_to(X, 0.0, 1); st.apply_pose({first_pose!r}, 1, face=False); st.mouth("neutral", 1)')
     if sb["holds_phone"]:
         x, z = vocab.PHONE_IN_HAND.get(first_pose, (0.62, 2.55))

@@ -57,7 +57,10 @@ def normalize(sb):
     sb.setdefault("set", "none")
     sb.setdefault("backdrop", "room")
     sb.setdefault("music", "sneaky")
-    sb.setdefault("holds_phone", True)
+    if "holds_phone" not in sb:   # only when the story is about the phone
+        sb["holds_phone"] = any(sh.get("camera") in ("phone_screen", "phone_push") or sh.get("phone_text")
+                                or sh.get("pose") in ("phone", "ph_tap", "ph_rage", "ph_hip")
+                                for sh in sb.get("shots") or [])
     sb["cast"] = [c for c in (sb.get("cast") or []) if c == "rick"]
     if sb["set"] not in vocab.SET_INFO:
         sb["set"] = "none"

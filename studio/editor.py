@@ -36,8 +36,19 @@ def pick_music(wanted, history, assets=None):
     return name, pool[name]
 
 
-def polish(sb, history=None, assets=None):
+def pick_set(wanted, set_history):
+    """Keep the director's set unless the last two videos already used it; then take the least recent."""
+    recent = list(set_history or [])[-2:]
+    if wanted in vocab.SET_INFO and wanted not in recent:
+        return wanted
+    used_at = {name: i for i, name in enumerate(set_history or [])}
+    return min(vocab.SET_INFO, key=lambda n: (used_at.get(n, -1), n != "none"))
+
+
+def polish(sb, history=None, assets=None, set_history=None):
     sb = normalize(sb)
+    if set_history is not None:
+        sb["set"] = pick_set(sb.get("set"), set_history)
     shots = sb["shots"]
     if not shots:
         return sb

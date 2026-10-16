@@ -119,3 +119,24 @@ def test_new_sets_and_rick_render():
     town = editor.polish(_sb(set="town"))
     st, bpy, src = run_script(town)
     assert "B = 132.05" in src and "X = 132.1" in src
+
+
+def test_set_rotation():
+    assert editor.pick_set("kitchen", ["none", "bed"]) == "kitchen"
+    new = editor.pick_set("none", ["town", "none"])
+    assert new not in ("none", "town")
+    hist = list(vocab.SET_INFO)
+    assert editor.pick_set("none", hist) == hist[0] or editor.pick_set("none", hist) != "none"
+    sb = editor.polish(_sb(set="none"), set_history=["kitchen", "none"])
+    assert sb["set"] not in ("none", "kitchen")
+    sb = editor.polish(_sb(set="none"), set_history=None)          # own script: keep it
+    assert sb["set"] == "none"
+
+
+def test_phone_only_when_story_needs_it():
+    sb = normalize(_sb())
+    assert sb["holds_phone"] is False
+    st, bpy, src = run_script(sb)
+    assert "st.apply_pose('stand', 1" in src and "hand_phone(1," not in src
+    sb = normalize(_sb(shots=[{"camera": "phone_screen", "seconds": 2.0}]))
+    assert sb["holds_phone"] is True

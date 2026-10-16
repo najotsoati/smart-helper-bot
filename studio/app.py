@@ -71,9 +71,16 @@ def _music_ctx():
     return list(editor.music_pool(st.get("assets"))), st.get("music_history", [])[-2:]
 
 
-def _polish(sb):
+def _polish(sb, rotate_set=True):
+    """rotate_set=False keeps the set the creator chose in his own script."""
     st = store.settings()
-    return editor.polish(sb, st.get("music_history", []), st.get("assets"))
+    return editor.polish(sb, st.get("music_history", []), st.get("assets"),
+                         st.get("set_history", []) if rotate_set else None)
+
+
+def _recent():
+    st = store.settings()
+    return st.get("title_history", [])[-12:], st.get("set_history", [])[-3:]
 
 
 def _check(p):
@@ -83,7 +90,8 @@ def _check(p):
 
 
 def step_hooks(p, log):
-    p["hooks"] = roles.make_hooks(p["brief"], log=log)
+    titles, sets = _recent()
+    p["hooks"] = roles.make_hooks(p["brief"], log=log, recent_titles=titles, recent_sets=sets)
     p["state"] = "hooks"
 
 
@@ -111,7 +119,8 @@ def step_direct(p, log):
 
 def step_own(p, log):
     music, recent = _music_ctx()
-    p["storyboard"] = _polish(roles.direct_own_script(p["brief"]["own_script"], log=log, music=music, recent=recent))
+    p["storyboard"] = _polish(roles.direct_own_script(p["brief"]["own_script"], log=log, music=music, recent=recent),
+                              rotate_set=False)
     p["state"], p["review"] = "storyboard", None
     _check(p)
 
@@ -122,7 +131,7 @@ def step_review(p, log):
 
 def step_revise(p, log):
     notes = (p.get("review") or {}).get("fix", []) + (p.get("check") or {}).get("errors", [])
-    p["storyboard"] = _polish(roles.revise(p["storyboard"], notes, log=log))
+    p["storyboard"] = _polish(roles.revise(p["storyboard"], notes, log=log), rotate_set=False)
     p["review"] = None
     _check(p)
 
@@ -175,7 +184,7 @@ def own_create(text: str = Form(...)):
         sb = json.loads(text)   # a finished storyboard JSON skips the AI completely
         if isinstance(sb, dict) and sb.get("shots"):
             p = store.load(p["id"])
-            p["storyboard"], p["state"] = _polish(sb), "storyboard"
+            p["storyboard"], p["state"] = _polish(sb, rotate_set=False), "storyboard"
             _check(p)
             store.save(p)
             return RedirectResponse(f"/p/{p['id']}", 303)
@@ -254,7 +263,9 @@ async def project_action(pid: str, action: str, request: Request):
             mf = p["storyboard"].get("music_file")
             if mf:
                 st["music_history"] = (st.get("music_history", []) + [mf])[-8:]
-                store.save_settings(st)
+            st["set_history"] = (st.get("set_history", []) + [p["storyboard"].get("set", "none")])[-8:]
+            st["title_history"] = (st.get("title_history", []) + [p["storyboard"].get("video_name", "")])[-30:]
+            store.save_settings(st)
         store.save(p)
     elif action == "delete":
         store.delete(pid)

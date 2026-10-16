@@ -40,7 +40,7 @@ that loop. Every hook has one of these styles:
 - flash_forward: open on the disaster, then rewind to show how it happened."""
 
 
-def make_hooks(brief, log=None):
+def make_hooks(brief, log=None, recent_titles=None, recent_sets=None):
     user = f"""Brief from the creator:
 topic: {brief.get('topic')}
 genre: {brief.get('genre', 'comedy sketch')}
@@ -49,8 +49,13 @@ notes: {brief.get('notes', '')}
 
 {HOOK_RULES}
 
-Write 3 different sketch ideas for this topic, each with its hook, each in a DIFFERENT style and,
-where it fits, a different set (variety matters: the channel must not look the same every day). Score each hook 1-10 honestly
+Recent videos on the channel (do NOT repeat their situation or joke): {"; ".join(recent_titles or []) or "none yet"}
+Sets used in the last videos (pick others): {", ".join(recent_sets or []) or "none yet"}
+
+Write 3 different sketch ideas for this topic, each with its hook, each in a DIFFERENT style and a
+DIFFERENT set. Vary the situation too: not always Sticky staring at his phone - use shops, food,
+neighbours, work, the past, a rich rival (Rick), the street, the kitchen. Sets are allowed to be absurd
+(paying rent to a dinosaur is funnier than another phone screen). Score each hook 1-10 honestly
 for how few viewers would swipe away. Return JSON:
 {{"hooks": [{{"premise": "one sentence a 10-year-old understands",
   "text_hook": "ON-SCREEN TEXT, max 6 words",
