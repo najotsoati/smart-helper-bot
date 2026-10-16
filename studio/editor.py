@@ -13,7 +13,7 @@ from .storyboard import normalize, timeline
 
 MOVING_OPENERS = ("open_zoom", "crash_zoom", "room_push", "phone_push", "two_shot")
 ROOM_CAMS = ["medium", "face", "medium_wide", "wide"]
-NO_COVERAGE = {"floor", "end_card", "extreme_closeup", "crash_zoom", "open_zoom", "two_shot"}
+NO_COVERAGE = {"floor", "end_card", "extreme_closeup", "crash_zoom", "open_zoom"}
 
 
 def music_pool(assets=None):
@@ -122,14 +122,17 @@ def polish(sb, history=None, assets=None, set_history=None):
 
     # 4) automatic extra cuts inside long shots
     lying = False
-    for sh, t in zip(shots, timeline(sb)):
+    for idx, (sh, t) in enumerate(zip(shots, timeline(sb))):
         if sh.get("action") == "fall_flat":
             lying = True
         elif lying and sh["camera"] not in ("floor", "phone_screen", "phone_push"):
             lying = False
         length = (t["end"] - t["start"]) / vocab.FPS
-        if lying or sh["camera"] in NO_COVERAGE or length <= 2.2:
+        if lying or sh["camera"] in NO_COVERAGE or length <= 2.2 or (idx == 0 and sh["camera"] == "two_shot"):
             sh["coverage"] = []
+            continue
+        if sh["camera"] in ("two_shot", "rick_face") and "rick" in sb.get("cast", []):
+            sh["coverage"] = ["face", "rick_face", "two_shot"] if sh["camera"] == "rick_face" else ["face", "rick_face"]
             continue
         kind = "phone" if sh["camera"] in ("phone_screen", "phone_push") else "room"
         sh["coverage"] = [c for c in vocab.COVERAGE[kind] if c != sh["camera"]] or vocab.COVERAGE[kind]
