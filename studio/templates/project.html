@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ (p.storyboard.video_name if p.storyboard else p.brief.topic) }} · Shorts Studio{% endblock %}
+{% block head %}{% if p.busy or p.state in ("queued", "rendering") %}<meta http-equiv="refresh" content="4">{% endif %}{% endblock %}
+{% block body %}
+{% set sb = p.storyboard %}
+<div class="row"><h1 style="margin-right:auto">{{ (sb.video_name if sb else p.brief.topic) or "Loyiha" }}</h1><span class="badge">{{ p.state }}</span></div>
+
+{% if p.busy %}<div class="card"><span class="spin"></span> <b>{{ p.busy }}</b> ishlayapti… sahifa o'zi yangilanadi.</div>{% endif %}
+{% if p.error %}<div class="card err">⚠️ {{ p.error }}</div>{% endif %}
+
+{# ---------- 1. Hooks ---------- #}
+{% if p.hooks and not p.brief.own_script %}
+<div class="card">
+  <h2>1 · Hook</h2>
+  <form method="post" action="/p/{{ p.id }}/do/pick_hook">
+  {% for h in p.hooks %}
+    <label class="hook" style="color:var(--text)"><input type="radio" name="i" value="{{ loop.index0 }}" {% if loop.first %}checked{% endif %}>
+      <b>“{{ h.text_hook }}”</b> <span class="badge">★ {{ h.score }}</span> <span class="badge">{{ h.style }}</span> <span class="badge">{{ h.set }}</span><br>
+      <span>🗣 {{ h.spoken_hook }}</span><br>
+      <span class="dim">{{ h.premise }} · twist: {{ h.twist }}</span></label>
+  {% endfor %}
+    <label>…yoki o'z hookingiz</label><input type="text" name="custom" placeholder="Nobody tells you THIS about payday">
+    <p class="row"><button class="btn">Tanlash → ssenariy</button></p>
+  </form>
+  <form method="post" action="/p/{{ p.id }}/do/hooks"><button class="btn ghost">🔄 Yana 3 ta</button></form>
+</div>
+{% endif %}
+
+{# ---------- 2. Script ---------- #}
+{% if p.script %}
+<div class="card">
+  <h2>2 · Ssenariy: {{ p.script.title }}</h2>
+  <div class="scroll"><table>
+    <tr><th>#</th><th>Nima ko'rinadi</th><th>Gap</th><th>Matn</th><th>Tovush</th></tr>
+    {% for b in p.script.beats %}<tr><td>{{ loop.index }}</td><td>{{ b.what }}</td>
+      <td>{% if b.line %}<b>{{ b.line.speaker }}:</b> {{ b.line.text }}{% endif %}</td><td>{{ b.caption }}</td><td class="dim">{{ b.sound }}</td></tr>{% endfor %}
+  </table></div>
+  <details><summary class="dim">✏️ Tahrirlash (JSON)</summary>
+    <form method="post" action="/p/{{ p.id }}/do/save_script"><textarea class="code" name="script_json">{{ p.script|tojson(indent=1) }}</textarea>
+    <p><button class="btn ghost">Saqlash</button></p></form></details>
+  <div class="row" style="margin-top:10px">
+    <form method="post" action="/p/{{ p.id }}/do/direct"><button class="btn">Tasdiqlash → rejissyor</button></form>
+    <form method="post" action="/p/{{ p.id }}/do/script"><button class="btn ghost">🔄 Qayta yoz</button></form>
+  </div>
+</div>
+{% endif %}
+
+{# ---------- 3. Storyboard ---------- #}
+{% if sb %}
+<div class="card">
+  <h2>3 · Rejissyor jadvali · {{ "%.1f"|format(seconds) }} s · {{ rows|length }} kadr</h2>
+  <div class="scroll"><table>
+    <tr><th>Vaqt</th><th>Kamera</th><th>Sticky</th><th>Gap</th><th>Matn</th><th>Tovush</th></tr>
+    {% for r in rows %}<tr>
+      <td>{{ "%.1f"|format(r.a) }}–{{ "%.1f"|format(r.b) }}</td>
+      <td>{{ r.sh.camera }}{% if r.sh.shake %} · shake{% endif %}</td>
+      <td>{{ r.sh.pose or "" }} {{ r.sh.eyes or "" }} {{ r.sh.mouth or "" }}{% if r.sh.action != "none" %} · <b>{{ r.sh.action }}</b>{% endif %}{% if r.sh.props %} · {{ r.sh.props|join(",") }}{% endif %}</td>
+      <td>{% if r.line %}<b>{{ r.line.speaker }}:</b> {{ r.line.text }}{% endif %}</td>
+      <td>{{ r.sh.caption.text if r.sh.caption else "" }}{% if r.sh.phone_text %} 📱 {{ r.sh.phone_text|join(" / ") }}{% endif %}</td>
+      <td class="dim">{% for s in r.sh.sfx %}{{ s.name }} {% endfor %}{% if r.sh.music_stop %}⏹ music{% endif %}</td></tr>{% endfor %}
+  </table></div>
+  <details><summary class="dim">✏️ Tahrirlash (JSON)</summary>
+    <form method="post" action="/p/{{ p.id }}/do/save_storyboard"><textarea class="code" name="sb_json">{{ sb_json }}</textarea>
+    <p><button class="btn ghost">Saqlash va tekshirish</button></p></form></details>
+</div>
+
+<div class="card">
+  <h2>4 · Tekshiruvchi</h2>
+  {% if p.check %}
+    {% for e in p.check.errors %}<div class="err">❌ {{ e }}</div>{% endfor %}
+    {% for w in p.check.warnings %}<div class="warn">⚠️ {{ w }}</div>{% endfor %}
+    {% if not p.check.errors and not p.check.warnings %}<div class="ok">✅ Barcha qoidalar bajarilgan</div>{% endif %}
+  {% endif %}
+  {% if p.review %}
+    <p style="margin-top:12px"><b>AI baho: {{ p.review.score }}/10</b> — {{ p.review.verdict }}</p>
+    {% for k in p.review.keep or [] %}<div class="ok">✔ {{ k }}</div>{% endfor %}
+    {% for f in p.review.fix or [] %}<div class="warn">→ {{ f }}</div>{% endfor %}
+  {% endif %}
+  <div class="row" style="margin-top:10px">
+    <form method="post" action="/p/{{ p.id }}/do/review"><button class="btn ghost">🧐 AI tekshirsin</button></form>
+    {% if p.review or (p.check and p.check.errors) %}<form method="post" action="/p/{{ p.id }}/do/revise"><button class="btn ghost">🛠 AI tuzatsin</button></form>{% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>5 · Ovoz <span class="dim">({{ tts_provider }})</span></h2>
+  {% for ln in sb.lines %}
+    <div style="margin-bottom:8px"><b>{{ ln.id }} · {{ ln.speaker }}</b> <span class="badge">{{ ln.mood or "normal" }}</span>{% if ln.seconds %} <span class="dim">{{ ln.seconds }} s</span>{% endif %}: {{ ln.text }}
+    {% if ln.file %}<br><audio controls preload="none" src="/p/{{ p.id }}/audio/{{ ln.file }}"></audio>{% endif %}</div>
+  {% endfor %}
+  <form method="post" action="/p/{{ p.id }}/do/voice"><button class="btn {% if p.state == 'storyboard' %}{% else %}ghost{% endif %}">🎙 Ovoz yarat</button></form>
+</div>
+
+<div class="card">
+  <h2>6 · Render</h2>
+  {% if p.state in ("queued", "rendering") %}<p><span class="spin"></span> {{ p.agent_msg or "" }}</p>
+  {% elif p.agent_msg %}<p class="dim">{{ p.agent_msg }}</p>{% endif %}
+  {% if video %}<video controls src="/p/{{ p.id }}/video.mp4"></video>
+    <p><a class="btn" href="/p/{{ p.id }}/video.mp4" download>⬇️ MP4 yuklab olish</a></p>{% endif %}
+  <div class="row">
+    {% if p.state in ("voiced", "done", "failed", "rendering") %}<form method="post" action="/p/{{ p.id }}/do/queue"><button class="btn">🎬 {% if video %}Qayta render{% else %}Renderga yuborish{% endif %}</button></form>{% endif %}
+    <a class="btn ghost" href="/p/{{ p.id }}/script.py" target="_blank">Blender skripti</a>
+  </div>
+</div>
+
+{% if sb.upload %}
+<div class="card">
+  <h2>📋 YouTube uchun</h2>
+  <p><b>{{ sb.upload.title }}</b></p>
+  <p style="white-space:pre-wrap">{{ sb.upload.description }}</p>
+  <p class="dim">{{ (sb.upload.hashtags or [])|join(" ") }}</p>
+  {% if sb.upload.pinned_comment %}<p>📌 {{ sb.upload.pinned_comment }}</p>{% endif %}
+</div>
+{% endif %}
+{% endif %}
+
+{% if p.log %}<details class="card"><summary class="dim">Jurnal</summary><pre class="dim" style="white-space:pre-wrap;font-size:12px">{{ p.log[-15:]|join("\n") }}</pre></details>{% endif %}
+<form method="post" action="/p/{{ p.id }}/do/delete" onsubmit="return confirm('Loyiha o\'chirilsinmi?')"><button class="btn red">🗑 O'chirish</button></form>
+{% endblock %}

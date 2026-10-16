@@ -1,0 +1,273 @@
+{
+ "title": "DIRTY MONEY",
+ "video_name": "I Tried to Clean My Dirty Money",
+ "hook_text": "HOW DO I CLEAN DIRTY MONEY?",
+ "hook_style": "question",
+ "set": "town",
+ "cast": [
+  "rick"
+ ],
+ "music": "sneaky",
+ "holds_phone": true,
+ "lines": [
+  {
+   "id": "S01",
+   "speaker": "sticky",
+   "text": "Noooo! My whole salary... in a puddle!",
+   "mood": "shout"
+  },
+  {
+   "id": "S02",
+   "speaker": "sticky",
+   "text": "Okay. How do I clean dirty money?",
+   "mood": "confused"
+  },
+  {
+   "id": "P01",
+   "speaker": "phone",
+   "text": "Money laundering is a crime. Reporting you now.",
+   "mood": "deadpan"
+  },
+  {
+   "id": "S03",
+   "speaker": "sticky",
+   "text": "No! It's LITERALLY dirty!",
+   "mood": "scared"
+  },
+  {
+   "id": "S04",
+   "speaker": "sticky",
+   "text": "Fine. I'll wash it myself.",
+   "mood": "smug"
+  },
+  {
+   "id": "R01",
+   "speaker": "rick",
+   "text": "Excuse me. Tax office. Is that... cash income?",
+   "mood": "smug"
+  },
+  {
+   "id": "S05",
+   "speaker": "sticky",
+   "text": "It was in a PUDDLE!",
+   "mood": "shout"
+  },
+  {
+   "id": "R02",
+   "speaker": "rick",
+   "text": "Then let's clean it properly. Three hundred dollars, please.",
+   "mood": "deadpan"
+  },
+  {
+   "id": "S06",
+   "speaker": "sticky",
+   "text": "So the only way to clean money... is to lose it?",
+   "mood": "sad"
+  }
+ ],
+ "shots": [
+  {
+   "camera": "crash_zoom",
+   "seconds": 1.6,
+   "line": "S01",
+   "line_at": 0.1,
+   "pose": "surrender",
+   "eyes": "wide",
+   "mouth": "scream",
+   "action": "jump_scare",
+   "rick": {
+    "pose": "arms_crossed"
+   }
+  },
+  {
+   "camera": "floor",
+   "seconds": 1.6,
+   "action": "money_slips_away",
+   "caption": {
+    "text": "$2,000 IN A PUDDLE",
+    "color": "red",
+    "pos": "bottom"
+   },
+   "sfx": [
+    {
+     "name": "splat",
+     "at": 0.2
+    }
+   ]
+  },
+  {
+   "camera": "medium",
+   "seconds": 1.8,
+   "line": "S02",
+   "pose": "phone",
+   "action": "none",
+   "brows": "worried"
+  },
+  {
+   "camera": "phone_screen",
+   "seconds": 1.8,
+   "phone_text": [
+    "SEARCH",
+    "CLEAN DIRTY MONEY",
+    "1 RESULT"
+   ],
+   "sfx": [
+    {
+     "name": "type",
+     "at": 0.0
+    }
+   ]
+  },
+  {
+   "camera": "phone_push",
+   "seconds": 2.0,
+   "line": "P01",
+   "phone_text": [
+    "",
+    "CRIME DETECTED",
+    "REPORTING..."
+   ],
+   "sfx": [
+    {
+     "name": "error",
+     "at": 0.3
+    }
+   ]
+  },
+  {
+   "camera": "face",
+   "seconds": 1.6,
+   "line": "S03",
+   "action": "stop_stop",
+   "eyes": "wide",
+   "music_stop": true,
+   "sfx": [
+    {
+     "name": "scratch",
+     "at": 0.0
+    }
+   ]
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.8,
+   "line": "S04",
+   "action": "count_fast",
+   "caption": {
+    "text": "WASHING...",
+    "color": "blue",
+    "pos": "top"
+   }
+  },
+  {
+   "camera": "wide",
+   "seconds": 1.6,
+   "action": "make_it_rain",
+   "sfx": [
+    {
+     "name": "whoosh",
+     "at": 0.0
+    }
+   ],
+   "caption": {
+    "text": "WIND: +1",
+    "color": "red",
+    "pos": "top"
+   }
+  },
+  {
+   "camera": "two_shot",
+   "seconds": 2.0,
+   "line": "R01",
+   "rick": {
+    "pose": "salesman",
+    "action": "tip_hat"
+   },
+   "pose": "innocent",
+   "sfx": [
+    {
+     "name": "shopbell",
+     "at": 0.0
+    }
+   ]
+  },
+  {
+   "camera": "face",
+   "seconds": 1.4,
+   "action": "nervous_sweat",
+   "eyes": "wide"
+  },
+  {
+   "camera": "medium",
+   "seconds": 1.6,
+   "line": "S05",
+   "action": "rant_mode"
+  },
+  {
+   "camera": "rick_face",
+   "seconds": 2.2,
+   "line": "R02",
+   "rick": {
+    "pose": "offer",
+    "action": "count_money"
+   },
+   "caption": {
+    "text": "TAX: $300",
+    "color": "red",
+    "pos": "big"
+   },
+   "sfx": [
+    {
+     "name": "chaching",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "camera": "face",
+   "seconds": 1.4,
+   "action": "faint_dramatic"
+  },
+  {
+   "camera": "two_shot",
+   "seconds": 2.2,
+   "line": "S06",
+   "pose": "empty_pockets",
+   "rick": {
+    "pose": "smug"
+   },
+   "sfx": [
+    {
+     "name": "trombone",
+     "at": 1.6
+    }
+   ]
+  },
+  {
+   "camera": "end_card",
+   "seconds": 1.8,
+   "sfx": [
+    {
+     "name": "pop",
+     "at": 0.1
+    }
+   ]
+  }
+ ],
+ "end_text": [
+  "CLEAN MONEY",
+  "= DECLARED MONEY"
+ ],
+ "upload": {
+  "title": "I Tried to Clean My Dirty Money",
+  "description": "Sticky's salary fell in a puddle. Cleaning it went... badly.\\nComedy sketch. Laundering money is a crime; declaring income is the clean way. Not financial or legal advice.",
+  "hashtags": [
+   "#shorts",
+   "#comedy",
+   "#money",
+   "#taxes",
+   "#stickman"
+  ],
+  "pinned_comment": "Be honest: would you have washed it too? 🧼💵"
+ }
+}

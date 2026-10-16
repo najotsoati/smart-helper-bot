@@ -1,0 +1,7 @@
+.env
+data/
+__pycache__/
+*.pyc
+.venv/
+agent/agent.ini
+.pytest_cache/

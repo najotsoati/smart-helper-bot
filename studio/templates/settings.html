@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>⚙️ Sozlamalar</h1>
+<div class="card">
+  <p class="dim">Kalitlar serverdagi <code>.env</code> faylda turadi. Bu yerda faqat ulangan-ulanmagani ko'rinadi.</p>
+  <table>
+    <tr><td>OpenRouter</td><td>{% if c.OPENROUTER_API_KEY %}<span class="ok">✅ ulangan</span>{% else %}<span class="err">❌ yo'q</span>{% endif %}</td></tr>
+    <tr><td>Bepul modellar</td><td>{{ (c.OPENROUTER_MODELS or free)|join(", ") or "—" }}</td></tr>
+    <tr><td>Kuchli model (ixtiyoriy, pullik)</td><td>{{ c.OPENROUTER_STRONG_MODELS|join(", ") or "—" }}</td></tr>
+    <tr><td>Grok (zaxira)</td><td>{% if c.XAI_API_KEY %}<span class="ok">✅ {{ c.XAI_MODEL }}</span>{% else %}<span class="dim">ulanmagan</span>{% endif %}</td></tr>
+    <tr><td>Boshqa tekin AI</td><td>{% for p in c.FREE_PROVIDERS %}<span class="ok">✅ {{ p[0] }} ({{ p[3] }})</span> {% else %}<span class="dim">ulanmagan — GEMINI_API_KEY, MISTRAL_API_KEY, GROQ_API_KEY, CEREBRAS_API_KEY</span>{% endfor %}</td></tr>
+    <tr><td>Ovoz</td><td>{{ c.TTS_PROVIDER }}{% if c.TTS_PROVIDER == "elevenlabs" and not c.ELEVENLABS_API_KEY %} <span class="err">— kalit yo'q</span>{% endif %}</td></tr>
+    <tr><td>Render agenti tokeni</td><td>{% if c.AGENT_TOKEN %}<span class="ok">✅ bor</span>{% else %}<span class="err">❌ yo'q</span>{% endif %}</td></tr>
+  </table>
+</div>
+<div class="card"><h2>Bugungi so'rovlar</h2>
+  {% for k, v in usage.items() %}<div class="row"><span>{{ k }}</span><span class="dim" style="margin-left:auto">{{ v }}</span></div>{% else %}<p class="dim">Hali yo'q</p>{% endfor %}
+</div>
+<div class="card"><h2>Rejissyor lug'ati</h2><p class="dim">Storyboard faqat shu so'zlardan tuziladi.</p><pre class="dim" style="white-space:pre-wrap;font-size:12px">{{ vocab_text }}</pre></div>
+{% endblock %}

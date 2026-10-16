@@ -1,0 +1,220 @@
+{
+ "title": "ACTIONS 2",
+ "video_name": "Actions 2",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "coin_catch",
+   "caption": {
+    "text": "COIN CATCH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "greedy_rub",
+   "caption": {
+    "text": "GREEDY RUB",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "salesman_pitch",
+   "caption": {
+    "text": "SALESMAN PITCH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "ceo_walk",
+   "caption": {
+    "text": "CEO WALK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "boss_pose",
+   "caption": {
+    "text": "BOSS POSE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "check_receipt",
+   "caption": {
+    "text": "CHECK RECEIPT",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "piggy_smash",
+   "caption": {
+    "text": "PIGGY SMASH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "double_take",
+   "caption": {
+    "text": "DOUBLE TAKE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "jaw_drop",
+   "caption": {
+    "text": "JAW DROP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "faint_dramatic",
+   "caption": {
+    "text": "FAINT DRAMATIC",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "heart_attack",
+   "caption": {
+    "text": "HEART ATTACK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "jump_scare",
+   "caption": {
+    "text": "JUMP SCARE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "frozen_stare",
+   "caption": {
+    "text": "FROZEN STARE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "panic_run",
+   "caption": {
+    "text": "PANIC RUN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "stop_stop",
+   "caption": {
+    "text": "STOP STOP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "dizzy_spin",
+   "caption": {
+    "text": "DIZZY SPIN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "slip_banana",
+   "caption": {
+    "text": "SLIP BANANA",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "whoa_back",
+   "caption": {
+    "text": "WHOA BACK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "nervous_sweat",
+   "caption": {
+    "text": "NERVOUS SWEAT",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "point_and_scream",
+   "caption": {
+    "text": "POINT AND SCREAM",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "sob_story",
+   "caption": {
+    "text": "SOB STORY",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

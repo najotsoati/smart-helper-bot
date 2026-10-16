@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>🎙 Ovozlar</h1>
+{% if request.query_params.get("saved") %}<div class="card ok">✅ Saqlandi. Yangi ovoz "Ovoz yarat" bosilganda ishlatiladi.</div>{% endif %}
+{% if provider != "edge" %}<div class="card warn">Hozir ovoz: {{ provider }}. Bu sahifa tekin (edge) ovozlar uchun.</div>{% endif %}
+<div class="card">
+  <h2>Tinglab ko'rish</h2>
+  <p class="dim">Namuna: “{{ sample_text }}”. Birinchi tinglash 2-3 soniya oladi.</p>
+  <div class="row">
+    <select id="v" style="flex:2">{% for v in choices %}<option>{{ v }}</option>{% endfor %}</select>
+    <select id="m" style="flex:1">{% for m in moods %}<option>{{ m }}</option>{% endfor %}</select>
+    <button class="btn ghost" type="button" onclick="play()">▶ Tinglash</button>
+  </div>
+  <audio id="a" controls style="width:100%;margin-top:10px"></audio>
+</div>
+<form class="card" method="post" action="/voices">
+  <h2>Kim qaysi ovozda gapiradi</h2>
+  {% for sp, v in chosen.items() %}
+    <label>{{ sp }}</label>
+    <select name="{{ sp }}">{% for c in choices %}<option {% if c == v %}selected{% endif %}>{{ c }}</option>{% endfor %}</select>
+  {% endfor %}
+  <p><button class="btn">Saqlash</button></p>
+  <p class="dim">Kayfiyat (excited, shout, sad, whisper, deadpan...) har bir gapga rejissyor tomonidan qo'yiladi; storyboard JSON'da "mood" ni o'zgartirsa bo'ladi.</p>
+</form>
+<script>
+function play() {
+  const a = document.getElementById('a');
+  a.src = '/voices/sample.mp3?voice=' + encodeURIComponent(document.getElementById('v').value) +
+          '&mood=' + encodeURIComponent(document.getElementById('m').value);
+  a.play();
+}
+</script>
+{% endblock %}

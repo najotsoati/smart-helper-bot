@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="card">
+  <div class="row"><b>Bugungi AI limiti</b><span class="dim" style="margin-left:auto">{{ used }} / {{ limit }} so'rov{% if rate_limited %} · <span class="warn">{{ rate_limited }} marta limitga urildi</span>{% endif %}</span></div>
+  <div class="meter" style="margin-top:8px"><i style="width:{{ [100, (used * 100 // (limit or 1))]|min }}%"></i></div>
+</div>
+<div class="menu">
+  <a href="/new"><span class="i">➕</span><div><b>Yangi video</b><div class="dim">Mavzu bering — hook, ssenariy va kadrlarni AI yozadi</div></div></a>
+  <a href="/own"><span class="i">📝</span><div><b>O'z ssenariyimdan video</b><div class="dim">Siz yozgan matn so'zma-so'z qoladi, AI faqat kadrlarni rejalaydi</div></div></a>
+  <a href="/settings"><span class="i">⚙️</span><div><b>Sozlamalar</b><div class="dim">API kalitlar, modellar, ovoz, lug'at</div></div></a>
+</div>
+<h2 style="margin-top:20px">📂 Loyihalarim</h2>
+{% for p in projects %}
+<div class="card row">
+  <a href="/p/{{ p.id }}"><b>{{ (p.storyboard.video_name if p.storyboard else p.brief.topic) or "—" }}</b></a>
+  <span class="badge">{{ p.state }}</span>{% if p.busy %}<span class="spin"></span>{% endif %}
+  <span class="dim" style="margin-left:auto">{{ p.created[:16].replace("T", " ") }}</span>
+</div>
+{% else %}<p class="dim">Hali loyiha yo'q.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,350 @@
+{
+ "title": "POSES 2",
+ "video_name": "Poses 2",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "shrug_big",
+   "caption": {
+    "text": "SHRUG BIG",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "innocent",
+   "caption": {
+    "text": "INNOCENT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hi_there",
+   "caption": {
+    "text": "HI THERE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "skeptical",
+   "caption": {
+    "text": "SKEPTICAL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "touched",
+   "caption": {
+    "text": "TOUCHED",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "beg",
+   "caption": {
+    "text": "BEG",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "jump_joy",
+   "caption": {
+    "text": "JUMP JOY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "march",
+   "caption": {
+    "text": "MARCH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "kick",
+   "caption": {
+    "text": "KICK",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "karate",
+   "caption": {
+    "text": "KARATE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "boxer",
+   "caption": {
+    "text": "BOXER",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "sneak",
+   "caption": {
+    "text": "SNEAK",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "chill",
+   "caption": {
+    "text": "CHILL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "on_call",
+   "caption": {
+    "text": "ON CALL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "selfie",
+   "caption": {
+    "text": "SELFIE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "photo",
+   "caption": {
+    "text": "PHOTO",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "yawn",
+   "caption": {
+    "text": "YAWN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "stretch",
+   "caption": {
+    "text": "STRETCH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "side_bend",
+   "caption": {
+    "text": "SIDE BEND",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "bow",
+   "caption": {
+    "text": "BOW",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "dead_tired",
+   "caption": {
+    "text": "DEAD TIRED",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "dizzy",
+   "caption": {
+    "text": "DIZZY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "slip",
+   "caption": {
+    "text": "SLIP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "whoa",
+   "caption": {
+    "text": "WHOA",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "faint",
+   "caption": {
+    "text": "FAINT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "sob",
+   "caption": {
+    "text": "SOB",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "accuse",
+   "caption": {
+    "text": "ACCUSE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "rant",
+   "caption": {
+    "text": "RANT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "make_it_rain",
+   "caption": {
+    "text": "MAKE IT RAIN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "carry",
+   "caption": {
+    "text": "CARRY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "cold",
+   "caption": {
+    "text": "COLD",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "mic_drop",
+   "caption": {
+    "text": "MIC DROP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "rock_on",
+   "caption": {
+    "text": "ROCK ON",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "reverse_dab",
+   "caption": {
+    "text": "REVERSE DAB",
+    "color": "red",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

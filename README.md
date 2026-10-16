@@ -17,3 +17,8 @@ Telegram boti, AI yordamida referat yozish, tarjima, rasm yaratish, internet qid
 1. Repositoryni clone qiling:
    ```bash
    git clone https://github.com/sizniki/smart-helper-bot.git# smart-helper-bot
+
+
+## 🎬 Shorts Studio
+
+Stickman Shorts studiyasi (AI ssenariy + Blender render): [studio/README.md](studio/README.md)

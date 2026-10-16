@@ -1,0 +1,32 @@
+{
+  "title": "PAYDAY",
+  "video_name": "My Salary Lasted 5 Minutes",
+  "set": "none",
+  "music": "sneaky",
+  "lines": [
+    {"id": "S01", "speaker": "sticky", "text": "Payday! I'm rich!"},
+    {"id": "P01", "speaker": "phone", "text": "Rent, bills and subscriptions. You owe me."},
+    {"id": "S02", "speaker": "sticky", "text": "Wait. Where did it go?"},
+    {"id": "S03", "speaker": "sticky", "text": "Next month I'm saving. Definitely."}
+  ],
+  "shots": [
+    {"camera": "open_zoom", "seconds": 2.0, "line": "S01", "line_at": 0.1, "pose": "cheer", "eyes": "money",
+     "mouth": "grin", "action": "bounce", "caption": {"text": "$1,200", "color": "gold", "pos": "top"},
+     "sfx": [{"name": "whoosh", "at": 0.0}, {"name": "chaching", "at": 0.5}]},
+    {"camera": "wide", "seconds": 2.0, "action": "coin_rain", "pose": "cheer"},
+    {"camera": "phone_screen", "seconds": 2.2, "line": "P01", "line_at": 0.2,
+     "phone_text": ["BALANCE", "$1,200", "-$1,195"], "sfx": [{"name": "ding", "at": 0.1}]},
+    {"camera": "face", "seconds": 2.0, "pose": "shock", "eyes": "wide", "mouth": "scream", "brows": "worried",
+     "props": ["sweat"], "fx": "lines", "music_stop": true, "sfx": [{"name": "boom", "at": 0.0}]},
+    {"camera": "medium", "seconds": 1.6, "line": "S02", "pose": "shrug", "eyes": "normal", "brows": "worried",
+     "action": "punch", "sfx": [{"name": "error", "at": 0.1}]},
+    {"camera": "medium_wide", "seconds": 1.4, "action": "fall_flat"},
+    {"camera": "floor", "seconds": 1.6, "caption": {"text": "BALANCE: $5", "color": "red", "pos": "bottom"},
+     "sfx": [{"name": "trombone", "at": 0.2}]},
+    {"camera": "extreme_closeup", "seconds": 1.8, "line": "S03", "pose": "phone", "eyes": "squint",
+     "mouth": "smile"},
+    {"camera": "end_card", "seconds": 1.6, "sfx": [{"name": "pop", "at": 0.1}]}
+  ],
+  "end_text": ["SAVED: $0", "AGAIN"],
+  "upload": {"title": "My Salary Lasted 5 Minutes", "description": "Payday hits different.", "hashtags": ["#shorts"]}
+}

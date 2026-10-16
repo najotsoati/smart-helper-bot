@@ -1,0 +1,13 @@
+[Unit]
+Description=Shorts Studio panel
+After=network-online.target
+
+[Service]
+WorkingDirectory=__APP_DIR__
+ExecStart=__APP_DIR__/.venv/bin/uvicorn studio.app:app --host 127.0.0.1 --port __PORT__ --workers 1
+Restart=always
+RestartSec=3
+MemoryMax=600M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,260 @@
+{
+ "title": "POSE TEST",
+ "video_name": "Pose Test",
+ "set": "none",
+ "music": "none",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "panic",
+   "caption": {
+    "text": "PANIC",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "facepalm",
+   "caption": {
+    "text": "FACEPALM",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "arms_crossed",
+   "caption": {
+    "text": "ARMS_CROSSED",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "flex",
+   "caption": {
+    "text": "FLEX",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "salute",
+   "caption": {
+    "text": "SALUTE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "pray",
+   "caption": {
+    "text": "PRAY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "point_up",
+   "caption": {
+    "text": "POINT_UP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "dab",
+   "caption": {
+    "text": "DAB",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "tired",
+   "caption": {
+    "text": "TIRED",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "wipe",
+   "caption": {
+    "text": "WIPE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "grab",
+   "caption": {
+    "text": "GRAB",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "point_r",
+   "caption": {
+    "text": "POINT_R",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "point_dl",
+   "caption": {
+    "text": "POINT_DL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "count_a",
+   "caption": {
+    "text": "COUNT_A",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "head_l",
+   "caption": {
+    "text": "HEAD_L",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.3,
+   "pose": "head_r",
+   "caption": {
+    "text": "HEAD_R",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "panic",
+   "caption": {
+    "text": "PANIC",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "dance",
+   "caption": {
+    "text": "DANCE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "count_money",
+   "caption": {
+    "text": "COUNT_MONEY",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "facepalm",
+   "caption": {
+    "text": "FACEPALM",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "head_shake",
+   "caption": {
+    "text": "HEAD_SHAKE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "flex",
+   "caption": {
+    "text": "FLEX",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "dab",
+   "caption": {
+    "text": "DAB",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "tired",
+   "caption": {
+    "text": "TIRED",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.0,
+   "action": "strut",
+   "caption": {
+    "text": "STRUT",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

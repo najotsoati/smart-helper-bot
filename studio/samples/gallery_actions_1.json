@@ -1,0 +1,220 @@
+{
+ "title": "ACTIONS 1",
+ "video_name": "Actions 1",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "victory_jump",
+   "caption": {
+    "text": "VICTORY JUMP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "touchdown_dance",
+   "caption": {
+    "text": "TOUCHDOWN DANCE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "spin_cheer",
+   "caption": {
+    "text": "SPIN CHEER",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "happy_hops",
+   "caption": {
+    "text": "HAPPY HOPS",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "rock_star",
+   "caption": {
+    "text": "ROCK STAR",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "disco_fever",
+   "caption": {
+    "text": "DISCO FEVER",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "robot_dance",
+   "caption": {
+    "text": "ROBOT DANCE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "cheerleader_kicks",
+   "caption": {
+    "text": "CHEERLEADER KICKS",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "maestro_conduct",
+   "caption": {
+    "text": "MAESTRO CONDUCT",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "hello_wave",
+   "caption": {
+    "text": "HELLO WAVE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "jump_kick_joy",
+   "caption": {
+    "text": "JUMP KICK JOY",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "airplane_run",
+   "caption": {
+    "text": "AIRPLANE RUN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "moonwalk",
+   "caption": {
+    "text": "MOONWALK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "tada_reveal",
+   "caption": {
+    "text": "TADA REVEAL",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "hug_the_world",
+   "caption": {
+    "text": "HUG THE WORLD",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "payday_jump",
+   "caption": {
+    "text": "PAYDAY JUMP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "make_it_rain",
+   "caption": {
+    "text": "MAKE IT RAIN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "count_fast",
+   "caption": {
+    "text": "COUNT FAST",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "grab_the_cash",
+   "caption": {
+    "text": "GRAB THE CASH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "empty_wallet",
+   "caption": {
+    "text": "EMPTY WALLET",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "money_slips_away",
+   "caption": {
+    "text": "MONEY SLIPS AWAY",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

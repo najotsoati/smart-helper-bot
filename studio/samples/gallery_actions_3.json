@@ -1,0 +1,220 @@
+{
+ "title": "ACTIONS 3",
+ "video_name": "Actions 3",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "slow_slump",
+   "caption": {
+    "text": "SLOW SLUMP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "beg_please",
+   "caption": {
+    "text": "BEG PLEASE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "deflate",
+   "caption": {
+    "text": "DEFLATE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "big_sigh",
+   "caption": {
+    "text": "BIG SIGH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "touched_tear",
+   "caption": {
+    "text": "TOUCHED TEAR",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "lonely_wave",
+   "caption": {
+    "text": "LONELY WAVE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "cold_shiver",
+   "caption": {
+    "text": "COLD SHIVER",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "head_hang",
+   "caption": {
+    "text": "HEAD HANG",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "stomp_stomp",
+   "caption": {
+    "text": "STOMP STOMP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "fist_shake",
+   "caption": {
+    "text": "FIST SHAKE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "rant_mode",
+   "caption": {
+    "text": "RANT MODE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "karate_chop",
+   "caption": {
+    "text": "KARATE CHOP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "shadow_boxing",
+   "caption": {
+    "text": "SHADOW BOXING",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "kick_air",
+   "caption": {
+    "text": "KICK AIR",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "skeptic_glare",
+   "caption": {
+    "text": "SKEPTIC GLARE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "rage_quake",
+   "caption": {
+    "text": "RAGE QUAKE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "accuse_point",
+   "caption": {
+    "text": "ACCUSE POINT",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "eureka_bulb",
+   "caption": {
+    "text": "EUREKA BULB",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "hmm_think",
+   "caption": {
+    "text": "HMM THINK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "deep_think",
+   "caption": {
+    "text": "DEEP THINK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "chin_rub",
+   "caption": {
+    "text": "CHIN RUB",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}
