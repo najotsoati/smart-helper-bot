@@ -18,7 +18,8 @@ T = bpy.data.texts["stickman_tools.py"]
 st = T.as_module()
 S = bpy.context.scene
 A = "//{audio_dir}/"
-X = {X}; PH = {PH}
+X = {X}; B = {B}; XR = {XR}; PH = {PH}
+RICK_ON = {rick_on}
 GAIN = 1.3
 CUSTOM_POSES = {custom_poses}
 PHONE_IN_HAND = {phone_in_hand}
@@ -29,8 +30,14 @@ for _k, _v in CUSTOM_POSES.items():
 S.frame_end = 1800
 S.render.filepath = "//{video_name}.mp4"
 
-def on(name, f, x=None, z=None): st.place(name, f, x=x, z=z, scale=1.0, step=True)
-def off(name, f): st.place(name, f, scale=0.0, step=True)
+MISSING = []
+def on(name, f, x=None, z=None):
+    if name not in bpy.data.objects:
+        MISSING.append(name); print("not in this template:", name); return
+    st.place(name, f, x=x, z=z, scale=1.0, step=True)
+def off(name, f):
+    if name in bpy.data.objects:
+        st.place(name, f, scale=0.0, step=True)
 def popin(name, f, x=None, z=None):
     st.place(name, f, x=x, z=z, scale=0.6, step=True); st.place(name, f + 3, scale=1.1); st.place(name, f + 6, scale=1.0)
 _B = [0.0, 0.0, 0.0]
@@ -49,6 +56,8 @@ def speak(speaker, path, f, **kw):
         return st.say(path, f, **kw)
     if speaker == "phone" and PHONE_FACE[0]:
         return st.phone_say(path, f)
+    if speaker == "rick" and RICK_ON:
+        return rk.say(path, f, end="smile", closed="smile")
     st.voice(path, f, volume=0.9)
     return f + L(path)
 PHONE_FACE = [False]
@@ -61,10 +70,14 @@ def _f(v):
 
 def generate(sb, audio_dir="audio"):
     sb = normalize(sb)
-    X = vocab.X_FURNITURE if sb["set"] in ("bed", "armchair") else vocab.X_PLAIN
+    info = vocab.SET_INFO.get(sb["set"], vocab.SET_INFO["none"])
+    B = info["base"]
+    rick_on = "rick" in sb.get("cast", [])
+    X = B - vocab.X_DUO if rick_on else info["x"]
+    XR = B + vocab.X_DUO
     lines = line_map(sb)
     out = [HEADER.format(
-        title=sb["title"].replace('"', "'"), audio_dir=audio_dir, X=X, PH=vocab.PHONE_X,
+        title=sb["title"].replace('"', "'"), audio_dir=audio_dir, X=X, B=B, XR=XR, rick_on=rick_on, PH=vocab.PHONE_X,
         custom_poses=json.dumps(vocab.CUSTOM_POSES), phone_in_hand=json.dumps(vocab.PHONE_IN_HAND),
         backdrop=sb["backdrop"], video_name=sb["video_name"].replace('"', "'"))]
     w = out.append
@@ -74,8 +87,14 @@ def generate(sb, audio_dir="audio"):
     if sb["set"] == "bed":
         w('on("Set_Bed", 1); on("Set_Blanket", 1)')
         w('bl = bpy.data.objects["Set_Blanket"]; bl.location.y = 0.25; bl.keyframe_insert("location", frame=1)')
-    elif sb["set"] == "armchair":
-        w('on("Set_Sofa", 1)')
+    else:
+        for name in info["on"]:
+            w(f'on({name!r}, 1)')
+    for name in info["off"]:
+        w(f'off({name!r}, 1)')
+    if rick_on:
+        w('rk = T.as_module(); rk.use("R_"); rk.clear_animation(); rk.show()')
+        w('rk.move_to(XR, 0.0, 1); rk.apply_pose("hips", 1, face=False); rk.mouth("smile", 1)')
     title = sb["title"]
     if len(title) <= 23:
         w(f'st.title({title!r}, f_on=-8)')
@@ -111,12 +130,12 @@ def generate(sb, audio_dir="audio"):
         w(f"c0 = c; e = c0 + {n}; starts.append(c0)")
 
         # camera
-        x, z, s = cam["at"](X)
+        x, z, s = cam["at"](X, B)
         w(f"st.cut(c0, {_f(x)}, {_f(z)}, {_f(s)})")
 
         # body: get up after a fall (he stays down for floor and phone shots), pose, phone in hand
         if lying and not is_phone_cam and sh["camera"] != "floor":
-            w(f"st.flat(c0 - 1); st.move_to(X, 0.0, c0); st.apply_pose({(sh.get('pose') or 'stand')!r}, c0, face=False)")
+            w(f"st.flat(c0 - 1, x=B - 1.7); st.move_to(X, 0.0, c0); st.apply_pose({(sh.get('pose') or 'stand')!r}, c0, face=False)")
             w("st.squint(c0, 1.0)")
             lying, eyes = False, "normal"
             pose = sh.get("pose") or "stand"
@@ -174,7 +193,7 @@ def generate(sb, audio_dir="audio"):
 
         # camera move over the whole (final) shot length
         if "zoom_to" in cam:
-            zx, zz, zs = cam["zoom_to"](X)
+            zx, zz, zs = cam["zoom_to"](X, B)
             a, b = cam.get("zoom_frames", (0, None))
             end = f"c0 + {b}" if b else ("min(e - 1, c0 + %d)" % (vocab.COVERAGE_EVERY - 3) if sh.get("coverage") else "e - 1")
             w(f"st.zoom(c0 + {a}, {end}, x={_f(zx)}, z={_f(zz)}, scale={_f(zs)})")
@@ -198,14 +217,14 @@ def generate(sb, audio_dir="audio"):
         elif act == "hop":
             w("st.hop(c0 + 2, 0.25, 10)")
         elif act == "fall_flat":
-            w('st.sfx("fall", c0, 0.3); st.flat(c0 + 6); st.squint(c0 + 6, 0.1)')
+            w('st.sfx("fall", c0, 0.3); st.flat(c0 + 6, x=B - 1.7); st.squint(c0 + 6, 0.1)')
             w('st.sfx("splat", c0 + 6, 0.35); st.sfx("land", c0 + 6, 0.22)')
-            w('st.fx("star", c0 + 6, 1.0, 1.32, 0.8); st.shake(c0 + 6, c0 + 12, 0.06)')
+            w('st.fx("star", c0 + 6, B + 1.0, 1.32, 0.8); st.shake(c0 + 6, c0 + 12, 0.06)')
             lying, eyes = True, "shut"
         elif act == "coin_rain":
             w('st.sfx("chaching", c0 + 4, 0.6)')
             w("for _i in range(10):")
-            w("    _f0 = c0 + _i * 2; _x = -1.6 + _i * 0.36")
+            w("    _f0 = c0 + _i * 2; _x = B - 1.6 + _i * 0.36")
             w('    st.place("Coin_%d" % (_i + 1), _f0, x=_x, z=6.1, scale=1.0, step=True)')
             w('    st.place("Coin_%d" % (_i + 1), _f0 + 22, z=-0.7)')
             w('    st.place("Coin_%d" % (_i + 1), _f0 + 23, scale=0.0, step=True)')
@@ -213,16 +232,16 @@ def generate(sb, audio_dir="audio"):
             w('st.sfx("whoosh", c0 + 2, 0.7)')
             w("for _i, (_dx, _x1, _z1) in enumerate(((-0.3, -2.4, 3.6), (0.3, 2.4, 4.2), (0.5, 2.4, 3.2))):")
             w('    _n = "Note_%d" % (_i + 1); _f = c0 + 2 + _i * 5')
-            w("    st.place(_n, _f, x=X + _dx, z=1.6, scale=1.0, step=True); st.place(_n, _f + 30, x=_x1, z=_z1)")
+            w("    st.place(_n, _f, x=X + _dx, z=1.6, scale=1.0, step=True); st.place(_n, _f + 30, x=B + _x1, z=_z1)")
             w("    st.place(_n, _f + 32, scale=0.0, step=True)")
         elif act == "bills_chase":
             label = str(sh.get("label") or "RENT").upper()[:8]
             w(f'bpy.data.objects["Bill_1_Label"].data.body = {label!r}')
-            w('st.place("Bill_1", c0 + 1, x=1.45, z=1.43, scale=0.05, step=True); st.place("Bill_1", c0 + 5, scale=1.5)')
+            w('st.place("Bill_1", c0 + 1, x=B + 1.45, z=1.43, scale=0.05, step=True); st.place("Bill_1", c0 + 5, scale=1.5)')
             w('st.sfx("whoosh", c0 + 3, 0.9); st.run("Bill_1", c0 + 5, c0 + 17, X + 1.0)')
             w('st.place("Note_1", c0 + 17, x=X + 0.1, z=2.0, scale=1.0, step=True); st.place("Note_1", c0 + 21, x=X + 0.6, z=1.64)')
             w('st.sfx("drop", c0 + 19, 0.8); st.fx("star", c0 + 22, X + 0.15, 2.0, 1.0)')
-            w('st.run("Bill_1", c0 + 21, c0 + 36, -3.4); st.place("Note_1", c0 + 36, x=-4.2, z=1.64)')
+            w('st.run("Bill_1", c0 + 21, c0 + 36, B - 3.4); st.place("Note_1", c0 + 36, x=B - 4.2, z=1.64)')
             w('st.place("Note_1", c0 + 37, scale=0.0, step=True)')
         elif act == "fly_buzz":
             w('st.flutter("FX_Fly", c0 + 4, c0 + 34, X + 0.36, 2.12, X + 0.75, 3.7); st.sfx("buzz", c0 + 4, 0.5)')
@@ -232,6 +251,29 @@ def generate(sb, audio_dir="audio"):
             w('    st.place("Set_Door", c0 + _f, x=1.92 + _dx)')
         if sh.get("shake") and act != "fall_flat":
             w("st.shake(c0 + 1, c0 + 9, 0.05)")
+
+        # Rick
+        rk_sh = sh.get("rick") or {}
+        if rick_on and rk_sh:
+            if rk_sh.get("pose") in vocab.POSES:
+                w(f"rk.snap({rk_sh['pose']!r}, c0 + 2, face=False)")
+            if rk_sh.get("eyes") in ("normal", "wide", "money"):
+                w(f"rk.eyes({rk_sh['eyes']!r}, c0)")
+            if rk_sh.get("mouth") in vocab.MOUTHS and lines.get(sh.get("line"), {}).get("speaker") != "rick":
+                w(f"rk.mouth({rk_sh['mouth']!r}, c0)")
+            ra = rk_sh.get("action")
+            if ra == "bounce":
+                w("rk.bounce(c0 + 4, height=0.3, length=12, sound=0.5)")
+            elif ra == "punch":
+                w("rk.punch(c0 + 2)")
+            elif ra == "tip_hat":
+                w('rk.tip_hat(c0 + 4); st.sfx("pop", c0 + 6, 0.4)')
+            elif ra == "spin":
+                w('rk.spin(c0 + 3, turns=2, length=16); st.sfx("whirl", c0 + 3, 0.6)')
+        if act == "dino_roar":
+            w('st.place("Dino_A", c0 + 1, x=B - 3.4, z=1.35, scale=1.0, step=True); st.place("Dino_A", c0 + 7, x=B - 2.15)')
+            w('st.sfx("roar", c0 + 4, 0.68); st.shake(c0 + 8, c0 + 18, 0.05)')
+            w('st.place("Dino_A", e - 2, x=B - 2.15); st.place("Dino_A", e + 4, x=B - 3.4)')
 
         # props and fx
         for p in sh["props"]:
@@ -262,6 +304,12 @@ def generate(sb, audio_dir="audio"):
             for (pz, psz, pcol), t in zip(spots, pt):
                 w(f"st.caption({t!r}, c0 + 3, e, z={pz}, size={psz}, x=PH, max_width=2.6, color={pcol!r})")
             w('st.sfx("pop", c0 + 3, 0.5)')
+        if sh.get("labels"):
+            lab = [str(t)[:10] for t in sh["labels"]][:2]
+            w(f"st.caption({lab[0]!r}, c0 + 2, e, z=-2.75, size=0.5, x=-0.95, hud=True, color='red')")
+            if len(lab) > 1:
+                w(f"st.caption({lab[1]!r}, c0 + 6, e, z=-2.75, size=0.5, x=0.95, hud=True, color='green')")
+            w('st.sfx("pop", c0 + 2, 0.5); st.sfx("chaching", c0 + 6, 0.5)')
         if sh["camera"] == "end_card" and sb.get("end_text"):
             et = list(sb["end_text"])[:2]
             w(f"st.caption({et[0]!r}, c0 + 3, e, z=0.45, size=0.36, hud=True, color='white')")
@@ -278,7 +326,7 @@ def generate(sb, audio_dir="audio"):
         # automatic extra cuts inside a long shot (the shot length is known only now)
         cov = sh.get("coverage") or []
         if cov:
-            spots = [tuple(round(v, 3) for v in vocab.CAMERAS[c]["at"](X)) for c in cov if c in vocab.CAMERAS]
+            spots = [tuple(round(v, 3) for v in vocab.CAMERAS[c]["at"](X, B)) for c in cov if c in vocab.CAMERAS]
             w(f"_cov = {spots!r}; _f = c0 + {vocab.COVERAGE_EVERY}; _k = 0")
             w("while _f <= e - 30:")
             w("    _x, _z, _s = _cov[_k % len(_cov)]; st.cut(_f, _x, _z, _s)")
@@ -305,6 +353,6 @@ def generate(sb, audio_dir="audio"):
     w("for s_ in st._strips():")
     w("    if s_.type == 'SOUND' and not s_.name.startswith('Music'): s_.volume *= GAIN")
     w("st.alive(1, END, blink_skip=[tuple(r) for r in skip_blink])")
-    w('bpy.app.driver_namespace["studio_marks"] = {"starts": starts, "end": END}')
+    w('bpy.app.driver_namespace["studio_marks"] = {"starts": starts, "end": END, "missing": MISSING}')
     w("S.frame_set(1)")
     return "\n".join(out) + "\n"

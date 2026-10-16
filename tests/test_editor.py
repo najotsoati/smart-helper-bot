@@ -69,3 +69,53 @@ def test_polished_script_runs_with_new_actions():
     assert "run" in names and "flutter" in names
     assert bpy.data.objects["Bill_1_Label"].data.body == "RENT"
     assert 'st.music("//musiqa_03_sneaky.wav"' not in src
+
+
+def _sb(**kw):
+    sb = {"title": "T", "hook_text": "HOOK", "music": "sneaky",
+          "lines": [{"id": "S01", "speaker": "sticky", "text": "hi", "seconds": 1.0}],
+          "shots": [{"camera": "medium", "seconds": 2.0, "line": "S01"}, {"camera": "wide", "seconds": 2.0},
+                    {"camera": "face", "seconds": 2.0, "action": "fall_flat"}, {"camera": "floor", "seconds": 2.0},
+                    {"camera": "medium", "seconds": 2.0, "action": "knock"}, {"camera": "face", "seconds": 2.0}]}
+    sb.update(kw)
+    return sb
+
+
+def test_hook_styles():
+    sb = editor.polish(_sb(hook_style="number"))
+    assert sb["shots"][0]["camera"] == "crash_zoom" and sb["shots"][0]["caption"]["pos"] == "big"
+    sb = editor.polish(_sb(hook_style="vs", cast=["rick"]))
+    assert sb["shots"][0]["camera"] == "two_shot" and sb["shots"][0]["labels"] == ["POOR", "RICH"]
+    sb = editor.polish(_sb(hook_style="pov"))
+    assert sb["shots"][0]["caption"]["text"].startswith("POV: ")
+    sb = editor.polish(_sb(hook_style="question"))
+    assert sb["shots"][0]["caption"]["text"].endswith("?") and sb["end_text"]
+    n = len(_sb()["shots"])
+    sb = editor.polish(_sb(hook_style="flash_forward"))
+    assert len(sb["shots"]) == n + 1
+    assert sb["shots"][0]["caption"]["text"] == "HOW DID THIS HAPPEN?"
+    assert sb["shots"][1]["sfx"][0]["name"] == "rewind"
+
+
+def test_set_fitting():
+    sb = editor.polish(_sb(set="kitchen"))
+    assert all(s.get("action") != "knock" for s in sb["shots"])
+    sb = editor.polish(_sb(shots=[{"camera": "rick_face", "seconds": 2.0}, {"camera": "two_shot", "seconds": 2.0},
+                                  {"camera": "face", "seconds": 2.0, "action": "dino_roar"}]))
+    cams = [s["camera"] for s in sb["shots"]]
+    assert "rick_face" not in cams and "two_shot" not in cams
+    assert sb["shots"][2]["action"] == "shiver"
+
+
+def test_new_sets_and_rick_render():
+    for set_name in vocab.SETS:
+        sb = editor.polish(_sb(set=set_name, hook_style="vs", cast=["rick"]))
+        sb["shots"][1]["rick"] = {"pose": "cheer", "action": "tip_hat", "eyes": "money"}
+        st, bpy, src = run_script(sb)
+        names = [c[0] for c in st.calls]
+        assert "use" in names and "tip_hat" in names, set_name
+        for name in vocab.SET_INFO[set_name]["on"]:
+            assert f"on({name!r}, 1)" in src or f'on("{name}", 1)' in src, (set_name, name)
+    town = editor.polish(_sb(set="town"))
+    st, bpy, src = run_script(town)
+    assert "B = 132.05" in src and "X = 132.1" in src

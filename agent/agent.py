@@ -133,7 +133,8 @@ def run_job(job):
     if not res.get("ok"):
         raise RuntimeError(res.get("error", "unknown error"))
     mp4 = Path(res["mp4"])
-    status(pid, f"Yuklanmoqda: {mp4.name} ({res['frames']} kadr)")
+    note = f" | shablonda yo'q: {', '.join(res['missing'])}" if res.get("missing") else ""
+    status(pid, f"Yuklanmoqda: {mp4.name} ({res['frames']} kadr){note}")
     upload(pid, mp4)
     log("done", res)
     report_assets()

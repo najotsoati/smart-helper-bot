@@ -14,7 +14,27 @@ X_PLAIN = -0.55
 X_FURNITURE = 0.15
 PHONE_X = 40.0
 
-SETS = ["none", "bed", "armchair"]
+# Sets proven in the template.  x = Sticky's place, base = centre of that place for wide shots,
+# on/off = objects switched at frame 1, door = the room door is visible (knock, bills_chase).
+SET_INFO = {
+    "none": {"x": -0.55, "base": 0.0, "on": [], "off": [], "door": True, "desc": "plain coloured room with a door"},
+    "bed": {"x": 0.15, "base": 0.0, "on": ["Set_Bed", "Set_Blanket"], "off": [], "door": True,
+            "desc": "bedroom, bed behind Sticky (mornings, alarm, lazy)"},
+    "armchair": {"x": 0.15, "base": 0.0, "on": ["Set_Sofa"], "off": [], "door": True,
+                 "desc": "living room with a red armchair (phone addiction, TV)"},
+    "kitchen": {"x": 0.08, "base": 0.0, "on": ["Set_Fridge"], "off": ["Set_Door", "Set_DoorFrame"], "door": False,
+                "desc": "kitchen with a fridge (food prices, groceries, cooking vs ordering)"},
+    "gold_rush": {"x": 0.15, "base": 0.0, "on": ["Gold_Back"], "off": [], "door": False,
+                  "desc": "wild-west gold mountains (get-rich-quick, gold, mining, history)"},
+    "prehistoric": {"x": 0.08, "base": 0.0, "on": ["Past_Back"], "off": ["Set_Floor"], "door": False,
+                    "desc": "dinosaur era with a volcano (then vs now, ancient money, time travel)"},
+    "town": {"x": 132.1, "base": 132.05, "on": ["Town_Back"], "off": [], "door": False,
+             "desc": "small town street by day (business, shops, water, neighbours)"},
+    "town_night": {"x": 132.1, "base": 132.05, "on": ["Town_Back", "Town_Back_Night"], "off": [], "door": False,
+                   "desc": "the same town street at night (late work, secret plans)"},
+}
+SETS = list(SET_INFO)
+X_DUO = 0.85      # Sticky at base - X_DUO, Rick at base + X_DUO when Rick is on stage
 BACKDROPS = ["room", "white"]
 
 POSES = [
@@ -69,7 +89,11 @@ ACTIONS = {
     "bills_chase": ("an angry bill with legs runs in from the door, grabs a banknote and runs off (set label)", 1.3),
     "fly_buzz": ("a fly buzzes out of his empty pocket/wallet: broke", 1.1),
     "knock": ("loud knocking on the door, the door shakes", 0.8),
+    "dino_roar": ("a dinosaur head slides in and roars (prehistoric set only)", 0.9),
 }
+
+# Rick: the second puppet with a top hat (rich guy, seller, boss, smarter neighbour).
+RICK_ACTIONS = ["none", "bounce", "punch", "tip_hat", "spin"]
 
 SFX = {
     "ding": 0.5, "pop": 0.55, "tick": 1.0, "chaching": 0.6, "jump": 0.4, "land": 0.32,
@@ -90,27 +114,31 @@ MUSIC = {
 
 # Camera presets.  Each value builds (x, z, scale) from Sticky's X.  "zoom_to" makes a slow push-in.
 CAMERAS = {
-    "wide": {"desc": "whole room", "at": lambda X: (0.0, 2.3, 7.0)},
-    "room_push": {"desc": "wide shot slowly pushing in", "at": lambda X: (0.0, 2.3, 7.0),
-                  "zoom_to": lambda X: (0.0, 2.6, 6.4)},
+    "wide": {"desc": "whole room", "at": lambda X, B=0.0: (B, 2.3, 7.0)},
+    "room_push": {"desc": "wide shot slowly pushing in", "at": lambda X, B=0.0: (B, 2.3, 7.0),
+                  "zoom_to": lambda X, B=0.0: (B, 2.6, 6.4)},
     "open_zoom": {"desc": "opening: fast zoom from medium-wide to the face (best first shot)",
-                  "at": lambda X: (X, 2.5, 5.2), "zoom_to": lambda X: (X + 0.08, 2.75, 2.6), "zoom_frames": (3, 10)},
-    "face": {"desc": "face close-up with a slow creep in", "at": lambda X: (X + 0.08, 2.75, 2.6),
-             "zoom_to": lambda X: (X + 0.12, 2.8, 2.42)},
-    "face_phone_up": {"desc": "face with the phone raised (use pose cheer)", "at": lambda X: (X + 0.05, 2.9, 2.7)},
-    "medium": {"desc": "head, torso and phone", "at": lambda X: (X + 0.01, 2.6, 2.9)},
-    "medium_wide": {"desc": "whole figure with room above the head", "at": lambda X: (X, 2.5, 5.2)},
-    "extreme_closeup": {"desc": "eyes only, for a final stare", "at": lambda X: (X, 2.84, 2.1),
-                        "zoom_to": lambda X: (X, 2.84, 1.85)},
-    "floor": {"desc": "Sticky lying on the floor", "at": lambda X: (0.62, 1.78, 4.7)},
-    "phone_screen": {"desc": "the big phone screen fills the frame (use phone_text)", "at": lambda X: (PHONE_X, 2.45, 6.0)},
-    "phone_push": {"desc": "phone screen with a gentle push-in", "at": lambda X: (PHONE_X, 2.45, 6.0),
-                   "zoom_to": lambda X: (PHONE_X, 2.85, 4.9)},
-    "end_card": {"desc": "dark end card for the last line", "at": lambda X: (60.0, 2.3, 7.0)},
-    "crash_zoom": {"desc": "violent fast zoom into the face (shock moment)", "at": lambda X: (X, 2.5, 5.2),
-                   "zoom_to": lambda X: (X + 0.08, 2.78, 2.3), "zoom_frames": (1, 5)},
+                  "at": lambda X, B=0.0: (X, 2.5, 5.2), "zoom_to": lambda X, B=0.0: (X + 0.08, 2.75, 2.6), "zoom_frames": (3, 10)},
+    "face": {"desc": "face close-up with a slow creep in", "at": lambda X, B=0.0: (X + 0.08, 2.75, 2.6),
+             "zoom_to": lambda X, B=0.0: (X + 0.12, 2.8, 2.42)},
+    "face_phone_up": {"desc": "face with the phone raised (use pose cheer)", "at": lambda X, B=0.0: (X + 0.05, 2.9, 2.7)},
+    "medium": {"desc": "head, torso and phone", "at": lambda X, B=0.0: (X + 0.01, 2.6, 2.9)},
+    "medium_wide": {"desc": "whole figure with room above the head", "at": lambda X, B=0.0: (X, 2.5, 5.2)},
+    "extreme_closeup": {"desc": "eyes only, for a final stare", "at": lambda X, B=0.0: (X, 2.84, 2.1),
+                        "zoom_to": lambda X, B=0.0: (X, 2.84, 1.85)},
+    "floor": {"desc": "Sticky lying on the floor", "at": lambda X, B=0.0: (B + 0.62, 1.78, 4.7)},
+    "phone_screen": {"desc": "the big phone screen fills the frame (use phone_text)", "at": lambda X, B=0.0: (PHONE_X, 2.45, 6.0)},
+    "phone_push": {"desc": "phone screen with a gentle push-in", "at": lambda X, B=0.0: (PHONE_X, 2.45, 6.0),
+                   "zoom_to": lambda X, B=0.0: (PHONE_X, 2.85, 4.9)},
+    "end_card": {"desc": "dark end card for the last line", "at": lambda X, B=0.0: (60.0, 2.3, 7.0)},
+    "crash_zoom": {"desc": "violent fast zoom into the face (shock moment)", "at": lambda X, B=0.0: (X, 2.5, 5.2),
+                   "zoom_to": lambda X, B=0.0: (X + 0.08, 2.78, 2.3), "zoom_frames": (1, 5)},
     "pull_back": {"desc": "starts on the face and pulls back to reveal the room (reveal moment)",
-                  "at": lambda X: (X + 0.08, 2.75, 2.6), "zoom_to": lambda X: (0.0, 2.3, 7.0)},
+                  "at": lambda X, B=0.0: (X + 0.08, 2.75, 2.6), "zoom_to": lambda X, B=0.0: (B, 2.3, 7.0)},
+    "two_shot": {"desc": "Sticky and Rick side by side (only when Rick is on stage)",
+                 "at": lambda X, B=0.0: (B, 2.5, 5.4), "zoom_to": lambda X, B=0.0: (B, 2.55, 5.0)},
+    "rick_face": {"desc": "Rick's face close-up (only when Rick is on stage)",
+                  "at": lambda X, B=0.0: (B + X_DUO + 0.08, 2.75, 2.6)},
 }
 
 # Cameras used for automatic extra cuts inside long shots, by situation.
@@ -173,6 +201,9 @@ fx (at Sticky): {", ".join(FX)}
 sfx (real recorded sounds, nothing else exists): {", ".join(SFX)}
 music: {", ".join(MUSIC)}
 caption color: {", ".join(CAPTION_COLORS)}; caption pos: top (under the title), bottom (on a cream plate), big (huge number in the middle)
-set: {", ".join(SETS)}
+sets (one per video):
+{chr(10).join(f"  - {k}: {v['desc']}" for k, v in SET_INFO.items())}
+cast: add "rick" to put Rick (top hat; the rich guy, seller, boss or smart neighbour) on stage next to Sticky;
+  then give shots a "rick" object {{"pose", "eyes", "mouth", "action": {", ".join(RICK_ACTIONS)}}} and use cameras two_shot / rick_face
 speakers: {", ".join(VOICES)}
 line mood (how it is said): {", ".join(MOODS)}"""

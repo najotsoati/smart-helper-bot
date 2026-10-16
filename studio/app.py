@@ -94,7 +94,16 @@ def step_script(p, log):
 
 def step_direct(p, log):
     music, recent = _music_ctx()
-    sb = _polish(roles.direct(p["script"], p["brief"], log=log, music=music, recent=recent))
+    sb = roles.direct(p["script"], p["brief"], log=log, music=music, recent=recent)
+    hook = p.get("hook") or {}
+    sb.setdefault("hook_style", hook.get("style"))
+    if hook.get("text_hook"):
+        sb.setdefault("hook_text", hook["text_hook"])
+    if hook.get("set") in vocab.SET_INFO and sb.get("set") in (None, "none"):
+        sb["set"] = hook["set"]
+    if sb.get("hook_style") == "vs" and "rick" not in (sb.get("cast") or []):
+        sb["cast"] = list(sb.get("cast") or []) + ["rick"]
+    sb = _polish(sb)
     sb.setdefault("upload", (p["script"] or {}).get("upload"))
     p["storyboard"], p["state"], p["review"] = sb, "storyboard", None
     _check(p)
@@ -147,7 +156,7 @@ def new_form(request: Request):
 @app.post("/new", dependencies=[Depends(panel_auth)])
 def new_create(topic: str = Form(...), genre: str = Form("comedy sketch"), seconds: int = Form(35),
                notes: str = Form("")):
-    p = store.create({"topic": topic.strip(), "genre": genre, "seconds": max(15, min(seconds, 58)),
+    p = store.create({"topic": topic.strip(), "genre": genre, "seconds": max(12, min(seconds, 58)),
                       "notes": notes.strip()})
     run_bg(p["id"], "Hook", step_hooks)
     return RedirectResponse(f"/p/{p['id']}", 303)

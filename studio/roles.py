@@ -27,7 +27,17 @@ Stakes (money gained or lost, a choice), Speed (fewest words), Clarity (one read
 Triple hook: the on-screen text hook (max 2 short lines, specific numbers beat vague words),
 the visual hook and the spoken hook (first line starts at once, no greeting) all say the same thing.
 Strong shapes: a choice ("Would you take X or Y?"), an outcome tease (show the end first),
-a shocking number ("This $2,000 TV cost $4,064"), a contrarian claim."""
+a shocking number ("This $2,000 TV cost $4,064"), a contrarian claim.
+
+What breaks out right now (vidIQ outliers, Shorts, last 3 months): "Rich vs Poor" / "Poor mindset vs
+rich mindset" comparisons (31M views for a rich-vs-poor sketch), "Then vs Now", "POV: ..." situations,
+a direct question ("Money or knowledge? What do you think?"), and very short stickman gags of 6-20 s
+that loop. Every hook has one of these styles:
+- number: one shocking number on screen
+- vs: Sticky (poor) next to Rick (rich, top hat) - needs Rick on stage
+- pov: "POV: ..." a moment everyone lived through
+- question: a question to the viewer, answered at the end
+- flash_forward: open on the disaster, then rewind to show how it happened."""
 
 
 def make_hooks(brief, log=None):
@@ -39,12 +49,15 @@ notes: {brief.get('notes', '')}
 
 {HOOK_RULES}
 
-Write 3 different sketch ideas for this topic, each with its hook. Score each hook 1-10 honestly
+Write 3 different sketch ideas for this topic, each with its hook, each in a DIFFERENT style and,
+where it fits, a different set (variety matters: the channel must not look the same every day). Score each hook 1-10 honestly
 for how few viewers would swipe away. Return JSON:
 {{"hooks": [{{"premise": "one sentence a 10-year-old understands",
   "text_hook": "ON-SCREEN TEXT, max 6 words",
   "spoken_hook": "Sticky's first line, max 8 words",
   "visual_hook": "what moves on frame 1",
+  "style": "number | vs | pov | question | flash_forward",
+  "set": "none | bed | armchair | kitchen | gold_rush | prehistoric | town | town_night",
   "twist": "the turn nobody expects",
   "score": 8.5, "why": "one sentence"}}]}}"""
     data = chat(CHANNEL, user, strong=True, temperature=0.95, log=log)
@@ -56,6 +69,7 @@ def write_script(brief, hook, log=None):
     user = f"""Brief: topic "{brief.get('topic')}", genre {brief.get('genre', 'comedy sketch')},
 about {brief.get('seconds', 35)} seconds. Notes: {brief.get('notes', '')}
 Chosen idea and hook: {json.dumps(hook, ensure_ascii=False)}
+Keep the hook's style and set. If the style is "vs", Rick (rich, top hat) is on stage next to Sticky and speaks.
 
 Write the sketch as beats. A new beat about every 2 seconds. Speakers: sticky (always on screen),
 phone (his phone talks with a face on its screen), narrator (only if really needed).
@@ -95,7 +109,8 @@ Rules:
 - Total length must stay under {vocab.MAX_SECONDS} s."""
 
 STORYBOARD_SHAPE = """Return JSON exactly in this shape:
-{"title": "...", "video_name": "...", "hook_text": "ON-SCREEN HOOK, max 5 words", "set": "none", "backdrop": "room", "music": "sneaky", "holds_phone": true,
+{"title": "...", "video_name": "...", "hook_text": "ON-SCREEN HOOK, max 5 words",
+ "hook_style": "number", "cast": [], "set": "none", "backdrop": "room", "music": "sneaky", "holds_phone": true,
  "lines": [{"id": "S01", "speaker": "sticky", "text": "...", "mood": "excited"}],
  "shots": [{"camera": "open_zoom", "seconds": 2.0, "line": "S01", "line_at": 0.1, "pose": "shock",
             "eyes": "wide", "mouth": "open", "brows": "worried", "look": "camera", "action": "punch",
@@ -107,7 +122,7 @@ Line ids: S01, S02... for sticky, P01... for phone, N01... for narrator, R01... 
 
 
 def _extras(seconds, music=None, recent=None):
-    n = max(8, round(float(seconds) / 1.8))
+    n = max(6, round(float(seconds) / 1.8))
     out = f"""Use at least {n} shots (a new picture every 1.5-2 s) and at least 4 different actions or props
 across the video (bounce, money_fly, bills_chase, fly_buzz, knock, coin_rain, spin, fall_flat, sweat...).
 Use crash_zoom for the shock and pull_back for a reveal."""

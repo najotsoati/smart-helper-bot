@@ -58,6 +58,9 @@ def normalize(sb):
     sb.setdefault("backdrop", "room")
     sb.setdefault("music", "sneaky")
     sb.setdefault("holds_phone", True)
+    sb["cast"] = [c for c in (sb.get("cast") or []) if c == "rick"]
+    if sb["set"] not in vocab.SET_INFO:
+        sb["set"] = "none"
     lines = []
     for i, ln in enumerate(sb.get("lines") or []):
         ln = dict(ln)

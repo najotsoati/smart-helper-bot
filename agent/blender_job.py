@@ -59,7 +59,8 @@ try:
     os.makedirs(os.path.join(folder, "TAYYOR"), exist_ok=True)
     final = os.path.join(folder, "TAYYOR", os.path.basename(mp4))
     shutil.copy2(mp4, final)
-    finish(ok=True, mp4=final, frames=frames, blend=target)
+    missing = bpy.app.driver_namespace.get("studio_marks", {}).get("missing", [])
+    finish(ok=True, mp4=final, frames=frames, blend=target, missing=missing)
 except Exception as e:
     traceback.print_exc()
     finish(ok=False, error=f"{e.__class__.__name__}: {e}"[-480:])

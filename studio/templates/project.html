@@ -15,7 +15,7 @@
   <form method="post" action="/p/{{ p.id }}/do/pick_hook">
   {% for h in p.hooks %}
     <label class="hook" style="color:var(--text)"><input type="radio" name="i" value="{{ loop.index0 }}" {% if loop.first %}checked{% endif %}>
-      <b>“{{ h.text_hook }}”</b> <span class="badge">★ {{ h.score }}</span><br>
+      <b>“{{ h.text_hook }}”</b> <span class="badge">★ {{ h.score }}</span> <span class="badge">{{ h.style }}</span> <span class="badge">{{ h.set }}</span><br>
       <span>🗣 {{ h.spoken_hook }}</span><br>
       <span class="dim">{{ h.premise }} · twist: {{ h.twist }}</span></label>
   {% endfor %}
