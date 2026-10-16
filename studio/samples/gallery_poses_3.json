@@ -1,0 +1,350 @@
+{
+ "title": "POSES 3",
+ "video_name": "Poses 3",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "disco",
+   "caption": {
+    "text": "DISCO",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "robot",
+   "caption": {
+    "text": "ROBOT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hello",
+   "caption": {
+    "text": "HELLO",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "farewell",
+   "caption": {
+    "text": "FAREWELL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "taxi",
+   "caption": {
+    "text": "TAXI",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hmm",
+   "caption": {
+    "text": "HMM",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "eureka",
+   "caption": {
+    "text": "EUREKA",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "deep_thought",
+   "caption": {
+    "text": "DEEP THOUGHT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "nervous",
+   "caption": {
+    "text": "NERVOUS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "shy",
+   "caption": {
+    "text": "SHY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "proud",
+   "caption": {
+    "text": "PROUD",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "boss",
+   "caption": {
+    "text": "BOSS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "ceo",
+   "caption": {
+    "text": "CEO",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "salesman",
+   "caption": {
+    "text": "SALESMAN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "grab_cash",
+   "caption": {
+    "text": "GRAB CASH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "empty_pockets",
+   "caption": {
+    "text": "EMPTY POCKETS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "cheers",
+   "caption": {
+    "text": "CHEERS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "weightlift",
+   "caption": {
+    "text": "WEIGHTLIFT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "sprint",
+   "caption": {
+    "text": "SPRINT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "awkward",
+   "caption": {
+    "text": "AWKWARD",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "maestro",
+   "caption": {
+    "text": "MAESTRO",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "magic",
+   "caption": {
+    "text": "MAGIC",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "zen",
+   "caption": {
+    "text": "ZEN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "tiptoe",
+   "caption": {
+    "text": "TIPTOE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "lookout",
+   "caption": {
+    "text": "LOOKOUT",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "greedy",
+   "caption": {
+    "text": "GREEDY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "plead",
+   "caption": {
+    "text": "PLEAD",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "smug",
+   "caption": {
+    "text": "SMUG",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "facepalm_both",
+   "caption": {
+    "text": "FACEPALM BOTH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "rooted",
+   "caption": {
+    "text": "ROOTED",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hug_air",
+   "caption": {
+    "text": "HUG AIR",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "cheerleader",
+   "caption": {
+    "text": "CHEERLEADER",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "stop_both",
+   "caption": {
+    "text": "STOP BOTH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "pointing_self",
+   "caption": {
+    "text": "POINTING SELF",
+    "color": "red",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

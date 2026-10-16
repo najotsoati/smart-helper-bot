@@ -1,0 +1,210 @@
+{
+ "title": "ACTIONS 5",
+ "video_name": "Actions 5",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "salute_sir",
+   "caption": {
+    "text": "SALUTE SIR",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "oath_promise",
+   "caption": {
+    "text": "OATH PROMISE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "magic_trick",
+   "caption": {
+    "text": "MAGIC TRICK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "mic_drop_move",
+   "caption": {
+    "text": "MIC DROP MOVE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "zen_breath",
+   "caption": {
+    "text": "ZEN BREATH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "thumbs_up_wink",
+   "caption": {
+    "text": "THUMBS UP WINK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "double_thumbs_bounce",
+   "caption": {
+    "text": "DOUBLE THUMBS BOUNCE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "cheers_toast",
+   "caption": {
+    "text": "CHEERS TOAST",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "handshake_deal",
+   "caption": {
+    "text": "HANDSHAKE DEAL",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "beckon_come",
+   "caption": {
+    "text": "BECKON COME",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "point_self_proud",
+   "caption": {
+    "text": "POINT SELF PROUD",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "proud_chest",
+   "caption": {
+    "text": "PROUD CHEST",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "sassy_turn",
+   "caption": {
+    "text": "SASSY TURN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "chill_lean",
+   "caption": {
+    "text": "CHILL LEAN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "smug_grin",
+   "caption": {
+    "text": "SMUG GRIN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "awkward_wave",
+   "caption": {
+    "text": "AWKWARD WAVE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "shy_hide",
+   "caption": {
+    "text": "SHY HIDE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "head_scratch_confused",
+   "caption": {
+    "text": "HEAD SCRATCH CONFUSED",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "hug_surprise",
+   "caption": {
+    "text": "HUG SURPRISE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "reverse_dab_move",
+   "caption": {
+    "text": "REVERSE DAB MOVE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

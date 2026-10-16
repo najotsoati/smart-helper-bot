@@ -167,3 +167,18 @@ def test_auto_acting_and_new_actions_render():
     i_face = src.index("st.snap('facepalm'")
     assert "st.squint(c0, 1.0)" in src[i_face:]          # eyes open again after the facepalm
     assert all(k in st.POSES for k in vocab.CUSTOM_POSES)   # every new pose is registered in the script
+
+
+def test_every_library_action_and_pose_renders():
+    from studio import blender_script, library
+    acts = list(library.ACTION_LIB)
+    poses = list(library.POSE_LIB)
+    for chunk in range(0, len(acts), 20):
+        shots = [{"camera": "medium_wide", "seconds": 2.0, "action": a} for a in acts[chunk:chunk + 20]]
+        st, bpy, src = run_script(normalize({"title": "A", "set": "town", "lines": [], "shots": shots}))
+        assert src.count("act(c0, e, [(") == len(shots)
+    shots = [{"camera": "medium", "seconds": 1.0, "pose": p} for p in poses]
+    st, bpy, src = run_script(normalize({"title": "P", "lines": [], "shots": shots}))
+    snapped = {c[1][0] for c in st.calls if c[0] == "snap"}
+    assert set(poses) - {poses[0]} <= snapped | {"stand"}
+    assert len(library.POSE_LIB) >= 100 and len(library.ACTION_LIB) >= 100

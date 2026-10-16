@@ -1,0 +1,220 @@
+{
+ "title": "ACTIONS 4",
+ "video_name": "Actions 4",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "sneak_walk",
+   "caption": {
+    "text": "SNEAK WALK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "tiptoe_peek",
+   "caption": {
+    "text": "TIPTOE PEEK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "shh_secret",
+   "caption": {
+    "text": "SHH SECRET",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "listen_close",
+   "caption": {
+    "text": "LISTEN CLOSE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "lookout_scan",
+   "caption": {
+    "text": "LOOKOUT SCAN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "innocent_whistle",
+   "caption": {
+    "text": "INNOCENT WHISTLE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "salesman_wink",
+   "caption": {
+    "text": "SALESMAN WINK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "both_ways_confused",
+   "caption": {
+    "text": "BOTH WAYS CONFUSED",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "stretch_yawn",
+   "caption": {
+    "text": "STRETCH YAWN",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "side_stretch",
+   "caption": {
+    "text": "SIDE STRETCH",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "weightlifting",
+   "caption": {
+    "text": "WEIGHTLIFTING",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "bodybuilder_flex",
+   "caption": {
+    "text": "BODYBUILDER FLEX",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "hero_landing",
+   "caption": {
+    "text": "HERO LANDING",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "march_proud",
+   "caption": {
+    "text": "MARCH PROUD",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "zombie_walk",
+   "caption": {
+    "text": "ZOMBIE WALK",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "sprint_in_place",
+   "caption": {
+    "text": "SPRINT IN PLACE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "bow_thanks",
+   "caption": {
+    "text": "BOW THANKS",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "selfie_snap",
+   "caption": {
+    "text": "SELFIE SNAP",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "photo_frame",
+   "caption": {
+    "text": "PHOTO FRAME",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "phone_call",
+   "caption": {
+    "text": "PHONE CALL",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 2.2,
+   "action": "taxi_whistle",
+   "caption": {
+    "text": "TAXI WHISTLE",
+    "color": "blue",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

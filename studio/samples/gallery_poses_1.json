@@ -1,0 +1,350 @@
+{
+ "title": "POSES 1",
+ "video_name": "Poses 1",
+ "set": "none",
+ "music": "lofi",
+ "holds_phone": false,
+ "lines": [],
+ "shots": [
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "victory",
+   "caption": {
+    "text": "VICTORY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "touchdown",
+   "caption": {
+    "text": "TOUCHDOWN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hero_stance",
+   "caption": {
+    "text": "HERO STANCE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "chin_stroke",
+   "caption": {
+    "text": "CHIN STROKE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "listen",
+   "caption": {
+    "text": "LISTEN",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "shh",
+   "caption": {
+    "text": "SHH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hand_on_heart",
+   "caption": {
+    "text": "HAND ON HEART",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "oath",
+   "caption": {
+    "text": "OATH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "thumbs_up",
+   "caption": {
+    "text": "THUMBS UP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "double_thumbs",
+   "caption": {
+    "text": "DOUBLE THUMBS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "stop",
+   "caption": {
+    "text": "STOP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "beckon",
+   "caption": {
+    "text": "BECKON",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "point_far",
+   "caption": {
+    "text": "POINT FAR",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "point_back",
+   "caption": {
+    "text": "POINT BACK",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "both_ways",
+   "caption": {
+    "text": "BOTH WAYS",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "point_floor",
+   "caption": {
+    "text": "POINT FLOOR",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "point_sky",
+   "caption": {
+    "text": "POINT SKY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "airplane",
+   "caption": {
+    "text": "AIRPLANE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "t_pose",
+   "caption": {
+    "text": "T POSE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "scarecrow",
+   "caption": {
+    "text": "SCARECROW",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "zombie",
+   "caption": {
+    "text": "ZOMBIE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "surrender",
+   "caption": {
+    "text": "SURRENDER",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "one_flex",
+   "caption": {
+    "text": "ONE FLEX",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "bodybuilder",
+   "caption": {
+    "text": "BODYBUILDER",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "shield_eyes",
+   "caption": {
+    "text": "SHIELD EYES",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "head_scratch",
+   "caption": {
+    "text": "HEAD SCRATCH",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "sassy",
+   "caption": {
+    "text": "SASSY",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "casual",
+   "caption": {
+    "text": "CASUAL",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "hip_wave",
+   "caption": {
+    "text": "HIP WAVE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "fist_pump",
+   "caption": {
+    "text": "FIST PUMP",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "champion",
+   "caption": {
+    "text": "CHAMPION",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "yes",
+   "caption": {
+    "text": "YES",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "handshake",
+   "caption": {
+    "text": "HANDSHAKE",
+    "color": "red",
+    "pos": "bottom"
+   }
+  },
+  {
+   "camera": "medium_wide",
+   "seconds": 1.0,
+   "pose": "tada",
+   "caption": {
+    "text": "TADA",
+    "color": "red",
+    "pos": "bottom"
+   }
+  }
+ ]
+}

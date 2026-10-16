@@ -69,6 +69,50 @@ def cycle(mod, poses, f0, f1, step=5):
 '''
 
 
+ACT_HELPERS = '''
+def act(c0, e, steps):
+    """Play an action recipe from the acting library (studio/library.py)."""
+    for s_ in steps:
+        op, a = s_[0], s_[1:]
+        if op == "pose": st.snap(a[0], c0 + a[1], face=False)
+        elif op == "cycle": cycle(st, a[0], c0 + 1, e, a[1])
+        elif op == "bounce": st.bounce(c0 + a[0], height=a[1], length=12, sound=0.5)
+        elif op == "hop": st.hop(c0 + a[0], a[1], 8)
+        elif op == "spin": st.spin(c0 + a[0], turns=a[1], length=16)
+        elif op == "punch": st.punch(c0 + a[0], a[1])
+        elif op == "shiver": st.shiver(c0, e, a[0])
+        elif op == "flatten": st.flatten(c0 + a[0], hold=a[1])
+        elif op == "eyes": st.eyes(a[0], c0 + a[1])
+        elif op == "mouth": st.mouth(a[0], c0 + a[1])
+        elif op == "squint": st.squint(c0 + a[1], a[0])
+        elif op == "brows": brow(c0 + a[2], a[0], a[1])
+        elif op == "look": look(c0 + a[2], a[0], a[1])
+        elif op == "sfx": st.sfx(a[0], c0 + a[1], a[2])
+        elif op == "prop": st.prop(a[0], c0 + a[1], e)
+        elif op == "fx":
+            if a[0] == "lines": st.fx("lines", c0 + a[1], X + a[2], a[3], a[4], length=max(8, e - c0 - a[1]))
+            else: st.fx(a[0], c0 + a[1], X + a[2], a[3], a[4])
+        elif op == "shake": st.shake(c0 + a[0], c0 + a[0] + a[1], a[2])
+        elif op == "walk":
+            _m = (c0 + e) // 2; _arms = st.POSES.get(a[2]) if a[2] else None
+            st.walk(c0, _m, X, X + a[0], step=a[1], arms=_arms); st.walk(_m, e, X + a[0], X, step=a[1], arms=_arms)
+        elif op == "slide":
+            st.move_to(X, 0.0, c0 + a[1]); st.move_to(X + a[0], 0.0, c0 + a[2]); st.move_to(X, 0.0, e)
+        elif op == "tears": st.tears(c0 + a[0], e)
+        elif op == "notes":
+            for _i, (_dx, _x1, _z1) in enumerate(((-0.3, -2.4, 3.6), (0.3, 2.4, 4.2), (0.5, 2.4, 3.2))):
+                _n = "Note_%d" % (_i + 1); _f = c0 + a[0] + _i * 5
+                st.place(_n, _f, x=X + _dx, z=1.6, scale=1.0, step=True); st.place(_n, _f + 30, x=B + _x1, z=_z1)
+                st.place(_n, _f + 32, scale=0.0, step=True)
+        elif op == "coins":
+            for _i in range(10):
+                _f = c0 + a[0] + _i * 2
+                st.place("Coin_%d" % (_i + 1), _f, x=B - 1.6 + _i * 0.36, z=6.1, scale=1.0, step=True)
+                st.place("Coin_%d" % (_i + 1), _f + 22, z=-0.7); st.place("Coin_%d" % (_i + 1), _f + 23, scale=0.0, step=True)
+        elif op == "fly": st.flutter("FX_Fly", c0 + a[0], c0 + a[0] + 30, X + 0.36, 2.12, X + 0.75, 3.7)
+'''
+
+
 def _f(v):
     return repr(round(float(v), 3))
 
@@ -86,6 +130,7 @@ def generate(sb, audio_dir="audio"):
         custom_poses=json.dumps(vocab.CUSTOM_POSES), phone_in_hand=json.dumps(vocab.PHONE_IN_HAND),
         backdrop=sb["backdrop"], video_name=sb["video_name"].replace('"', "'"))]
     w = out.append
+    w(ACT_HELPERS)
 
     # --- set and title (titles before any camera call) ---
     w('off("Set_Calendar", 1)')
@@ -161,7 +206,7 @@ def generate(sb, audio_dir="audio"):
 
         # face
         if temp_eyes and not lying and not sh.get("eyes"):
-            w("st.squint(c0, 1.0)")
+            w("st.squint(c0, 1.0); st.eyes('normal', c0)")
             eyes, temp_eyes = "normal", False
         if sh.get("eyes") and sh["eyes"] != eyes:
             if sh["eyes"] in ("squint", "shut"):
@@ -294,6 +339,12 @@ def generate(sb, audio_dir="audio"):
         elif act == "strut":
             w("_m = (c0 + e) // 2; st.walk(c0, _m, X, X + 0.6, step=8, arms=st.POSES['hips'])")
             w("st.walk(_m, e, X + 0.6, X, step=8, arms=st.POSES['hips'])")
+        elif act in vocab.ACTION_LIB:
+            steps = vocab.ACTION_LIB[act][1]
+            w(f"act(c0, e, {steps!r})  # {act}")
+            pose = None
+            if any(st_[0] in ("eyes", "squint") for st_ in steps):
+                temp_eyes = True
         if sh.get("shake") and act != "fall_flat":
             w("st.shake(c0 + 1, c0 + 9, 0.05)")
 

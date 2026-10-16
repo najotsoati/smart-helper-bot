@@ -74,12 +74,20 @@ CUSTOM_POSES = {
     "head_r": {"upper_arm.L": -80, "forearm.L": -86, "upper_arm.R": -100, "forearm.R": -94, "head": 76},
 }
 
+# The acting library (studio/library.py): 100+ more poses and actions.
+from .library import ACTION_LIB, POSE_FEEL, POSE_LIB  # noqa: E402
+
+POSES += list(POSE_LIB)
+CUSTOM_POSES.update(POSE_LIB)
+
 # Poses that read as an emotion, used by the editor when the director left a shot without one.
 ACTING = {
     "shock": ["shock", "panic", "point_up"], "happy": ["cheer", "flex", "wave", "dab", "idea"],
     "sad": ["slump", "facepalm", "tired", "shrug"], "angry": ["rage", "arms_crossed", "point"],
     "think": ["think", "hips", "point_r"], "beg": ["pray", "present"],
 }
+for _name, _feel in POSE_FEEL.items():
+    ACTING.setdefault(_feel, []).append(_name)
 
 # Where the phone in the hand sits for poses that hold it; any other pose hides it.
 PHONE_IN_HAND = {"phone": (0.62, 2.55), "ph_tap": (0.62, 2.55), "ph_rage": (0.62, 2.55),
@@ -129,6 +137,8 @@ ACTIONS = {
     "tired": ("bends over exhausted, wipes his brow", 0.7),
     "strut": ("struts across like a rich man, hands on hips", 0),
 }
+
+ACTIONS.update({name: (desc, 0) for name, (desc, _steps) in ACTION_LIB.items()})
 
 # Rick: the second puppet with a top hat (rich guy, seller, boss, smarter neighbour).
 RICK_ACTIONS = ["none", "bounce", "punch", "tip_hat", "spin", "dance", "count_money", "flex"]
