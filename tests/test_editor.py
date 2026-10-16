@@ -140,3 +140,30 @@ def test_phone_only_when_story_needs_it():
     assert "st.apply_pose('stand', 1" in src and "hand_phone(1," not in src
     sb = normalize(_sb(shots=[{"camera": "phone_screen", "seconds": 2.0}]))
     assert sb["holds_phone"] is True
+
+
+def test_auto_acting_and_new_actions_render():
+    sb = _sb(shots=[{"camera": "face", "seconds": 2.0, "mouth": "scream"},
+                    {"camera": "medium", "seconds": 2.0, "mouth": "scream"},
+                    {"camera": "medium_wide", "seconds": 2.0, "mouth": "sad"},
+                    {"camera": "medium", "seconds": 2.0, "action": "facepalm"},
+                    {"camera": "face", "seconds": 2.0},
+                    {"camera": "wide", "seconds": 2.5, "action": "dance"},
+                    {"camera": "medium", "seconds": 2.0, "action": "count_money"},
+                    {"camera": "face", "seconds": 2.0, "action": "tired"},
+                    {"camera": "medium", "seconds": 2.0, "action": "head_shake"},
+                    {"camera": "wide", "seconds": 2.0, "action": "strut"},
+                    {"camera": "medium", "seconds": 2.0, "action": "flex"},
+                    {"camera": "face", "seconds": 2.0, "action": "panic"}])
+    sb = editor.polish(sb)
+    poses = [s.get("pose") for s in sb["shots"][:3]]
+    assert poses[0] and poses[1] and poses[0] != poses[1]
+    assert poses[2] in vocab.ACTING["sad"]
+    st, bpy, src = run_script(sb)
+    names = [c[0] for c in st.calls]
+    applied = {c[1][0] for c in st.calls if c[0] == "apply_pose"}
+    assert {"panic", "count_a", "count_b", "head_l", "head_r", "cheer"} <= applied
+    assert "walk" in names and "hop" in names
+    i_face = src.index("st.snap('facepalm'")
+    assert "st.squint(c0, 1.0)" in src[i_face:]          # eyes open again after the facepalm
+    assert all(k in st.POSES for k in vocab.CUSTOM_POSES)   # every new pose is registered in the script

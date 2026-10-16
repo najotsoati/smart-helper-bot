@@ -36,6 +36,40 @@ def pick_music(wanted, history, assets=None):
     return name, pool[name]
 
 
+def _feeling(sh, mood):
+    if sh.get("mouth") == "scream" or sh.get("eyes") == "wide" or mood in ("scared", "shout"):
+        return "shock"
+    if sh.get("mouth") in ("grin", "smile") or sh.get("eyes") == "money" or mood == "excited":
+        return "happy"
+    if sh.get("mouth") == "sad" or mood in ("sad", "deadpan"):
+        return "sad"
+    if sh.get("brows") == "angry":
+        return "angry"
+    if mood == "confused" or sh.get("mouth") == "think":
+        return "think"
+    return None
+
+
+def auto_act(sb):
+    lines = {ln["id"]: ln for ln in sb["lines"]}
+    prev, used = None, {}
+    for i, sh in enumerate(sb["shots"]):
+        if sh["camera"] in ("phone_screen", "phone_push", "end_card", "floor"):
+            continue
+        if not sh.get("pose"):
+            feel = _feeling(sh, lines.get(sh.get("line"), {}).get("mood"))
+            if feel:
+                pool = [p for p in vocab.ACTING[feel] if p != prev]
+                sh["pose"] = min(pool, key=lambda p: (used.get(p, 0), pool.index(p)))
+        elif sh["pose"] == prev and sh.get("action", "none") == "none":
+            alts = [p for f in vocab.ACTING.values() if prev in f for p in f if p != prev]
+            if alts:
+                sh["pose"] = min(alts, key=lambda p: used.get(p, 0))
+        if sh.get("pose"):
+            used[sh["pose"]] = used.get(sh["pose"], 0) + 1
+            prev = sh["pose"]
+
+
 def pick_set(wanted, set_history):
     """Keep the director's set unless the last two videos already used it; then take the least recent."""
     recent = list(set_history or [])[-2:]
@@ -75,6 +109,9 @@ def polish(sb, history=None, assets=None, set_history=None):
         prev, cur = shots[i - 1]["camera"], shots[i]["camera"]
         if cur == prev and cur not in ("phone_screen", "phone_push", "floor"):
             shots[i]["camera"] = next(c for c in ROOM_CAMS if c != prev)
+
+    # 2b) body language: a fitting pose for every shot without one, never the same twice in a row
+    auto_act(sb)
 
     # 3) music stop on the twist
     if len(shots) >= 5 and not any(s.get("music_stop") for s in shots):

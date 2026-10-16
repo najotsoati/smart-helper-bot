@@ -104,6 +104,9 @@ Rules:
 - A shot with a spoken line stretches to fit it automatically; "seconds" is the minimum length.
 - Every action gets a matching sfx (bounce, spin, flatten, fall_flat and coin_rain already add theirs).
 - Exaggerated faces: eyes wide/money, mouth scream, brows angry/worried, props sweat/exclaim/question.
+- Body language changes every shot: never the same pose twice in a row. Use the acting actions
+  (panic, dance, count_money, facepalm, head_shake, flex, dab, tired, strut) - at least 3 different
+  ones per video - and poses like arms_crossed, pray, salute, point_up, wipe, grab.
 - Phone screens: camera phone_screen or phone_push with phone_text (up to 3 short lines: label, BIG NUMBER, small red line).
 - Captions: max 6 words, never pos "big" on a face close-up.
 - Use music_stop on the shock moment; the twist sits at 40-70% of the runtime.

@@ -42,6 +42,9 @@ POSES = [
     "wave", "wave2", "shrug", "present", "shock", "slump", "tip", "phone",
     # custom ones defined in the generated script
     "ph_tap", "ph_rage", "ph_hip", "rage",
+    # new: body language beyond the phone
+    "panic", "facepalm", "arms_crossed", "flex", "salute", "pray", "point_up", "dab", "tired",
+    "wipe", "grab", "point_r", "point_dl", "count_a", "count_b", "head_l", "head_r",
 ]
 
 # Custom poses written into st.POSES by the generated script (angles from the skill notes).
@@ -50,6 +53,32 @@ CUSTOM_POSES = {
     "ph_rage": {"upper_arm.L": -62, "forearm.L": 58, "upper_arm.R": 150, "forearm.R": 85},
     "ph_hip": {"upper_arm.L": -62, "forearm.L": 58, "upper_arm.R": -135, "forearm.R": -49},
     "rage": {"upper_arm.L": 45, "forearm.L": 100, "upper_arm.R": 135, "forearm.R": 80},
+    # proven in video_06..16
+    "wipe": {"upper_arm.R": 128, "forearm.R": 52, "upper_arm.L": -80, "forearm.L": -86, "front": "R"},
+    "grab": {"root": 97, "head": 96, "upper_arm.R": 232, "forearm.R": 216, "upper_arm.L": -60, "forearm.L": -100},
+    "point_r": {"upper_arm.L": 4, "forearm.L": 10, "upper_arm.R": -100, "forearm.R": -94, "head": 86},
+    "point_dl": {"upper_arm.R": 230, "forearm.R": 240, "upper_arm.L": -45, "forearm.L": -131, "head": 97},
+    # new, built from the same angle rules (0 right, 90 up; .L is the limb on the screen's right)
+    "panic": {"upper_arm.L": 50, "forearm.L": 150, "upper_arm.R": 130, "forearm.R": 30, "head": 90},
+    "facepalm": {"upper_arm.L": -40, "forearm.L": 118, "upper_arm.R": -100, "forearm.R": -94, "head": 80, "front": "L"},
+    "arms_crossed": {"upper_arm.L": -110, "forearm.L": 180, "upper_arm.R": -70, "forearm.R": 0, "head": 92, "front": "L"},
+    "flex": {"upper_arm.L": 0, "forearm.L": 90, "upper_arm.R": 180, "forearm.R": 90, "head": 90},
+    "salute": {"upper_arm.L": 30, "forearm.L": 165, "upper_arm.R": -100, "forearm.R": -94, "head": 90, "front": "L"},
+    "pray": {"upper_arm.L": -110, "forearm.L": 110, "upper_arm.R": -70, "forearm.R": 70, "head": 86, "front": "L"},
+    "point_up": {"upper_arm.L": 80, "forearm.L": 85, "upper_arm.R": -100, "forearm.R": -94, "head": 95},
+    "dab": {"upper_arm.L": 30, "forearm.L": 30, "upper_arm.R": 20, "forearm.R": 160, "head": 62, "front": "R"},
+    "tired": {"torso": 65, "head": 55, "upper_arm.L": -75, "forearm.L": -85, "upper_arm.R": -100, "forearm.R": -80},
+    "count_a": {"upper_arm.L": -50, "forearm.L": 10, "upper_arm.R": -60, "forearm.R": 20, "head": 80, "front": "R"},
+    "count_b": {"upper_arm.L": -50, "forearm.L": 10, "upper_arm.R": -75, "forearm.R": -15, "head": 80, "front": "R"},
+    "head_l": {"upper_arm.L": -80, "forearm.L": -86, "upper_arm.R": -100, "forearm.R": -94, "head": 104},
+    "head_r": {"upper_arm.L": -80, "forearm.L": -86, "upper_arm.R": -100, "forearm.R": -94, "head": 76},
+}
+
+# Poses that read as an emotion, used by the editor when the director left a shot without one.
+ACTING = {
+    "shock": ["shock", "panic", "point_up"], "happy": ["cheer", "flex", "wave", "dab", "idea"],
+    "sad": ["slump", "facepalm", "tired", "shrug"], "angry": ["rage", "arms_crossed", "point"],
+    "think": ["think", "hips", "point_r"], "beg": ["pray", "present"],
 }
 
 # Where the phone in the hand sits for poses that hold it; any other pose hides it.
@@ -90,10 +119,19 @@ ACTIONS = {
     "fly_buzz": ("a fly buzzes out of his empty pocket/wallet: broke", 1.1),
     "knock": ("loud knocking on the door, the door shakes", 0.8),
     "dino_roar": ("a dinosaur head slides in and roars (prehistoric set only)", 0.9),
+    "panic": ("hands on head, flailing between panic and shock", 0),
+    "dance": ("victory dance: cheer, wave, point, hop", 0),
+    "count_money": ("counts banknotes, flick flick flick", 0),
+    "facepalm": ("slaps his face and closes his eyes", 0.4),
+    "head_shake": ("shakes his head: no, no, no", 0.5),
+    "flex": ("flexes his muscles with a sparkle (fake confidence)", 0.5),
+    "dab": ("does a dab", 0.3),
+    "tired": ("bends over exhausted, wipes his brow", 0.7),
+    "strut": ("struts across like a rich man, hands on hips", 0),
 }
 
 # Rick: the second puppet with a top hat (rich guy, seller, boss, smarter neighbour).
-RICK_ACTIONS = ["none", "bounce", "punch", "tip_hat", "spin"]
+RICK_ACTIONS = ["none", "bounce", "punch", "tip_hat", "spin", "dance", "count_money", "flex"]
 
 SFX = {
     "ding": 0.5, "pop": 0.55, "tick": 1.0, "chaching": 0.6, "jump": 0.4, "land": 0.32,

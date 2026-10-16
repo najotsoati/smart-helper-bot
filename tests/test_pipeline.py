@@ -13,7 +13,9 @@ class Rec:
     """Stands in for stickman_tools.py: records every call."""
 
     def __init__(self):
-        self.calls, self.POSES = [], {}
+        self.calls = []
+        self.POSES = {n: {} for n in ("rest", "stand", "hips", "think", "point", "point_left", "idea", "cheer",
+                                      "wave", "wave2", "shrug", "present", "shock", "slump", "tip", "phone")}
 
     def __getattr__(self, name):
         def f(*a, **k):

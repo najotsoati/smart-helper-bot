@@ -61,6 +61,11 @@ def speak(speaker, path, f, **kw):
     st.voice(path, f, volume=0.9)
     return f + L(path)
 PHONE_FACE = [False]
+def cycle(mod, poses, f0, f1, step=5):
+    """Alternate poses every `step` frames: lively acting from fixed poses."""
+    f, k = f0, 0
+    while f < f1 - 2:
+        mod.apply_pose(poses[k % len(poses)], f, face=False); f += step; k += 1
 '''
 
 
@@ -94,6 +99,8 @@ def generate(sb, audio_dir="audio"):
         w(f'off({name!r}, 1)')
     if rick_on:
         w('rk = T.as_module(); rk.use("R_"); rk.clear_animation(); rk.show()')
+        w("for _k, _v in CUSTOM_POSES.items():")
+        w("    rk.POSES[_k] = _v")
         w('rk.move_to(XR, 0.0, 1); rk.apply_pose("hips", 1, face=False); rk.mouth("smile", 1)')
     title = sb["title"]
     if len(title) <= 23:
@@ -120,6 +127,7 @@ def generate(sb, audio_dir="audio"):
     w("starts = []; skip_blink = []; music_cuts = []")
 
     pose, eyes, lying, phone_shown = first_pose, "normal", False, first_pose in vocab.PHONE_IN_HAND
+    temp_eyes = False     # eyes closed by an action (facepalm, tired): open them in the next shot
 
     for i, sh in enumerate(sb["shots"], 1):
         cam = vocab.CAMERAS[sh["camera"]]
@@ -152,6 +160,9 @@ def generate(sb, audio_dir="audio"):
             phone_shown = want
 
         # face
+        if temp_eyes and not lying and not sh.get("eyes"):
+            w("st.squint(c0, 1.0)")
+            eyes, temp_eyes = "normal", False
         if sh.get("eyes") and sh["eyes"] != eyes:
             if sh["eyes"] in ("squint", "shut"):
                 w(f'st.eyes("normal", c0); st.squint(c0, {0.55 if sh["eyes"] == "squint" else 0.1})')
@@ -249,6 +260,40 @@ def generate(sb, audio_dir="audio"):
             w('st.sfx("knock3", c0 + 1, 1.0); st.punch(c0 + 1, 0.06)')
             w("for _f, _dx in ((1, 0.0), (2, 0.05), (4, 0.0), (6, 0.0), (7, 0.05), (9, 0.0), (12, 0.0), (13, 0.05), (15, 0.0)):")
             w('    st.place("Set_Door", c0 + _f, x=1.92 + _dx)')
+        elif act == "panic":
+            w("cycle(st, ['panic', 'shock'], c0 + 1, e, 5); st.shiver(c0, e, 0.015)")
+            pose = None
+        elif act == "dance":
+            w("cycle(st, ['cheer', 'wave2', 'point', 'idea'], c0 + 1, e, 6)")
+            w("for _h in range(c0 + 6, e - 10, 12): st.hop(_h, 0.18, 8)")
+            pose = None
+        elif act == "count_money":
+            w("cycle(st, ['count_a', 'count_b'], c0 + 1, e, 6)")
+            w('for _t in range(c0 + 4, e - 4, 12): st.sfx("drop", _t, 0.35)')
+            w('st.place("Note_1", c0 + 1, x=X + 0.35, z=1.95, scale=0.8, step=True); st.place("Note_1", e, scale=0.0, step=True)')
+            pose = None
+        elif act == "facepalm":
+            w("st.snap('facepalm', c0 + 2, face=False); st.squint(c0 + 6, 0.1); brow(c0 + 6, 12.0, 0.0, 0.0)")
+            w('st.sfx("hit", c0 + 5, 0.3)')
+            pose, eyes, temp_eyes = "facepalm", "shut", True
+        elif act == "head_shake":
+            w("cycle(st, ['head_l', 'head_r'], c0 + 1, min(e, c0 + 25), 4)")
+            pose = None
+        elif act == "flex":
+            w("st.snap('flex', c0 + 2, face=False); st.mouth('grin', c0 + 2); st.bounce(c0 + 4, 0.12, 8)")
+            w("st.fx('star', c0 + 8, X + 0.75, 3.1, 0.5); st.fx('star', c0 + 10, X - 0.75, 3.1, 0.5)")
+            w('st.sfx("chaching", c0 + 8, 0.4)')
+            pose = "flex"
+        elif act == "dab":
+            w('st.snap("dab", c0 + 2, face=False); st.sfx("whoosh", c0 + 1, 0.6)')
+            pose = "dab"
+        elif act == "tired":
+            w("st.snap('tired', c0 + 2, face=False); st.squint(c0 + 2, 0.55)")
+            w("st.snap('wipe', c0 + 16, face=False); st.prop('sweat', c0 + 4, e)")
+            pose, eyes, temp_eyes = "wipe", "squint", True
+        elif act == "strut":
+            w("_m = (c0 + e) // 2; st.walk(c0, _m, X, X + 0.6, step=8, arms=st.POSES['hips'])")
+            w("st.walk(_m, e, X + 0.6, X, step=8, arms=st.POSES['hips'])")
         if sh.get("shake") and act != "fall_flat":
             w("st.shake(c0 + 1, c0 + 9, 0.05)")
 
@@ -270,6 +315,12 @@ def generate(sb, audio_dir="audio"):
                 w('rk.tip_hat(c0 + 4); st.sfx("pop", c0 + 6, 0.4)')
             elif ra == "spin":
                 w('rk.spin(c0 + 3, turns=2, length=16); st.sfx("whirl", c0 + 3, 0.6)')
+            elif ra == "dance":
+                w("cycle(rk, ['cheer', 'wave2', 'point', 'idea'], c0 + 1, e, 6)")
+            elif ra == "count_money":
+                w("cycle(rk, ['count_a', 'count_b'], c0 + 1, e, 6)")
+            elif ra == "flex":
+                w("rk.snap('flex', c0 + 2, face=False); rk.mouth('grin', c0 + 2)")
         if act == "dino_roar":
             w('st.place("Dino_A", c0 + 1, x=B - 3.4, z=1.35, scale=1.0, step=True); st.place("Dino_A", c0 + 7, x=B - 2.15)')
             w('st.sfx("roar", c0 + 4, 0.68); st.shake(c0 + 8, c0 + 18, 0.05)')
