@@ -12,10 +12,12 @@ from pydantic import BaseModel, ValidationError
 
 from . import config, net
 
-# preferred families, best first, when picking a free model automatically (free catalog changes often;
-# gpt-oss-120b follows long instructions and JSON formats most reliably among free models in 2026 tests)
-PREFERENCE = ["gpt-oss-120b", "deepseek", "qwen3", "nemotron", "gemma", "llama", "qwen", "gemini", "mistral", "glm"]
-VISION_PREFERENCE = ["gemma", "qwen", "llama", "gemini", "mistral", "nemotron"]
+# preferred models, best first, when picking a free one automatically (the free catalog changes often)
+PREFERENCE = ["inkling", "nemotron-3-ultra", "gpt-oss-120b", "nemotron-3-super", "deepseek", "qwen3",
+              "gemma-4-31b", "gemma", "llama", "qwen", "mistral", "glm"]
+VISION_PREFERENCE = ["inkling", "gemma-4-31b", "gemma-4", "gemma", "qwen", "llama", "mistral"]
+# free but not chat models: they can't write a script
+NOT_CHAT = ("embed", "rerank", "safety", "guard", "moderation", "whisper", "tts", "transcri")
 _models_cache: tuple[float, list[dict]] = (0.0, [])
 
 
@@ -46,7 +48,8 @@ def pick_model(vision: bool = False) -> str:
     chosen = config.OPENROUTER_VISION_MODEL if vision else config.OPENROUTER_MODEL
     if chosen:
         return chosen
-    free = [m for m in _models() if _is_free(m)]
+    free = [m for m in _models() if _is_free(m) and not any(w in m["id"].lower() for w in NOT_CHAT)
+            and "text" in m.get("architecture", {}).get("output_modalities", ["text"])]
     if vision:
         free = [m for m in free if "image" in m.get("architecture", {}).get("input_modalities", [])]
     if not free:

@@ -298,6 +298,10 @@ def test_openrouter_free_model_and_json_retry(monkeypatch):
     models = {"data": [
         {"id": "anthropic/claude-x", "pricing": {"prompt": "0.000003", "completion": "0.000015"},
          "context_length": 200000, "architecture": {"input_modalities": ["text", "image"]}},
+        {"id": "nvidia/nemotron-3-embed-1b:free", "pricing": {"prompt": "0", "completion": "0"},
+         "context_length": 8000, "architecture": {"input_modalities": ["text"], "output_modalities": ["embeddings"]}},
+        {"id": "nvidia/nemotron-3.5-content-safety:free", "pricing": {"prompt": "0", "completion": "0"},
+         "context_length": 128000, "architecture": {"input_modalities": ["text", "image"]}},
         {"id": "mistralai/small:free", "pricing": {"prompt": "0", "completion": "0"}, "context_length": 32000,
          "architecture": {"input_modalities": ["text"]}},
         {"id": "deepseek/chat:free", "pricing": {"prompt": "0", "completion": "0"}, "context_length": 128000,
@@ -354,3 +358,19 @@ def test_openrouter_free_model_and_json_retry(monkeypatch):
     assert chats[2]["messages"][1]["content"][1] == {"type": "image_url", "image_url": {"url": "https://t/1.jpg"}}
     assert picks.scenes[0].match == 88
     assert checks == [] and "veb-qidiruv" in warning
+
+
+def test_openrouter_prefers_inkling(monkeypatch):
+    from studio import openrouter
+
+    free = {"prompt": "0", "completion": "0"}
+    monkeypatch.setattr(config, "OPENROUTER_MODEL", "")
+    monkeypatch.setattr(config, "OPENROUTER_VISION_MODEL", "")
+    monkeypatch.setattr(openrouter, "_models", lambda: [
+        {"id": "nvidia/nemotron-3-ultra-550b-a55b:free", "pricing": free, "architecture": {"input_modalities": ["text"]}},
+        {"id": "thinkingmachines/inkling:free", "pricing": free,
+         "architecture": {"input_modalities": ["text", "image", "audio"]}},
+        {"id": "google/gemma-4-31b-it:free", "pricing": free, "architecture": {"input_modalities": ["text", "image"]}},
+    ])
+    assert openrouter.pick_model() == "thinkingmachines/inkling:free"
+    assert openrouter.pick_model(vision=True) == "thinkingmachines/inkling:free"
