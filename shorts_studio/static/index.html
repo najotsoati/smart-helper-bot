@@ -37,7 +37,7 @@
   .hooks label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
   .hooks input { margin-top: 4px; accent-color: var(--accent); }
   .scenes { display: grid; gap: 8px; }
-  .scene { display: grid; grid-template-columns: 28px 1fr 170px 140px 96px; gap: 8px; align-items: start; }
+  .scene { display: grid; grid-template-columns: 28px 1fr 150px 130px 96px 104px; gap: 8px; align-items: start; }
   .scene .idx { color: var(--muted); padding-top: 10px; text-align: right; }
   .scene input { width: 100%; }
   .head { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
@@ -64,6 +64,10 @@
   .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; margin-right: 6px; font-weight: 700; }
   .tag.ok { background: #1d3b27; color: var(--green); } .tag.fix { background: #3b331d; color: var(--accent); } .tag.del { background: #3b1d24; color: var(--red); }
   .scene .meta { grid-column: 2 / -1; font-size: 12px; color: var(--muted); margin-top: -4px; }
+  .match { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin: 4px 0 12px; font-size: 13px; }
+  .match div { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+  .match b.good { color: var(--green); } .match b.bad { color: var(--red); }
+  .big { font-size: 22px; font-weight: 800; }
   .hidden { display: none; }
   .err { color: var(--red); white-space: pre-wrap; }
 </style>
@@ -102,7 +106,7 @@
     <div class="head">Hook: eng muhim birinchi 3 soniya. Eng kuchlisini tanlang.</div>
     <div class="hooks" id="hooks" style="margin:8px 0 16px"></div>
     <div id="checksBox" class="hidden"><div class="head">Faktlar tekshiruvi</div><div class="checks" id="checks" style="margin-top:6px"></div></div>
-    <div class="scene head"><span></span><span>Matn (ovoz)</span><span>Video qidiruv</span><span>Ekrandagi sarlavha</span><span>Bosqich</span></div>
+    <div class="scene head"><span></span><span>Matn (ovoz)</span><span>Video qidiruv</span><span>Ekrandagi sarlavha</span><span>Bosqich</span><span>Kadr</span></div>
     <div class="scenes" id="scenes"></div>
     <div style="margin-top:14px" class="head">YouTube sarlavhasi</div>
     <input id="title" style="width:100%;margin-top:6px">
@@ -122,6 +126,12 @@
         <option value="+20%">Juda tez</option>
       </select>
       <input id="series" placeholder="Seriya: Ocean Facts #3 (ixtiyoriy)" style="flex:1 1 200px">
+      <select id="visualMode" title="Faktlar qanday ko'rsatilsin">
+        <option value="mixed" selected>Kadrlar: aralash (tavsiya)</option>
+        <option value="illustration">Kadrlar: faqat AI chizmalar</option>
+        <option value="stock">Kadrlar: faqat stok video</option>
+      </select>
+      <label class="row" style="gap:6px"><input type="checkbox" id="host" checked> Maskot (Fakti)</label>
       <label class="row" style="gap:6px"><input type="checkbox" id="music" checked> Fon musiqasi</label>
       <button id="btnRender">Video yasash</button>
     </div>
@@ -133,6 +143,11 @@
     <div class="result hidden" id="result">
       <video id="player" controls playsinline></video>
       <div>
+        <div id="matchBox" class="hidden">
+          <div class="head">Kadr va matn mosligi</div>
+          <div class="big" id="matchAvg"></div>
+          <div class="match" id="match"></div>
+        </div>
         <div class="head">Sarlavha</div><div class="copy" id="rTitle"></div>
         <div class="head">Tavsif + heshteglar</div><div class="copy" id="rDesc"></div>
         <div class="head">Pin qilinadigan izoh</div><div class="copy" id="rPin"></div>
@@ -166,7 +181,8 @@ function busy(btn, on, label) {
 async function loadConfig() {
   const c = await api("/api/config");
   const mark = (ok) => `<b class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</b>`;
-  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · YouTube ${mark(c.youtube)} · ElevenLabs ${mark(c.elevenlabs)} · Musiqa: ${c.music_tracks} ta`;
+  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · YouTube ${mark(c.youtube)} · ElevenLabs ${mark(c.elevenlabs)} · Chizmalar (OpenAI) ${mark(c.openai)} · Musiqa: ${c.music_tracks} ta`;
+  threshold = c.match_threshold;
   $("voice").innerHTML = Object.entries(c.voices).map(([k, v]) => `<option value="${v}">${k}</option>`).join("");
 }
 
@@ -265,9 +281,12 @@ function renderScenes() {
   script.scenes.forEach((s, i) => {
     const row = document.createElement("div");
     row.className = "scene";
-    row.innerHTML = `<span class="idx">${i + 1}</span><textarea rows="1"></textarea><input><input>
-      <select><option value="normal">oddiy</option><option value="twist">twist</option><option value="payoff">payoff</option></select>`;
-    const [ta, q, t, beat] = row.querySelectorAll("textarea, input, select");
+    row.innerHTML = `<span class="idx">${i + 1}</span><textarea rows="2"></textarea><input><input>
+      <select><option value="normal">oddiy</option><option value="twist">twist</option><option value="payoff">payoff</option></select>
+      <select><option value="mascot">maskot</option><option value="illustration">chizma</option><option value="stock">video</option></select>`;
+    const [ta, q, t, beat, kind] = row.querySelectorAll("textarea, input, select");
+    kind.value = s.visual_type || "stock";
+    kind.onchange = () => (s.visual_type = kind.value);
     ta.value = s.narration; q.value = s.visual_query; t.value = s.on_screen_text; beat.value = s.beat || "normal";
     ta.oninput = () => (s.narration = ta.value);
     q.oninput = () => (s.visual_query = q.value);
@@ -278,7 +297,8 @@ function renderScenes() {
       : s.graphic_type === "compare"
       ? `📊 Taqqoslash: ${s.compare_a_label} ${s.compare_a_value} vs ${s.compare_b_label} ${s.compare_b_value} ${s.graphic_label}`
       : "";
-    if (g) { const m = document.createElement("div"); m.className = "meta"; m.textContent = g; row.append(m); }
+    const lines = [g, s.image_prompt && s.visual_type !== "mascot" ? "🎨 " + s.image_prompt : ""].filter(Boolean);
+    if (lines.length) { const m = document.createElement("div"); m.className = "meta"; m.textContent = lines.join("  ·  "); row.append(m); }
     $("scenes").append(row);
   });
 }
@@ -289,7 +309,8 @@ $("btnRender").onclick = async () => {
   const btn = $("btnRender"); busy(btn, true, "Yasalmoqda...");
   $("err3").textContent = ""; $("result").classList.add("hidden"); $("progressBox").classList.remove("hidden");
   try {
-    const { job_id } = await api("/api/render", { script, voice: $("voice").value, rate: $("rate").value, music: $("music").checked, series: $("series").value });
+    const { job_id } = await api("/api/render", { script, voice: $("voice").value, rate: $("rate").value, music: $("music").checked, series: $("series").value,
+      visual_mode: $("visualMode").value, host: $("host").checked });
     while (true) {
       await new Promise((r) => setTimeout(r, 1500));
       const j = await api("/api/jobs/" + job_id);
@@ -307,8 +328,29 @@ async function showResult(dir) {
   const meta = await (await fetch(`/output/${dir}/meta.json`)).json();
   const src = `/output/${dir}/video.mp4`;
   $("player").src = src; $("download").href = src;
+  showMatch(meta);
   setCopy("rTitle", meta.title); setCopy("rDesc", meta.description); setCopy("rPin", meta.pinned_comment);
   $("result").classList.remove("hidden");
+}
+
+let threshold = 80;
+function showMatch(meta) {
+  const rows = (meta.match || []).filter((m) => m.score !== null);
+  $("matchBox").classList.toggle("hidden", !rows.length);
+  if (!rows.length) return;
+  $("matchAvg").textContent = `${meta.match_average}% o'rtacha`;
+  $("match").innerHTML = "";
+  const names = { mascot: "maskot", illustration: "chizma", stock: "video", gradient: "fon" };
+  for (const m of meta.match) {
+    const d = document.createElement("div");
+    const score = m.score === null ? "—" : m.score + "%";
+    d.innerHTML = `#${m.scene} ${names[m.visual] || m.visual}: <b></b>`;
+    const b = d.querySelector("b");
+    b.textContent = score;
+    if (m.score !== null) b.className = m.score >= threshold ? "good" : "bad";
+    if (m.issue) d.title = m.issue;
+    $("match").append(d);
+  }
 }
 
 function setCopy(id, text) {

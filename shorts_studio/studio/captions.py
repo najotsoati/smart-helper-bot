@@ -75,10 +75,17 @@ def build_ass(
     total: float,
     extra_events: list[str] = (),
     series: str = "",
+    host_ranges: list[tuple[float, float]] = (),
+    badge: bool = False,
 ) -> str:
+    """`host_ranges`: when the big host is on screen, captions drop below it.
+    `badge`: the round host badge sits top-left, so scene titles shift right to clear it."""
     from .graphics import STYLES
 
-    lines = [HEADER.replace("{extra_styles}", STYLES)]
+    header = HEADER.replace("{extra_styles}", STYLES)
+    if badge:
+        header = header.replace(",2,-3,3,24,0,8,60,60,300,1", ",2,-3,3,24,0,8,290,40,300,1")
+    lines = [header]
     groups = _groups(words)
     for gi, group in enumerate(groups):
         group_end = groups[gi + 1][0].start if gi + 1 < len(groups) else total
@@ -96,8 +103,9 @@ def build_ass(
                     )
                 else:
                     parts.append(f"{{\\c{GREEN if other.emphasis else WHITE}}}{text}{{\\c{WHITE}}}")
+            y = 1450 if any(a <= start < b for a, b in host_ranges) else 1180
             # first word of a group slides up slightly to sell the "new line"
-            intro = "{\\move(540,1215,540,1180,0,80)}" if i == 0 else "{\\pos(540,1180)}"
+            intro = f"{{\\move(540,{y + 35},540,{y},0,80)}}" if i == 0 else f"{{\\pos(540,{y})}}"
             lines.append(f"Dialogue: 0,{ts(start)},{ts(end)},Caption,,0,0,0,,{intro}{' '.join(parts)}\n")
 
     for start, end, text in titles:

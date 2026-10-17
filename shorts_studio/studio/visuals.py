@@ -63,22 +63,25 @@ def candidates_for(query: str, limit: int, exclude: set[int]) -> list[Candidate]
 class ScenePick(BaseModel):
     scene: int
     picks: list[int] = Field(description="Chosen candidate numbers, best first")
+    match: int = Field(description="0-100: how clearly the best pick shows what the narration says")
 
 
 class Picks(BaseModel):
     scenes: list[ScenePick]
 
 
-def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> list[list[Candidate]]:
+def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> tuple[list[list[Candidate]], list[int | None]]:
     """Show Claude every candidate thumbnail and let it pick the clips that literally match each line.
 
-    `scenes` is a list of (narration, shots_needed, candidates). Falls back to search order on any error.
+    `scenes` is a list of (narration, shots_needed, candidates). Returns the picks per scene and a 0-100
+    match score per scene (None when unknown). Falls back to search order on any error.
     """
     from .script import ask_json  # local import: script.py doesn't depend on visuals
 
     fallback = [cands[:n] for _, n, cands in scenes]
+    unknown: list[int | None] = [None] * len(scenes)
     if not config.ANTHROPIC_API_KEY or not any(c for _, _, c in scenes):
-        return fallback
+        return fallback, unknown
 
     content: list[dict] = [{
         "type": "text",
@@ -86,8 +89,9 @@ def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> list[list[Candidat
             "You are the editor of a viral fact Short. For each scene pick the stock clips (by number) "
             "whose thumbnail best shows what the narration says. Prefer dramatic, close, high-contrast, "
             "clearly lit shots with one obvious subject; avoid text overlays, watermarks, boring wide shots "
-            "and anything that contradicts the line. Scene 1 is the hook: it must be the single most "
-            "eye-catching image of the video. Never pick the same number twice."
+            "and anything that contradicts the line. Never pick the same number twice. Also score 0-100 how "
+            "clearly your best pick shows what the sentence says (90+ instantly obvious, under 80 a viewer "
+            "would be confused); be honest, a low score means the scene will be drawn instead."
         ),
     }]
     for i, (narration, n, cands) in enumerate(scenes):
@@ -102,18 +106,22 @@ def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> list[list[Candidat
     try:
         result = ask_json(content, Picks, effort="low", system="You pick stock footage for short videos.")
     except Exception:
-        return fallback
+        return fallback, unknown
 
     chosen = list(fallback)
+    scores = list(unknown)
     used: set[int] = set()
     by_scene = {p.scene: p.picks for p in result.scenes}
+    for p in result.scenes:
+        if 1 <= p.scene <= len(scenes):
+            scores[p.scene - 1] = p.match
     for i, (_, n, cands) in enumerate(scenes):
         picks = [cands[k - 1] for k in by_scene.get(i + 1, []) if 1 <= k <= len(cands)]
         picks = [c for c in picks if c.id not in used]
         picks += [c for c in cands if c not in picks and c.id not in used]  # top up if Claude picked too few
         chosen[i] = picks[:n]
         used |= {c.id for c in chosen[i]}
-    return chosen
+    return chosen, scores
 
 
 def download(url: str, out: Path) -> Path:

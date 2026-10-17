@@ -1,4 +1,5 @@
-"""End-to-end: script -> voice -> footage -> captions/graphics -> sound design -> final 9:16 video."""
+"""End-to-end: script -> voice -> visuals (host / drawings / footage, match-checked) -> captions/graphics
+-> sound design -> final 9:16 video."""
 
 import json
 import math
@@ -6,17 +7,18 @@ import random
 import re
 import shutil
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable
 
-from . import captions, config, graphics, render, sfx, visuals
+from . import captions, config, graphics, illustrate, mascot, render, sfx, visuals
 from .ffmpeg import probe_duration, run
 from .script import Scene, ShortScript
 from .voice import Word, silent_scene, voice_scene
 
 Progress = Callable[[str, float], None]
 
-MAX_SHOT = 2.8  # seconds; longer scenes get split into several shots so the picture keeps changing
+MAX_SHOT = 2.8  # seconds; longer stock scenes get split into several shots so the picture keeps changing
 AUDIO_EXT = {".mp3", ".wav", ".m4a", ".ogg"}
 
 
@@ -49,6 +51,46 @@ def _graphic_events(scene: Scene, start: float, end: float) -> list[str]:
     return []
 
 
+def plan_visuals(scenes: list[Scene], mode: str, host: bool, offline: bool) -> list[str]:
+    """Decide per scene: "mascot", "illustration", "stock" or "gradient" (nothing available)."""
+    can_draw = bool(config.OPENAI_API_KEY) and not offline
+    can_film = bool(config.PEXELS_API_KEY) and not offline
+    kinds = []
+    for s in scenes:
+        if s.visual_type == "mascot" and host and s.graphic_type == "none":
+            kinds.append("mascot")
+            continue
+        want = {"illustration": "illustration", "stock": "stock"}.get(mode, s.visual_type)
+        if want == "mascot":  # host turned off: show the sentence instead
+            want = "illustration"
+        if want == "illustration" and not can_draw:
+            want = "stock"
+        if want == "stock" and not can_film:
+            want = "illustration" if can_draw else "gradient"
+        kinds.append(want)
+    return kinds
+
+
+def _draw_prompt(scene: Scene) -> str:
+    return scene.image_prompt or f"A picture that clearly shows: {scene.narration}"
+
+
+def _try_draw(prompt: str, out: Path) -> Path | None:
+    try:
+        return illustrate.draw(prompt, out)
+    except Exception as e:  # one failed drawing shouldn't sink the whole video
+        print(f"illustration failed: {e}")
+        return None
+
+
+def _try_review(items: list[tuple[int, str, Path]]) -> dict:
+    try:
+        return illustrate.review(items)
+    except Exception as e:
+        print(f"match review failed: {e}")
+        return {}
+
+
 def make_video(
     script: ShortScript,
     job: Path,
@@ -56,6 +98,8 @@ def make_video(
     rate: str = "+12%",
     music: bool = True,
     series: str = "",
+    visual_mode: str = "mixed",
+    host: bool = True,
     offline: bool = False,
     progress: Progress = lambda step, pct: None,
 ) -> Path:
@@ -67,7 +111,7 @@ def make_video(
     # 1. Voice, scene by scene
     voiced = []
     for i, scene in enumerate(scenes):
-        progress(f"Ovoz: {i + 1}/{len(scenes)}", 0.03 + 0.2 * i / len(scenes))
+        progress(f"Ovoz: {i + 1}/{len(scenes)}", 0.03 + 0.15 * i / len(scenes))
         if offline:
             voiced.append(silent_scene(scene.narration, work, i))
         else:
@@ -101,43 +145,92 @@ def make_video(
             sfx_events.append((sfx.get("ding", work), number.start, 0.3))
             last_ding = number.start
         t += v.duration
+    scene_ranges = [(s, s + v.duration) for s, v in zip(scene_starts, voiced)]
 
-    # 3. Footage: gather candidates, let Claude look at them and pick, then cut
-    shots_per_scene = []
-    for scene, v in zip(scenes, voiced):
-        steady = scene.graphic_type != "none"  # don't cut away under an infographic
-        shots_per_scene.append(1 if steady else max(1, math.ceil(v.duration / MAX_SHOT)))
+    # 3. Visuals: decide host / drawing / footage per scene, then make sure each one matches its line
+    kinds = plan_visuals(scenes, visual_mode, host, offline)
+    shots = [1 if k != "stock" or s.graphic_type != "none" else max(1, math.ceil(v.duration / MAX_SHOT))
+             for k, s, v in zip(kinds, scenes, voiced)]
+    scores: list[int | None] = [None] * len(scenes)
+    issues: list[str] = [""] * len(scenes)
+    clips: list[list[visuals.Candidate]] = [[] for _ in scenes]
+    drawings: dict[int, Path] = {}
 
-    picked: list[list[visuals.Candidate]] = [[] for _ in scenes]
-    if not offline and config.PEXELS_API_KEY:
+    stock_idx = [i for i, k in enumerate(kinds) if k == "stock"]
+    if stock_idx:
         used: set[int] = set()
         pool = []
-        for i, (scene, n) in enumerate(zip(scenes, shots_per_scene)):
-            progress(f"Video qidirilmoqda: {i + 1}/{len(scenes)} ({scene.visual_query})", 0.25 + 0.15 * i / len(scenes))
-            cands = visuals.candidates_for(scene.visual_query, min(n + 3, 6), used)
+        for n, i in enumerate(stock_idx):
+            progress(f"Video qidirilmoqda: {n + 1}/{len(stock_idx)} ({scenes[i].visual_query})",
+                     0.2 + 0.12 * n / len(stock_idx))
+            cands = visuals.candidates_for(scenes[i].visual_query, min(shots[i] + 3, 6), used)
             used |= {c.id for c in cands}
-            pool.append((scene.narration, n, cands))
-        progress("Claude eng yaxshi kadrlarni tanlayapti...", 0.42)
-        picked = visuals.choose(pool)
+            pool.append((scenes[i].narration, shots[i], cands))
+        progress("Claude stok videolarni ko'rib, eng moslarini tanlayapti...", 0.33)
+        picked, picked_scores = visuals.choose(pool)
+        for i, chosen, score in zip(stock_idx, picked, picked_scores):
+            clips[i], scores[i] = chosen, score
+            no_match = not chosen or (score is not None and score < config.MATCH_THRESHOLD)
+            if no_match and config.OPENAI_API_KEY and not offline:
+                kinds[i] = "illustration"  # stock can't show this line well enough: draw it instead
+                shots[i] = 1
+            elif not chosen:
+                kinds[i] = "gradient"
+
+    draw_idx = [i for i, k in enumerate(kinds) if k == "illustration"]
+    if draw_idx:
+        progress(f"AI chizmalar chizilmoqda ({len(draw_idx)} ta)...", 0.38)
+        prompts = {i: _draw_prompt(scenes[i]) for i in draw_idx}
+        with ThreadPoolExecutor(max_workers=4) as pool_ex:
+            for i, path in zip(draw_idx, pool_ex.map(
+                    lambda i: _try_draw(prompts[i], work / f"draw_{i:02d}_a.png"), draw_idx)):
+                if path:
+                    drawings[i] = path
+                else:
+                    kinds[i] = "stock" if clips[i] else "gradient"
+                    scores[i] = None if not clips[i] else scores[i]
+        draw_idx = [i for i in draw_idx if i in drawings]
+        progress("Claude chizmalarni matnga mosligini tekshiryapti...", 0.5)
+        review = _try_review([(i + 1, scenes[i].narration, drawings[i]) for i in draw_idx]) if draw_idx else {}
+        weak = [i for i in draw_idx if review.get(i + 1) and review[i + 1].score < config.MATCH_THRESHOLD]
+        for i in draw_idx:
+            if review.get(i + 1):
+                scores[i], issues[i] = review[i + 1].score, review[i + 1].issue
+        if weak:
+            progress(f"{len(weak)} ta chizma {config.MATCH_THRESHOLD}% dan past, qayta chizilmoqda...", 0.55)
+            with ThreadPoolExecutor(max_workers=4) as pool_ex:
+                redrawn = dict(zip(weak, pool_ex.map(
+                    lambda i: _try_draw(review[i + 1].better_prompt, work / f"draw_{i:02d}_b.png"), weak)))
+            redrawn = {i: p for i, p in redrawn.items() if p}
+            second = _try_review([(i + 1, scenes[i].narration, p) for i, p in redrawn.items()]) if redrawn else {}
+            for i in redrawn:
+                if second.get(i + 1) and second[i + 1].score > (scores[i] or 0):  # keep the better version
+                    drawings[i], scores[i], issues[i] = redrawn[i], second[i + 1].score, second[i + 1].issue
+
+    host_ranges = [scene_ranges[i] for i, k in enumerate(kinds) if k == "mascot"]
+    surprised = [scene_ranges[i] for i, s in enumerate(scenes) if s.beat == "twist"]
 
     segments: list[Path] = []
     shot = 0
     for i, (scene, v) in enumerate(zip(scenes, voiced)):
-        progress(f"Montaj: sahna {i + 1}/{len(scenes)}", 0.45 + 0.35 * i / len(scenes))
-        n = shots_per_scene[i]
-        clips = picked[i]
+        progress(f"Montaj: sahna {i + 1}/{len(scenes)}", 0.6 + 0.22 * i / len(scenes))
         start = scene_starts[i]
         dim = scene.graphic_type != "none"
         punch = 0.18 if scene.beat == "twist" else 0.10
-        for k in range(n):
-            length = v.duration / n
+        for k in range(shots[i]):
+            length = v.duration / shots[i]
             if start > 0.3:
                 sfx_events.append((sfx.get("whoosh", work), start - 0.25, 0.32))
             out = work / f"shot_{shot:03d}.mp4"
-            if clips:
-                c = clips[k] if k < len(clips) else random.choice(clips)
+            zoom_in = shot % 2 == 0
+            if kinds[i] == "stock":
+                c = clips[i][k] if k < len(clips[i]) else random.choice(clips[i])
                 src = visuals.download(c.url, work / f"src_{c.id}.mp4")
-                render.clip_segment(src, c.duration, length, out, zoom_in=shot % 2 == 0, punch=punch, dim=dim)
+                render.clip_segment(src, c.duration, length, out, zoom_in, punch, dim)
+            elif kinds[i] == "illustration":
+                render.image_segment(drawings[i], length, out, zoom_in, punch, dim)
+            elif kinds[i] == "mascot":
+                render.gradient_segment(length, out, shot, punch, colors=render.MASCOT_BACKDROP)
             else:
                 render.gradient_segment(length, out, shot, punch)
             segments.append(out)
@@ -145,16 +238,24 @@ def make_video(
             shot += 1
     base = render.concat(segments, work / "base.mp4")
 
-    # 4. Captions + final mix
-    progress("Yakuniy render: subtitr, grafika, effektlar, musiqa", 0.85)
+    # 4. Host, captions + final mix
+    progress("Yakuniy render: maskot, subtitr, grafika, effektlar, musiqa", 0.85)
+    host_track = mascot.build(voice_track, surprised, work) if host else None
     ass = work / "captions.ass"
-    ass.write_text(captions.build_ass(words, titles, total, extra, series), encoding="utf-8")
+    ass.write_text(captions.build_ass(words, titles, total, extra, series, host_ranges, badge=host), encoding="utf-8")
     track = pick_music(script.mood) if music else None
-    final = render.finish(base, voice_track, ass, sfx_events, total, work / "final.mp4", track)
+    final = render.finish(base, voice_track, ass, sfx_events, total, work / "final.mp4", track,
+                          host_track, host_ranges)
 
     video = job / "video.mp4"
     final.replace(video)
     run(["ffmpeg", "-y", "-ss", "0.6", "-i", str(video), "-frames:v", "1", "-q:v", "3", str(job / "cover.jpg")])
+
+    match = [
+        {"scene": i + 1, "visual": kinds[i], "score": scores[i], "issue": issues[i]}
+        for i in range(len(scenes))
+    ]
+    scored = [m["score"] for m in match if m["score"] is not None]
     title = f"{series}: {script.title}" if series else script.title
     meta = {
         "title": title,
@@ -163,6 +264,8 @@ def make_video(
         "duration": round(total, 1),
         "mood": script.mood,
         "music": track.name if track else None,
+        "match_average": round(sum(scored) / len(scored)) if scored else None,
+        "match": match,
     }
     (job / "meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
     shutil.rmtree(work, ignore_errors=True)  # downloaded clips and temp renders can be hundreds of MB

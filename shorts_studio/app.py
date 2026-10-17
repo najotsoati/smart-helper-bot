@@ -44,6 +44,8 @@ class RenderRequest(BaseModel):
     rate: str = "+12%"
     music: bool = True
     series: str = ""
+    visual_mode: str = "mixed"  # mixed | illustration | stock
+    host: bool = True
 
 
 @app.get("/")
@@ -63,6 +65,8 @@ def get_config():
         "pexels": bool(config.PEXELS_API_KEY),
         "youtube": bool(config.YOUTUBE_API_KEY),
         "elevenlabs": bool(config.ELEVENLABS_API_KEY),
+        "openai": bool(config.OPENAI_API_KEY),
+        "match_threshold": config.MATCH_THRESHOLD,
         "music_tracks": len(music),
     }
 
@@ -109,7 +113,8 @@ def render(req: RenderRequest):
     def work():
         try:
             pipeline.make_video(req.script, job_dir, voice=req.voice, rate=req.rate, music=req.music,
-                                series=req.series.strip(), progress=progress)
+                                series=req.series.strip(), visual_mode=req.visual_mode, host=req.host,
+                                progress=progress)
             with lock:
                 jobs[job_id].update(status="done", step="Tayyor!", progress=1.0)
         except Exception as e:

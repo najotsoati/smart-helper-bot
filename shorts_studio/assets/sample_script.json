@@ -13,7 +13,9 @@
         "Everest",
         "underwater"
       ],
-      "on_screen_text": "11 KM DEEP"
+      "on_screen_text": "11 KM DEEP",
+      "visual_type": "mascot",
+      "image_prompt": ""
     },
     {
       "narration": "This is the Challenger Deep, at the bottom of the Mariana Trench.",
@@ -21,7 +23,9 @@
       "emphasis": [
         "Challenger"
       ],
-      "on_screen_text": ""
+      "on_screen_text": "",
+      "visual_type": "illustration",
+      "image_prompt": "A tiny submarine with a headlight descending into an endless dark blue ocean trench, glowing particles, deep perspective looking down."
     },
     {
       "narration": "It's almost eleven kilometers down, deeper than Everest is tall.",
@@ -35,7 +39,9 @@
       "compare_a_label": "Everest",
       "compare_a_value": 8849,
       "compare_b_label": "Trench",
-      "compare_b_value": 10935
+      "compare_b_value": 10935,
+      "visual_type": "illustration",
+      "image_prompt": "Side-by-side cross-section: Mount Everest placed inside an ocean trench, its peak still far below the sea surface."
     },
     {
       "narration": "The water pushes on you with over 1,000 times the air pressure.",
@@ -48,7 +54,9 @@
       "counter_value": 1086,
       "counter_prefix": "",
       "counter_suffix": " BAR",
-      "graphic_label": "water pressure"
+      "graphic_label": "water pressure",
+      "visual_type": "illustration",
+      "image_prompt": "A deep-sea diver silhouette being squeezed by huge arrows of water pressure from every side, dark ocean."
     },
     {
       "narration": "That's like an elephant standing on your thumbnail.",
@@ -56,7 +64,9 @@
       "emphasis": [
         "elephant"
       ],
-      "on_screen_text": ""
+      "on_screen_text": "",
+      "visual_type": "illustration",
+      "image_prompt": "A grey elephant balancing on a giant human thumbnail, comic exaggeration, studio backdrop."
     },
     {
       "narration": "Sunlight dies after a few hundred meters, so it's pitch black.",
@@ -65,7 +75,9 @@
         "pitch",
         "black"
       ],
-      "on_screen_text": ""
+      "on_screen_text": "",
+      "visual_type": "illustration",
+      "image_prompt": "Sun rays fading as they go down into the ocean, the bottom half of the picture pitch black."
     },
     {
       "narration": "But something still lives down there.",
@@ -73,7 +85,9 @@
       "emphasis": [
         "lives"
       ],
-      "on_screen_text": "SOMETHING LIVES"
+      "on_screen_text": "SOMETHING LIVES",
+      "visual_type": "stock",
+      "image_prompt": "A strange glowing deep-sea creature with big eyes emerging from darkness."
     },
     {
       "narration": "Tiny shrimp-like amphipods, and fish made of almost jelly.",
@@ -81,7 +95,9 @@
       "emphasis": [
         "jelly"
       ],
-      "on_screen_text": ""
+      "on_screen_text": "",
+      "visual_type": "illustration",
+      "image_prompt": "Tiny translucent shrimp-like amphipods and a pale jelly-like snailfish swimming in darkness, bioluminescent glow."
     },
     {
       "narration": "Fewer people have reached this spot than have walked on the Moon.",
@@ -89,7 +105,9 @@
       "emphasis": [
         "Moon"
       ],
-      "on_screen_text": "RARER THAN THE MOON"
+      "on_screen_text": "RARER THAN THE MOON",
+      "visual_type": "illustration",
+      "image_prompt": "An astronaut on the Moon looking at a lone deep-sea submarine on the ocean floor, split composition."
     },
     {
       "narration": "And here's the scary part: scientists found plastic bags there too.",
@@ -98,7 +116,9 @@
         "plastic"
       ],
       "on_screen_text": "",
-      "beat": "twist"
+      "beat": "twist",
+      "visual_type": "mascot",
+      "image_prompt": ""
     },
     {
       "narration": "We've mapped Mars better than our own seafloor, which is why if you",
@@ -107,7 +127,9 @@
         "Mars"
       ],
       "on_screen_text": "",
-      "beat": "payoff"
+      "beat": "payoff",
+      "visual_type": "mascot",
+      "image_prompt": ""
     }
   ],
   "title": "Everest would DISAPPEAR down here 🌊",

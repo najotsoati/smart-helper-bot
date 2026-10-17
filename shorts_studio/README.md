@@ -13,6 +13,9 @@ Oddiy "rasm + robot ovoz" videolaridan farqi: har bir video ko'rishni ushlab qol
 | **Ekrandagi sarlavhalar** | "11 KM DEEP" kabi sariq qutili sarlavhalar. |
 | **Ovoz dizayni** | Har kesishda whoosh, boshida impact, musiqa ovoz chiqqanda o'zi pasayadi, ovoz balandligi -14 LUFS. |
 | **Progress bar** | Pastdagi sariq chiziq odamni oxirigacha ko'rishga undaydi. |
+| **Maskot "Fakti"** | Multfilm personaj hookni, twistni va oxirgi gapni o'zi aytadi: og'zi ovozga qarab qimirlaydi, ko'zini qisadi, twistda hayron bo'ladi. Faktlar paytida burchakda kichik dumaloq nishonda turadi. |
+| **AI chizmalar** | Kamera bilan olib bo'lmaydigan faktlar (tana ichi, koinot, tarix) bir xil uslubdagi maxsus chizmalar bilan ko'rsatiladi. |
+| **Kamida 80% moslik** | Har bir kadrni Claude ko'rib, matnga mosligini 0–100 ball bilan baholaydi. 80% dan past chizma yaxshilangan tavsif bilan qayta chiziladi, mos stok video topilmasa sahna chizmaga o'tadi. Natija panelda har sahna bo'yicha ko'rsatiladi. |
 | **AI kadr tanlash** | Har sahna uchun 6 tagacha stok video topiladi, Claude ularning rasmlariga qarab eng mos va dramatigini tanlaydi. Birinchi kadr eng kuchlisi bo'ladi. |
 | **Infografika** | Raqamlar ekranda sanalib chiqadi, taqqoslashlar o'sib boradigan ustunlar bilan ko'rsatiladi (masalan, Everest va Mariana chuqurligi). |
 | **Faktlarni tekshirish** | Claude har bir faktni internetdan tekshiradi, xatolarini to'g'rilaydi va manbasini ko'rsatadi. |
@@ -40,9 +43,11 @@ cp .env.example .env             # keyin .env ichiga kalitlarni yozing
 | `ANTHROPIC_API_KEY` | ha | https://console.anthropic.com |
 | `PEXELS_API_KEY` | ha (bo'lmasa fon rangli gradient bo'ladi) | https://www.pexels.com/api/ (bepul) |
 | `ELEVENLABS_API_KEY` | yo'q | https://elevenlabs.io. Eng jonli ovoz shu. Microsoft ovozlari har doim ro'yxatda qoladi. |
+| `OPENAI_API_KEY` | tavsiya | https://platform.openai.com. AI chizmalar uchun (bir video ~$0.3–0.7). Bo'lmasa faqat stok video ishlatiladi. |
 | `YOUTUBE_API_KEY` | yo'q | https://console.cloud.google.com, "YouTube Data API v3" (bepul). "Trenddagi Shorts" tugmasi uchun kerak. |
 
 Fon musiqasi kerak bo'lsa, `assets/music/` papkasiga mualliflik huquqisiz `.mp3` fayllarni tashlang (kayfiyat bo'yicha papkalar: [assets/music/README.md](assets/music/README.md)).
+O'z personajingizni ishlatmoqchi bo'lsangiz, `assets/mascot/` ichidagi PNG'larni xuddi shu nomlar bilan almashtiring: `closed`, `half`, `open`, `blink`, `surprised_closed`, `surprised_open`. Rasmlar kvadrat va shaffof fonli bo'lsin.
 Haqiqiy ovoz effektlari kerak bo'lsa, ularni `assets/sfx/` papkasiga tashlang: [assets/sfx/README.md](assets/sfx/README.md).
 
 ## Ishga tushirish
@@ -55,7 +60,7 @@ Brauzerda http://127.0.0.1:8000 manzilini oching. Keyin:
 
 1. **Trenddagi Shorts** tugmasi nishangizda hozir nima ko'rilayotganini ko'rsatadi. **Viral g'oyalar topish** tugmasi shularga asoslanib mavzu taklif qiladi. Mavzuni o'zingiz ham yozishingiz mumkin.
 2. **Ssenariy yozish**: faktlar tekshiruvi natijasini ko'rib chiqing, hookni tanlang, kerak bo'lsa matnni, video qidiruv so'zlarini, sarlavhalarni va twist sahnasini tahrirlang.
-3. **Video yasash**: ovoz, tezlik va seriya nomini tanlang. 2–4 daqiqada tayyor MP4 chiqadi, sarlavha va heshteglar bilan birga.
+3. **Video yasash**: ovoz, tezlik, seriya nomi, kadr turi (aralash, faqat chizma yoki faqat video) va maskotni tanlang. 2–4 daqiqada tayyor MP4 chiqadi, sarlavha va heshteglar bilan birga.
 
 Terminaldan ham ishlatsa bo'ladi:
 

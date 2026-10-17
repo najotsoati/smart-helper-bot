@@ -30,7 +30,19 @@ doesn't notice the restart (e.g. last line "...and that's exactly why" + hook "y
 or use the myth as the twist ("Goldfish don't have 3-second memories. They remember for months.").
 7. No call to action like "subscribe" or "like" in the narration.
 
+The channel has a cartoon host called Fakti (a friendly purple creature) and custom illustrations.
 For each scene also give:
+- visual_type, the single most important choice, because the picture must clearly show what is being said:
+  * "mascot": Fakti talks straight to camera. Use it ONLY for scene 1 (the hook), the twist scene \
+and the last scene. Fakti introduces, reacts, and closes the loop; facts are shown with pictures.
+  * "illustration": a custom drawing. Use it when the fact is impossible or boring to film: inside the \
+body, microscopic, space scales, prehistoric/historic events, hypothetical or exaggerated comparisons.
+  * "stock": real footage. Use it when real video of the subject looks spectacular (animals, nature, \
+weather, cities, machines) and a stock site will certainly have it.
+- image_prompt: what to draw so the picture literally shows the sentence: the subject, what it's doing, \
+setting, camera angle, and a scale cue if the fact is about size. Concrete and visual, 1-2 sentences, \
+no text or numbers in the image. Write it for every non-mascot scene (stock scenes use it as a backup). \
+Empty string for mascot scenes.
 - visual_query: 2-4 concrete English words for a stock-video search that will literally show \
 the sentence (things that exist on Pexels: "deep ocean dark", "human heart beating", \
 "lightning storm night"). Never abstract words.
@@ -55,6 +67,8 @@ class Scene(BaseModel):
     visual_query: str
     emphasis: list[str]
     on_screen_text: str
+    visual_type: Literal["mascot", "illustration", "stock"] = "stock"
+    image_prompt: str = ""
     beat: Literal["normal", "twist", "payoff"] = "normal"
     graphic_type: Literal["none", "counter", "compare"] = "none"
     graphic_label: str = ""

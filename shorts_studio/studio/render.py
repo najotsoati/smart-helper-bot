@@ -46,8 +46,20 @@ def clip_segment(src: Path, src_duration: float, duration: float, out: Path, zoo
     return out
 
 
-def gradient_segment(duration: float, out: Path, index: int, punch: float = 0.10) -> Path:
-    c0, c1 = GRADIENTS[index % len(GRADIENTS)]
+def image_segment(image: Path, duration: float, out: Path, zoom_in: bool, punch: float = 0.10,
+                  dim: bool = False) -> Path:
+    """A still illustration brought to life with the same punch zoom and slow push as video shots."""
+    run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(image), "-t", f"{duration:.3f}",
+         "-vf", _motion(duration, zoom_in, punch, dim), *DRAFT, str(out)])
+    return out
+
+
+MASCOT_BACKDROP = ("0x0f2027", "0x2c7a7b")  # teal, so the purple host pops
+
+
+def gradient_segment(duration: float, out: Path, index: int, punch: float = 0.10,
+                     colors: tuple[str, str] | None = None) -> Path:
+    c0, c1 = colors or GRADIENTS[index % len(GRADIENTS)]
     src = f"gradients=s={W}x{H}:c0={c0}:c1={c1}:x0=0:y0=0:x1={W}:y1={H}:speed=0.03:r={FPS}"
     run(["ffmpeg", "-y", "-f", "lavfi", "-i", src, "-t", f"{duration:.3f}",
          "-vf", _motion(duration, index % 2 == 0, punch), *DRAFT, str(out)])
@@ -70,20 +82,37 @@ def finish(
     total: float,
     out: Path,
     music: Path | None,
+    mascot: tuple[Path, Path] | None = None,
+    host_ranges: list[tuple[float, float]] = (),
 ) -> Path:
-    """Burn captions + progress bar, and mix voice, sound effects (file, start time, volume) and ducked music."""
+    """Overlay the host, burn captions + progress bar, and mix voice, sound effects (file, start time,
+    volume) and ducked music. The big host shows during `host_ranges`, the round badge the rest of the time."""
     work = out.parent
     inputs = ["-i", base_video.name, "-i", voice.name]
     for path, _, _ in sfx_events:
         inputs += ["-i", str(path)]
+    next_idx = 2 + len(sfx_events)
     music_idx = None
     if music:
-        music_idx = 2 + len(sfx_events)
+        music_idx = next_idx
+        next_idx += 1
         inputs += ["-stream_loop", "-1", "-i", str(music.resolve())]
 
     fonts = Path(os.path.relpath(config.FONTS_DIR, work)).as_posix()
-    filters = [
-        f"[0:v]subtitles={ass_file.name}:fontsdir={fonts}[cap]",
+    video_in = "[0:v]"
+    filters = []
+    if mascot:
+        big, badge = mascot
+        inputs += ["-i", big.name, "-i", badge.name]
+        on = "+".join(f"between(t,{a:.3f},{b:.3f})" for a, b in host_ranges) or "0"
+        filters += [
+            # gentle bob so the host never looks frozen
+            f"[0:v][{next_idx}:v]overlay=x=(W-w)/2:y='500+10*sin(2*PI*1.3*t)':enable='{on}':eof_action=pass[h1]",
+            f"[h1][{next_idx + 1}:v]overlay=x=36:y=200:enable='not({on})':eof_action=pass[h2]",
+        ]
+        video_in = "[h2]"
+    filters += [
+        f"{video_in}subtitles={ass_file.name}:fontsdir={fonts}[cap]",
         f"color=c=0xFFE500:s={W}x14:r={FPS}[bar]",
         f"[cap][bar]overlay=x='-w+w*t/{total:.3f}':y=H-h:shortest=1,format=yuv420p[v]",
         "[1:a]asplit=2[vo][key]",

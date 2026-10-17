@@ -23,6 +23,8 @@ def main() -> None:
     parser.add_argument("--voice", default=config.DEFAULT_EDGE_VOICE, help='edge-tts voice name or "elevenlabs"')
     parser.add_argument("--rate", default="+12%", help="edge-tts speed, e.g. +0%% or +20%%")
     parser.add_argument("--series", default="", help='e.g. "Ocean Facts #3"')
+    parser.add_argument("--visuals", default="mixed", choices=["mixed", "illustration", "stock"])
+    parser.add_argument("--no-host", action="store_true", help="no cartoon host")
     parser.add_argument("--no-music", action="store_true")
     parser.add_argument("--no-factcheck", action="store_true")
     parser.add_argument("--offline", action="store_true", help="no API calls: sample script, silent voice")
@@ -47,10 +49,13 @@ def main() -> None:
     job = pipeline.new_job_dir(script.topic)
     video = pipeline.make_video(
         script, job, voice=args.voice, rate=args.rate, music=not args.no_music, series=args.series,
-        offline=args.offline,
+        visual_mode=args.visuals, host=not args.no_host, offline=args.offline,
         progress=lambda step, pct: print(f"[{pct:4.0%}] {step}"),
     )
-    print(f"\nVideo: {video}\nSarlavha: {script.title}")
+    meta = json.loads((job / "meta.json").read_text())
+    print(f"\nVideo: {video}\nSarlavha: {meta['title']}")
+    if meta["match_average"] is not None:
+        print(f"Kadr va matn mosligi: {meta['match_average']}%")
 
 
 if __name__ == "__main__":
