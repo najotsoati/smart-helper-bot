@@ -374,3 +374,28 @@ def test_openrouter_prefers_inkling(monkeypatch):
     ])
     assert openrouter.pick_model() == "thinkingmachines/inkling:free"
     assert openrouter.pick_model(vision=True) == "thinkingmachines/inkling:free"
+
+
+def test_openrouter_falls_back_to_next_free_model(monkeypatch):
+    from studio import net, openrouter
+    from studio.script import TopicIdeas
+
+    monkeypatch.setattr(openrouter, "ranked_models", lambda vision=False: ["busy/one:free", "ok/two:free"])
+    calls = []
+
+    class Resp:
+        def __init__(self, payload):
+            self.payload = payload
+
+        def json(self):
+            return self.payload
+
+    def fake_request(method, url, **kw):
+        calls.append(kw["json"]["model"])
+        if kw["json"]["model"] == "busy/one:free":
+            return Resp({"error": {"message": "Upstream error from Nvidia: Service temporarily overloaded"}})
+        return Resp({"choices": [{"message": {"content": '{"ideas": []}'}}]})
+
+    monkeypatch.setattr(net, "request", fake_request)
+    result = openrouter.ask_json("ideas", TopicIdeas, {}, "s")
+    assert isinstance(result, TopicIdeas) and calls == ["busy/one:free", "ok/two:free"]

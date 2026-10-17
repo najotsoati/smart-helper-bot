@@ -8,6 +8,7 @@ import json
 import re
 import time
 
+import httpx
 from pydantic import BaseModel, ValidationError
 
 from . import config, net
@@ -44,17 +45,13 @@ def _is_free(m: dict) -> bool:
     return str(p.get("prompt", "1")) in ("0", "0.0") and str(p.get("completion", "1")) in ("0", "0.0")
 
 
-def pick_model(vision: bool = False) -> str:
+def ranked_models(vision: bool = False) -> list[str]:
+    """Free chat models, best first; the one set in the panel (if any) goes first."""
     chosen = config.OPENROUTER_VISION_MODEL if vision else config.OPENROUTER_MODEL
-    if chosen:
-        return chosen
     free = [m for m in _models() if _is_free(m) and not any(w in m["id"].lower() for w in NOT_CHAT)
             and "text" in m.get("architecture", {}).get("output_modalities", ["text"])]
     if vision:
         free = [m for m in free if "image" in m.get("architecture", {}).get("input_modalities", [])]
-    if not free:
-        raise RuntimeError("OpenRouter'da hozir mos bepul model topilmadi" + (" (rasmni tushunadigan)" if vision else ""))
-
     order = VISION_PREFERENCE if vision else PREFERENCE
 
     def rank(m: dict):
@@ -62,7 +59,16 @@ def pick_model(vision: bool = False) -> str:
         family = next((i for i, name in enumerate(order) if name in mid), len(order))
         return family, -int(m.get("context_length") or 0)
 
-    return min(free, key=rank)["id"]
+    ids = [m["id"] for m in sorted(free, key=rank)]
+    if chosen:
+        ids = [chosen] + [i for i in ids if i != chosen]
+    if not ids:
+        raise RuntimeError("OpenRouter'da hozir mos bepul model topilmadi" + (" (rasmni tushunadigan)" if vision else ""))
+    return ids
+
+
+def pick_model(vision: bool = False) -> str:
+    return ranked_models(vision)[0]
 
 
 def _to_openai_content(content) -> str | list[dict]:
@@ -92,24 +98,51 @@ def _extract_json(text: str) -> dict:
 
 
 def ask_json(content, schema: type[BaseModel], json_schema: dict, system: str) -> BaseModel:
+    """Ask for JSON; if a free model is overloaded, rate-limited or unavailable, move on to the next one."""
     vision = not isinstance(content, str) and any(b["type"] == "image" for b in content)
-    model = pick_model(vision)
     instructions = (
         f"{system}\n\nReply with ONLY one JSON object (no markdown, no comments) that matches this JSON schema "
         f"exactly, with every required field filled in:\n{json.dumps(json_schema)}"
     )
+    failures = []
+    for model in ranked_models(vision)[:MAX_MODELS]:
+        try:
+            return _ask_model(model, instructions, content, schema)
+        except _ModelUnavailable as e:
+            failures.append(f"{model}: {e}")
+    raise RuntimeError("Bepul modellar hozir band yoki ishlamayapti, birozdan keyin qayta urinib ko'ring. "
+                       + " | ".join(failures)[:600])
+
+
+MAX_MODELS = 4  # how many free models to try before giving up
+
+
+class _ModelUnavailable(Exception):
+    """This model can't answer right now (busy, rate-limited, region, removed): try another one."""
+
+
+def _ask_model(model: str, instructions: str, content, schema: type[BaseModel]) -> BaseModel:
     messages = [{"role": "system", "content": instructions},
                 {"role": "user", "content": _to_openai_content(content)}]
     last_error = ""
     for attempt in range(2):  # one retry with the validation error fed back
-        r = net.request(
-            "POST", f"{config.OPENROUTER_BASE_URL}/chat/completions", headers=_headers(), timeout=300,
-            json={"model": model, "messages": messages, "response_format": {"type": "json_object"},
-                  "max_tokens": 12000},
-        )
+        try:
+            r = net.request(
+                "POST", f"{config.OPENROUTER_BASE_URL}/chat/completions", headers=_headers(), timeout=300,
+                attempts=2,
+                json={"model": model, "messages": messages, "response_format": {"type": "json_object"},
+                      "max_tokens": 12000},
+            )
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code in (401, 402):  # bad key / no credit: no other model will do better
+                raise
+            raise _ModelUnavailable(f"HTTP {e.response.status_code}") from e
         data = r.json()
         if "error" in data:
-            raise RuntimeError(f"OpenRouter: {data['error'].get('message', data['error'])}")
+            err = data["error"]
+            raise _ModelUnavailable(err.get("message", str(err)) if isinstance(err, dict) else str(err))
+        if not data.get("choices"):
+            raise _ModelUnavailable("bo'sh javob")
         text = data["choices"][0]["message"].get("content") or ""
         try:
             return schema.model_validate(_extract_json(text))
@@ -117,7 +150,7 @@ def ask_json(content, schema: type[BaseModel], json_schema: dict, system: str) -
             last_error = str(e)[:1500]
             messages += [{"role": "assistant", "content": text},
                          {"role": "user", "content": f"That JSON was invalid: {last_error}\nSend the corrected JSON only."}]
-    raise RuntimeError(f"{model} to'g'ri JSON qaytarmadi: {last_error[:300]}")
+    raise _ModelUnavailable(f"to'g'ri JSON qaytarmadi: {last_error[:200]}")
 
 
 def key_info() -> str:
