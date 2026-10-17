@@ -23,8 +23,8 @@ fi
 STAMP=.venv/.requirements.stamp
 if [ ! -f "$STAMP" ] || ! cmp -s requirements.txt "$STAMP"; then
   echo "Kutubxonalar o'rnatilmoqda (bir necha daqiqa)..."
-  .venv/bin/python -m pip install --upgrade pip -q
-  .venv/bin/python -m pip install -r requirements.txt -q
+  .venv/bin/python -m pip install --upgrade pip -q --timeout 60 --retries 10
+  .venv/bin/python -m pip install -r requirements.txt -q --timeout 60 --retries 10
   cp requirements.txt "$STAMP"
 fi
 

@@ -25,8 +25,8 @@ rem reinstall dependencies only when requirements.txt changed
 fc /b requirements.txt ".venv\requirements.stamp" >nul 2>nul
 if errorlevel 1 (
   echo Kutubxonalar o'rnatilmoqda, bir necha daqiqa...
-  ".venv\Scripts\python.exe" -m pip install --upgrade pip -q || goto :fail
-  ".venv\Scripts\python.exe" -m pip install -r requirements.txt -q || goto :fail
+  ".venv\Scripts\python.exe" -m pip install --upgrade pip -q --timeout 60 --retries 10 || goto :fail
+  ".venv\Scripts\python.exe" -m pip install -r requirements.txt -q --timeout 60 --retries 10 || goto :fail
   copy /y requirements.txt ".venv\requirements.stamp" >nul
 )
 
