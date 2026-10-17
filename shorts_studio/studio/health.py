@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 
 import anthropic
+import httpx
 import edge_tts
 
 from . import config, net, youtube
@@ -109,6 +110,14 @@ def explain(e: Exception) -> str:
                 "(Claude ilovasi obunasi API'ga kirmaydi).")
     if "insufficient_quota" in text or "billing_hard_limit" in text:
         return "OpenAI balansi tugagan. platform.openai.com → Billing'da balansni to'ldiring."
+    if isinstance(e, httpx.TransportError):
+        try:
+            host = e.request.url.host
+        except RuntimeError:  # no request attached
+            host = "xizmat"
+        return (f"Internet aloqasi uzildi: {host} bilan ulanib bo'lmadi ({type(e).__name__}). Internet yoki "
+                f"xizmat vaqtincha javob bermadi, qayta urinib ko'ring. Takrorlansa, bu xizmat sizning "
+                f"tarmog'ingizdan ochilmayotgan bo'lishi mumkin: Tizim → Tekshirish'da qaysi qator ✗ ekanini ko'ring.")[:500]
     response = getattr(e, "response", None)
     status = getattr(e, "status_code", None) or getattr(response, "status_code", None)
     hint = {

@@ -91,6 +91,9 @@ def _run(job_id: str) -> None:
         )
         video = pipeline.make_video(script, job_dir, progress=progress, **render_args)
         db.save_video(job_dir.name, "a")
+        voice_note = json.loads((job_dir / "meta.json").read_text()).get("voice_note")
+        if voice_note:
+            warning = f"{warning} ⚠ {voice_note}".strip()
 
         variant_b = pipeline.hook_variant(script) if settings.get("ab") else None
         if variant_b:

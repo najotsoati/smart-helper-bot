@@ -399,3 +399,13 @@ def test_openrouter_falls_back_to_next_free_model(monkeypatch):
     monkeypatch.setattr(net, "request", fake_request)
     result = openrouter.ask_json("ideas", TopicIdeas, {}, "s")
     assert isinstance(result, TopicIdeas) and calls == ["busy/one:free", "ok/two:free"]
+
+
+def test_explain_names_the_host_on_connection_reset():
+    import httpx
+
+    from studio import health
+
+    request = httpx.Request("POST", "https://api.elevenlabs.io/v1/text-to-speech/x")
+    text = health.explain(httpx.ConnectError("[WinError 10054] reset", request=request))
+    assert "api.elevenlabs.io" in text and "Internet aloqasi uzildi" in text

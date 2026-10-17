@@ -202,13 +202,26 @@ def make_video(
     scenes = script.scenes
 
     # 1. Voice, scene by scene
-    voiced = []
-    for i, scene in enumerate(scenes):
-        progress(f"Ovoz: {i + 1}/{len(scenes)}", 0.03 + 0.15 * i / len(scenes))
-        if offline:
-            voiced.append(silent_scene(scene.narration, work, i))
-        else:
-            voiced.append(voice_scene(scene.narration, work, i, voice, rate))
+    def voice_all(voice: str) -> list:
+        voiced = []
+        for i, scene in enumerate(scenes):
+            progress(f"Ovoz: {i + 1}/{len(scenes)}", 0.03 + 0.15 * i / len(scenes))
+            if offline:
+                voiced.append(silent_scene(scene.narration, work, i))
+            else:
+                voiced.append(voice_scene(scene.narration, work, i, voice, rate))
+        return voiced
+
+    voice_note = ""
+    try:
+        voiced = voice_all(voice)
+    except Exception as e:
+        if voice != "elevenlabs":
+            raise
+        # ElevenLabs unreachable or out of credit: redo every scene with the Microsoft voice so it stays one voice
+        voice_note = f"ElevenLabs ishlamadi, Microsoft ovozi ishlatildi ({type(e).__name__})"
+        progress(voice_note, 0.03)
+        voiced = voice_all(config.DEFAULT_EDGE_VOICE)
     voice_track = render.concat([v.audio for v in voiced], work / "voice.wav", reencode_audio=True)
     total = probe_duration(voice_track)
 
@@ -316,6 +329,7 @@ def make_video(
         "hook": script.scenes[0].narration,
         "topic": script.topic,
         "variant": variant,
+        "voice_note": voice_note,
     }
     (job / f"meta{suffix}.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False))
     shutil.rmtree(work, ignore_errors=True)  # downloaded clips and temp renders can be hundreds of MB
