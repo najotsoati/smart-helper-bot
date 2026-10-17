@@ -117,7 +117,7 @@ class CheckedScript(BaseModel):
 def _client() -> anthropic.Anthropic:
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY is not set (add it to shorts_studio/.env)")
-    return anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+    return anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=4)
 
 
 def _check_stop(response) -> None:

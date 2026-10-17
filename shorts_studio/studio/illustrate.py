@@ -4,18 +4,18 @@ import base64
 import io
 from pathlib import Path
 
-import httpx
 from PIL import Image
 from pydantic import BaseModel, Field
 
-from . import config
+from . import config, net
 
 
 def draw(prompt: str, out: Path) -> Path:
     """Draw one vertical illustration in the channel's fixed style."""
     if not config.OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY is not set")
-    r = httpx.post(
+    r = net.request(
+        "POST",
         "https://api.openai.com/v1/images/generations",
         headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}"},
         json={
@@ -27,7 +27,6 @@ def draw(prompt: str, out: Path) -> Path:
         },
         timeout=180,
     )
-    r.raise_for_status()
     out.write_bytes(base64.b64decode(r.json()["data"][0]["b64_json"]))
     return out
 

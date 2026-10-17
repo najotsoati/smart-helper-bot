@@ -3,10 +3,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-import httpx
 from pydantic import BaseModel, Field
 
-from . import config
+from . import config, net
 
 API = "https://api.pexels.com/videos/search"
 
@@ -37,8 +36,7 @@ def search(query: str, limit: int, exclude: set[int]) -> list[Candidate]:
         params = {"query": query, "per_page": 15, "size": "medium"}
         if orientation:
             params["orientation"] = orientation
-        r = httpx.get(API, params=params, headers={"Authorization": config.PEXELS_API_KEY}, timeout=30)
-        r.raise_for_status()
+        r = net.request("GET", API, params=params, headers={"Authorization": config.PEXELS_API_KEY}, timeout=30)
         for video in r.json().get("videos", []):
             if video["id"] in seen or video.get("duration", 0) < 3 or not video.get("image"):
                 continue
@@ -125,11 +123,4 @@ def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> tuple[list[list[Ca
 
 
 def download(url: str, out: Path) -> Path:
-    if out.exists():
-        return out
-    with httpx.stream("GET", url, timeout=120, follow_redirects=True) as r:
-        r.raise_for_status()
-        with out.open("wb") as f:
-            for chunk in r.iter_bytes(1 << 16):
-                f.write(chunk)
-    return out
+    return net.download(url, out)

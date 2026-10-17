@@ -7,13 +7,13 @@ Each scene is voiced separately so scene boundaries are exact.
 import asyncio
 import base64
 import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
 import edge_tts
-import httpx
 
-from . import config
+from . import config, net
 from .ffmpeg import probe_duration, run
 
 
@@ -45,7 +45,8 @@ async def _edge(text: str, voice: str, rate: str, out: Path) -> list[Word]:
 
 
 def _elevenlabs(text: str, out: Path) -> list[Word]:
-    r = httpx.post(
+    r = net.request(
+        "POST",
         f"https://api.elevenlabs.io/v1/text-to-speech/{config.ELEVENLABS_VOICE_ID}/with-timestamps",
         headers={"xi-api-key": config.ELEVENLABS_API_KEY},
         json={
@@ -55,7 +56,6 @@ def _elevenlabs(text: str, out: Path) -> list[Word]:
         },
         timeout=120,
     )
-    r.raise_for_status()
     data = r.json()
     out.write_bytes(base64.b64decode(data["audio_base64"]))
 
@@ -84,7 +84,14 @@ def voice_scene(text: str, out_dir: Path, index: int, voice: str, rate: str = "+
     if config.ELEVENLABS_API_KEY and voice == "elevenlabs":
         words = _elevenlabs(text, raw)
     else:
-        words = asyncio.run(_edge(text, voice, rate, raw))
+        for attempt in range(3):  # the free edge endpoint occasionally drops connections
+            try:
+                words = asyncio.run(_edge(text, voice, rate, raw))
+                break
+            except Exception:
+                if attempt == 2:
+                    raise
+                time.sleep(2 ** (attempt + 1))
 
     # Normalise to wav and cut trailing silence down to a tight gap so the pacing stays fast.
     wav = out_dir / f"voice_{index:02d}.wav"

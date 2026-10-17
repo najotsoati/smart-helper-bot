@@ -3,17 +3,13 @@ Needs a free YouTube Data API v3 key (https://console.cloud.google.com -> APIs -
 
 from datetime import datetime, timedelta, timezone
 
-import httpx
-
-from . import config
+from . import config, net
 
 API = "https://www.googleapis.com/youtube/v3"
 
 
 def _get(path: str, **params) -> dict:
-    r = httpx.get(f"{API}/{path}", params={**params, "key": config.YOUTUBE_API_KEY}, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    return net.request("GET", f"{API}/{path}", params={**params, "key": config.YOUTUBE_API_KEY}, timeout=30).json()
 
 
 def outliers(niche: str, days: int = 30, limit: int = 12) -> list[dict]:
