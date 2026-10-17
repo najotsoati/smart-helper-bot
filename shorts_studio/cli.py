@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from studio import config, pipeline
-from studio.script import ShortScript, fact_check, write_script
+from studio.script import ShortScript, try_fact_check, write_script
 
 SAMPLE = Path(__file__).parent / "assets" / "sample_script.json"
 
@@ -40,9 +40,10 @@ def main() -> None:
         script = write_script(args.topic, args.seconds)
         if not args.no_factcheck:
             print("Faktlar internetdan tekshirilmoqda...")
-            checked = fact_check(script)
-            script = checked.script
-            for c in checked.checks:
+            script, checks, warning = try_fact_check(script)
+            if warning:
+                print(f"  {warning}")
+            for c in checks:
                 if c.verdict != "correct":
                     print(f"  #{c.scene} {c.verdict}: {c.note}")
         print(f"Hook: {script.scenes[0].narration}")

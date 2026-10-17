@@ -5,12 +5,12 @@ cd /d "%~dp0"
 chcp 65001 >nul
 
 set "PY="
-where py >nul 2>nul && (py -3 -c "import sys; sys.exit(sys.version_info < (3, 10))" >nul 2>nul && set "PY=py -3")
+where py >nul 2>nul && (py -3 -c "import sys; sys.exit(sys.version_info < (3, 11))" >nul 2>nul && set "PY=py -3")
 if not defined PY (
-  where python >nul 2>nul && (python -c "import sys; sys.exit(sys.version_info < (3, 10))" >nul 2>nul && set "PY=python")
+  where python >nul 2>nul && (python -c "import sys; sys.exit(sys.version_info < (3, 11))" >nul 2>nul && set "PY=python")
 )
 if not defined PY (
-  echo Python 3.10+ topilmadi. https://www.python.org/downloads/ dan o'rnating
+  echo Python 3.11+ topilmadi. https://www.python.org/downloads/ dan o'rnating
   echo va o'rnatishda "Add python.exe to PATH" belgisini qo'ying.
   pause
   exit /b 1

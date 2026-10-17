@@ -111,7 +111,11 @@ def choose_visuals(scenes: list[Scene], durations: list[float], visual_mode: str
         for n, i in enumerate(stock_idx):
             progress(f"Video qidirilmoqda: {n + 1}/{len(stock_idx)} ({scenes[i].visual_query})",
                      0.2 + 0.12 * n / len(stock_idx))
-            cands = visuals.candidates_for(scenes[i].visual_query, min(shots[i] + 3, 6), used)
+            try:
+                cands = visuals.candidates_for(scenes[i].visual_query, min(shots[i] + 3, 6), used)
+            except Exception as e:  # bad key or Pexels down: the scene falls back to a drawing / background
+                cands = []
+                issues[i] = f"Pexels: {e}"[:200]
             used |= {c.id for c in cands}
             pool.append((scenes[i].narration, shots[i], cands))
         progress("Claude stok videolarni ko'rib, eng moslarini tanlayapti...", 0.33)

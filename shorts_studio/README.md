@@ -37,7 +37,7 @@ Oddiy "rasm + robot ovoz" videolaridan farqi: har bir video ko'rishni ushlab qol
 
 ## O'rnatish
 
-Kerak bo'ladi: **Python 3.10+** va **ffmpeg** (`ffmpeg -version` ishlashi kerak).
+Kerak bo'ladi: **Python 3.11+** (tavsiya: 3.12) va **ffmpeg** (`ffmpeg -version` ishlashi kerak).
 
 ```bash
 cd shorts_studio

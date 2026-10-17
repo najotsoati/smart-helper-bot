@@ -148,7 +148,9 @@ def ask_json(content, schema: type[BaseModel], effort: str = "high", system: str
         messages=[{"role": "user", "content": content}],
     )
     _check_stop(response)
-    text = next(b.text for b in response.content if b.type == "text")
+    text = next((b.text for b in response.content if b.type == "text"), None)
+    if text is None:
+        raise RuntimeError("Claude returned no text, try again")
     return schema.model_validate(json.loads(text))
 
 
@@ -223,6 +225,7 @@ def fact_check(script: ShortScript) -> CheckedScript:
     )
     tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 8}]
     messages = [{"role": "user", "content": question}]
+    report_parts: list[str] = []
     for _ in range(5):  # resume if the server-side search loop pauses
         response = client.beta.messages.create(
             model=config.CLAUDE_MODEL,
@@ -235,10 +238,11 @@ def fact_check(script: ShortScript) -> CheckedScript:
             messages=messages,
         )
         _check_stop(response)
+        report_parts += [b.text for b in response.content if b.type == "text"]
         if response.stop_reason != "pause_turn":
             break
         messages = [messages[0], {"role": "assistant", "content": response.content}]
-    report = "\n".join(b.text for b in response.content if b.type == "text")
+    report = "\n".join(report_parts)
 
     prompt = (
         "Here is a Short script as JSON and a web fact-check report. Return the script with every "
@@ -248,3 +252,13 @@ def fact_check(script: ShortScript) -> CheckedScript:
         f"SCRIPT:\n{script.model_dump_json()}\n\nFACT-CHECK REPORT:\n{report}"
     )
     return ask_json(prompt, CheckedScript, effort="low")
+
+
+def try_fact_check(script: ShortScript) -> tuple[ShortScript, list[FactCheck], str]:
+    """Fact-check, but never lose the script: if checking fails (e.g. web search is turned off for
+    the Anthropic organization), return the unchecked draft and a warning to show."""
+    try:
+        checked = fact_check(script)
+        return checked.script, checked.checks, ""
+    except Exception as e:
+        return script, [], f"Faktlarni tekshirib bo'lmadi, ssenariy tekshirilmagan holda qoldi. Sabab: {e}"[:400]

@@ -81,9 +81,11 @@ def _elevenlabs(text: str, out: Path) -> list[Word]:
 
 def voice_scene(text: str, out_dir: Path, index: int, voice: str, rate: str = "+12%") -> VoicedScene:
     raw = out_dir / f"voice_{index:02d}.mp3"
-    if config.ELEVENLABS_API_KEY and voice == "elevenlabs":
+    if voice == "elevenlabs" and config.ELEVENLABS_API_KEY:
         words = _elevenlabs(text, raw)
     else:
+        if voice == "elevenlabs":  # key was removed after the job was queued
+            voice = config.DEFAULT_EDGE_VOICE
         for attempt in range(3):  # the free edge endpoint occasionally drops connections
             try:
                 words = asyncio.run(_edge(text, voice, rate, raw))

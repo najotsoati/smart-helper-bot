@@ -1,6 +1,7 @@
 """Start the panel: checks Python and ffmpeg, picks a free port and opens the browser.
 Normally launched by start.bat (Windows) or start.sh (macOS / Linux)."""
 
+import os
 import shutil
 import socket
 import sys
@@ -25,8 +26,9 @@ def free_port(start: int = 8000) -> int:
 
 
 def main() -> None:
-    if sys.version_info < (3, 10):
-        raise SystemExit(f"Python 3.10 yoki yangisi kerak (sizda {sys.version.split()[0]})")
+    if sys.version_info < (3, 11):
+        raise SystemExit(f"Python 3.11 yoki yangisi kerak (sizda {sys.version.split()[0]})")
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # so "app:app" imports from any working directory
     if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
         raise SystemExit(FFMPEG_HELP)
 

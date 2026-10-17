@@ -4,13 +4,13 @@ set -e
 cd "$(dirname "$0")"
 
 PY=""
-for cand in python3.13 python3.12 python3.11 python3.10 python3; do
-  if command -v "$cand" >/dev/null 2>&1 && "$cand" -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+for cand in python3.13 python3.12 python3.11 python3; do
+  if command -v "$cand" >/dev/null 2>&1 && "$cand" -c 'import sys; sys.exit(sys.version_info < (3, 11))'; then
     PY="$cand"; break
   fi
 done
 if [ -z "$PY" ]; then
-  echo "Python 3.10+ topilmadi. https://www.python.org/downloads/ dan o'rnating (macOS: brew install python)."
+  echo "Python 3.11+ topilmadi. https://www.python.org/downloads/ dan o'rnating (macOS: brew install python)."
   exit 1
 fi
 

@@ -25,7 +25,7 @@ Demak, bitta video taxminan **$0.5–1.2** turadi. Boshlash uchun Claude va Open
 ## 1. Python va ffmpeg o'rnatish (bir marta)
 
 ### Windows
-1. **Python 3.12**: https://www.python.org/downloads/ dan yuklab oling. O'rnatishda birinchi oynada **"Add python.exe to PATH"** belgisini albatta qo'ying.
+1. **Python 3.12** (3.11 yoki undan yangi bo'lishi kerak): https://www.python.org/downloads/ dan yuklab oling. O'rnatishda birinchi oynada **"Add python.exe to PATH"** belgisini albatta qo'ying.
 2. **ffmpeg**: Start menyusida **PowerShell**ni oching va quyidagini yozing:
    ```
    winget install Gyan.FFmpeg
@@ -110,7 +110,9 @@ Bitta video taxminan 3–6 daqiqada tayyor bo'ladi. Demak, 10 ta mavzu taxminan 
 | Belgi | Yechim |
 |---|---|
 | `start.bat` "Python topilmadi" deydi | Python'ni qayta o'rnating, **"Add python.exe to PATH"** belgisini qo'ying |
-| "ffmpeg topilmadi" | 1-qadamdagi ffmpeg o'rnatishni bajaring va oynani qayta oching |
+| "ffmpeg topilmadi" | 1-qadamdagi ffmpeg o'rnatishni bajaring va oynani qayta oching. Yordam bermasa, kompyuterni qayta yoqing (Windows yangi PATH'ni ba'zan shundan keyin ko'radi) |
+| Ssenariy ostida "⚠ Faktlarni tekshirib bo'lmadi" | Ssenariy saqlanib qoladi, faqat tekshirilmagan bo'ladi. Odatda sabab: Anthropic hisobingizda veb-qidiruv (web search) o'chiq. Uni console.anthropic.com sozlamalarida yoqing yoki "Faktlarni tekshirish" belgisini olib qo'ying |
+| Moslik hisobotida "Pexels: ..." | Pexels kaliti noto'g'ri yoki xizmat javob bermadi. Video baribir yasaladi: bu sahnalar AI chizma yoki rangli fon bilan almashtiriladi |
 | Kalit ostida "Kalit noto'g'ri (401)" | Kalitni qaytadan nusxalang (boshida yoki oxirida bo'sh joy qolmasin) |
 | "Ruxsat yo'q (403)" | Hisobda pul bormi yoki xizmat hududingizda ishlaydimi, tekshiring |
 | "Limit tugagan (429)" | Balansni to'ldiring yoki biroz kuting |

@@ -365,14 +365,15 @@ $("btnScript").onclick = () => {
   run($("btnScript"), fc ? "Yozilmoqda va tekshirilmoqda... (~1 daq)" : "Yozilmoqda... (~30 s)", $("err1"), async () => {
     const res = await api("/api/script", { topic, seconds: +$("seconds").value, factcheck: fc });
     script = res.script;
-    showChecks(res.checks);
+    showChecks(res.checks, res.warning);
     showScript();
   });
 };
 
-function showChecks(checks) {
-  $("checksBox").classList.toggle("hidden", !checks.length);
+function showChecks(checks, warning) {
+  $("checksBox").classList.toggle("hidden", !checks.length && !warning);
   $("checks").innerHTML = "";
+  if (warning) { const w = document.createElement("div"); w.className = "err"; w.textContent = "⚠ " + warning; $("checks").append(w); }
   const tags = { correct: ["ok", "To'g'ri"], fixed: ["fix", "Tuzatildi"], removed: ["del", "Olib tashlandi"] };
   for (const c of checks) {
     const d = document.createElement("div");

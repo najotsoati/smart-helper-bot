@@ -163,3 +163,95 @@ def test_secrets_cannot_be_changed_remotely():
     assert client.post("/api/keys", json={"name": "PEXELS_API_KEY", "value": "x"}).status_code == 403
     assert client.post("/api/youtube/client_secret", json={"content": "{}"}).status_code == 403
     assert client.get("/api/keys").status_code == 200
+
+
+def test_fact_check_failure_keeps_the_script(monkeypatch):
+    from studio import script as script_mod
+
+    def broken(_):
+        raise RuntimeError("web search is disabled for this organization")
+
+    monkeypatch.setattr(script_mod, "fact_check", broken)
+    kept, checks, warning = script_mod.try_fact_check(SAMPLE)
+    assert kept is SAMPLE and checks == []
+    assert "web search is disabled" in warning
+
+
+def test_pexels_failure_falls_back_instead_of_failing(monkeypatch):
+    from studio import visuals
+
+    monkeypatch.setattr(config, "PEXELS_API_KEY", "bad-key")
+    monkeypatch.setattr(config, "OPENAI_API_KEY", "")
+    monkeypatch.setattr(config, "ANTHROPIC_API_KEY", "")
+
+    def down(*_args, **_kwargs):
+        raise RuntimeError("401 Unauthorized")
+
+    monkeypatch.setattr(visuals, "candidates_for", down)
+    durations = [3.0] * len(SAMPLE.scenes)
+    plan = pipeline.choose_visuals(SAMPLE.scenes, durations, "stock", True, False, lambda *_: None)
+    stock_scenes = [i for i, s in enumerate(SAMPLE.scenes) if s.visual_type != "mascot" or s.graphic_type != "none"]
+    assert all(plan["kinds"][i] == "gradient" for i in stock_scenes if plan["kinds"][i] != "mascot")
+    assert any("Pexels: 401 Unauthorized" in issue for issue in plan["issues"])
+
+
+def test_claude_requests_against_a_fake_api(monkeypatch):
+    """Runs the real Anthropic SDK against a local fake server: checks what we send and that we parse replies."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    from studio import script as script_mod
+
+    seen: list[tuple[dict, dict]] = []
+
+    def message(content, stop="end_turn"):
+        return {"id": "msg_1", "type": "message", "role": "assistant", "model": config.CLAUDE_MODEL,
+                "content": content, "stop_reason": stop, "stop_sequence": None,
+                "usage": {"input_tokens": 1, "output_tokens": 1}}
+
+    class Fake(BaseHTTPRequestHandler):
+        def do_POST(self):
+            body = json.loads(self.rfile.read(int(self.headers["content-length"])))
+            seen.append((dict(self.headers), body))
+            thinking = {"type": "thinking", "thinking": "", "signature": "sig"}
+            if "tools" in body:  # the web-search fact-check turn
+                searches = sum(1 for h, b in seen if "tools" in b)
+                reply = message([thinking, {"type": "text", "text": "Everest is 8,849 m. All correct."}],
+                                "pause_turn" if searches == 1 else "end_turn")
+            elif "checks" in json.dumps(body["output_config"]["format"]["schema"]["properties"]):
+                fixed = {"script": json.loads(SAMPLE.model_dump_json()),
+                         "checks": [{"scene": 3, "verdict": "correct", "note": "ok", "source": "https://x"}]}
+                reply = message([thinking, {"type": "text", "text": json.dumps(fixed)}])
+            else:
+                reply = message([thinking, {"type": "text", "text": SAMPLE.model_dump_json()}])
+            data = json.dumps(reply).encode()
+            self.send_response(200)
+            self.send_header("content-type", "application/json")
+            self.send_header("content-length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def log_message(self, *_):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Fake)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    monkeypatch.setenv("ANTHROPIC_BASE_URL", f"http://127.0.0.1:{server.server_port}")
+    monkeypatch.setattr(config, "ANTHROPIC_API_KEY", "test-key")
+    try:
+        draft = script_mod.write_script("the deepest point of the ocean", 35)
+        checked, checks, warning = script_mod.try_fact_check(draft)
+    finally:
+        server.shutdown()
+
+    assert draft.title == SAMPLE.title and warning == "" and checks[0].scene == 3
+    headers, first = seen[0]
+    assert first["model"] == config.CLAUDE_MODEL and first["fallbacks"] == "default"
+    assert "server-side-fallback-2026-07-01" in headers.get("anthropic-beta", "")
+    assert first["thinking"] == {"type": "adaptive"}
+    assert first["output_config"]["format"]["type"] == "json_schema"
+    assert "title" in first["output_config"]["format"]["schema"]["properties"]
+    searches = [b for _, b in seen if "tools" in b]
+    assert len(searches) == 2  # paused once, then resumed
+    assert searches[1]["messages"][-1]["role"] == "assistant"  # resume = same turn sent back, no extra user message
+    assert searches[0]["tools"][0]["type"] == "web_search_20260209"

@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from studio import config, db, health, jobs, learn, pipeline, trends, youtube
-from studio.script import ShortScript, fact_check, suggest_topics, write_script
+from studio.script import ShortScript, suggest_topics, try_fact_check, write_script
 
 
 @asynccontextmanager
@@ -167,9 +167,9 @@ def script(req: ScriptRequest):
     def work():
         draft = write_script(req.topic, req.seconds)
         if not req.factcheck:
-            return {"script": draft.model_dump(), "checks": []}
-        checked = fact_check(draft)
-        return {"script": checked.script.model_dump(), "checks": [c.model_dump() for c in checked.checks]}
+            return {"script": draft.model_dump(), "checks": [], "warning": ""}
+        checked, checks, warning = try_fact_check(draft)
+        return {"script": checked.model_dump(), "checks": [c.model_dump() for c in checks], "warning": warning}
 
     return _guard(work)
 

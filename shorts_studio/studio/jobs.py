@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 
 from . import config, db, pipeline, youtube
-from .script import ShortScript, fact_check, write_script
+from .script import ShortScript, try_fact_check, write_script
 
 _executor = ThreadPoolExecutor(max_workers=1)  # one render at a time keeps the machine responsive
 _started = threading.Event()
@@ -68,6 +68,7 @@ def _run(job_id: str) -> None:
     def progress(step: str, pct: float):
         db.update_job(job_id, status="running", step=step, progress=pct)
 
+    warning = ""
     try:
         if params.get("script"):
             script = ShortScript.model_validate(params["script"])
@@ -76,7 +77,7 @@ def _run(job_id: str) -> None:
             script = write_script(job["topic"], settings.get("seconds", 35))
             if settings.get("factcheck", True):
                 progress("Faktlar internetdan tekshirilmoqda...", 0.02)
-                script = fact_check(script).script
+                script, _, warning = try_fact_check(script)
 
         job_dir = pipeline.new_job_dir(script.topic)
         db.update_job(job_id, dir=job_dir.name)
@@ -108,7 +109,7 @@ def _run(job_id: str) -> None:
             db.save_video(job_dir.name, "a", youtube_id=vid, publish_at=params.get("publish_at"),
                           uploaded=datetime.now().timestamp())
 
-        db.update_job(job_id, status="done", step="Tayyor!", progress=1.0)
+        db.update_job(job_id, status="done", step=f"Tayyor! {warning}".strip(), progress=1.0)
     except Exception as e:
         traceback.print_exc()
         db.update_job(job_id, status="error", step=f"{type(e).__name__}: {e}"[:600])
