@@ -22,35 +22,51 @@ GRADIENTS = [
 ]
 
 
-def _motion(duration: float, zoom_in: bool, punch: float = 0.10, dim: bool = False) -> str:
-    """Cover-crop to 9:16, a quick 'punch' zoom on the cut, then a slow push in (or pull out).
+MOVES = ["push_in", "pan_right", "tilt_up", "pull_out", "pan_left"]
+
+
+def _motion(duration: float, move: str = "push_in", punch: float = 0.10, dim: bool = False,
+            shake: bool = False) -> str:
+    """Cover-crop to 9:16 with a quick 'punch' zoom on the cut, then a camera move:
+    push_in / pull_out (slow zoom), pan_left / pan_right, tilt_up. `shake` adds a subtle handheld wobble.
     `dim` blurs and darkens the shot so an infographic on top stays readable."""
-    drift = f"0.07*t/{duration:.3f}" if zoom_in else f"0.07*(1-t/{duration:.3f})"
-    z = f"(1+{punch}*max(0\\,1-t/0.2)+{drift})"
+    d = f"{duration:.3f}"
+    drift = {"push_in": f"0.07*t/{d}", "pull_out": f"0.07*(1-t/{d})"}.get(move, "0.02")
+    z = f"(1.12*(1+{punch}*max(0\\,1-t/0.2)+{drift}))"  # 12% overscan leaves room to pan
+    x, y = "(iw-ow)/2", "(ih-oh)/2"
+    if move == "pan_right":
+        x = f"(iw-ow)*(0.15+0.7*t/{d})"
+    elif move == "pan_left":
+        x = f"(iw-ow)*(0.85-0.7*t/{d})"
+    elif move == "tilt_up":
+        y = f"(ih-oh)*(0.85-0.7*t/{d})"
+    if shake:
+        x = f"clip({x}+5*sin(11*t)+3*sin(6.7*t)\\,0\\,iw-ow)"
+        y = f"clip({y}+4*sin(9.3*t+1)\\,0\\,ih-oh)"
     look = "boxblur=18:2,eq=brightness=-0.22:saturation=0.9" if dim else "eq=contrast=1.07:saturation=1.22"
     return (
         f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},"
-        f"scale=w='trunc({W}*{z}/2)*2':h='trunc({H}*{z}/2)*2':eval=frame,crop={W}:{H},"
+        f"scale=w='trunc({W}*{z}/2)*2':h='trunc({H}*{z}/2)*2':eval=frame,crop={W}:{H}:x='{x}':y='{y}',"
         f"{look},fps={FPS},setsar=1,format=yuv420p"
     )
 
 
-def clip_segment(src: Path, src_duration: float, duration: float, out: Path, zoom_in: bool,
+def clip_segment(src: Path, src_duration: float, duration: float, out: Path, move: str = "push_in",
                  punch: float = 0.10, dim: bool = False) -> Path:
     max_offset = max(src_duration - duration - 0.2, 0)
     offset = random.uniform(0, min(max_offset, 4.0))
     run(
         ["ffmpeg", "-y", "-stream_loop", "-1", "-ss", f"{offset:.2f}", "-i", str(src), "-t", f"{duration:.3f}",
-         "-vf", _motion(duration, zoom_in, punch, dim), "-an", *DRAFT, str(out)]
+         "-vf", _motion(duration, move, punch, dim), "-an", *DRAFT, str(out)]
     )
     return out
 
 
-def image_segment(image: Path, duration: float, out: Path, zoom_in: bool, punch: float = 0.10,
+def image_segment(image: Path, duration: float, out: Path, move: str = "push_in", punch: float = 0.10,
                   dim: bool = False) -> Path:
-    """A still illustration brought to life with the same punch zoom and slow push as video shots."""
+    """A still illustration brought to life: punch zoom, a camera move and a handheld wobble."""
     run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(image), "-t", f"{duration:.3f}",
-         "-vf", _motion(duration, zoom_in, punch, dim), *DRAFT, str(out)])
+         "-vf", _motion(duration, move, punch, dim, shake=True), *DRAFT, str(out)])
     return out
 
 
@@ -62,7 +78,7 @@ def gradient_segment(duration: float, out: Path, index: int, punch: float = 0.10
     c0, c1 = colors or GRADIENTS[index % len(GRADIENTS)]
     src = f"gradients=s={W}x{H}:c0={c0}:c1={c1}:x0=0:y0=0:x1={W}:y1={H}:speed=0.03:r={FPS}"
     run(["ffmpeg", "-y", "-f", "lavfi", "-i", src, "-t", f"{duration:.3f}",
-         "-vf", _motion(duration, index % 2 == 0, punch), *DRAFT, str(out)])
+         "-vf", _motion(duration, "push_in" if index % 2 == 0 else "pull_out", punch), *DRAFT, str(out)])
     return out
 
 

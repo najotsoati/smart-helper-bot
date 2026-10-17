@@ -35,6 +35,9 @@ For each scene also give:
 - visual_type, the single most important choice, because the picture must clearly show what is being said:
   * "mascot": Fakti talks straight to camera. Use it ONLY for scene 1 (the hook), the twist scene \
 and the last scene. Fakti introduces, reacts, and closes the loop; facts are shown with pictures.
+- host_emotion: Fakti's face for this scene (shown big in mascot scenes, in a corner badge otherwise): \
+"excited" for amazing facts and the hook, "surprised" for the twist, "scared" for creepy or dangerous \
+facts, "pointing" when introducing something to look at, "neutral" otherwise.
   * "illustration": a custom drawing. Use it when the fact is impossible or boring to film: inside the \
 body, microscopic, space scales, prehistoric/historic events, hypothetical or exaggerated comparisons.
   * "stock": real footage. Use it when real video of the subject looks spectacular (animals, nature, \
@@ -68,6 +71,7 @@ class Scene(BaseModel):
     emphasis: list[str]
     on_screen_text: str
     visual_type: Literal["mascot", "illustration", "stock"] = "stock"
+    host_emotion: Literal["neutral", "excited", "surprised", "scared", "pointing"] = "neutral"
     image_prompt: str = ""
     beat: Literal["normal", "twist", "payoff"] = "normal"
     graphic_type: Literal["none", "counter", "compare"] = "none"
@@ -153,16 +157,23 @@ def _strict_schema(model: type[BaseModel]) -> dict:
     schema = model.model_json_schema()
 
     def walk(node):
-        if isinstance(node, dict):
-            if node.get("type") == "object":
-                node["additionalProperties"] = False
-                node["required"] = list(node.get("properties", {}))
-            node.pop("title", None)
-            node.pop("default", None)
-            for value in node.values():
-                walk(value)
-        elif isinstance(node, list):
+        """`node` is always a schema (never a `properties` mapping, whose keys are field names)."""
+        if isinstance(node, list):
             for value in node:
+                walk(value)
+            return
+        if not isinstance(node, dict):
+            return
+        node.pop("title", None)
+        node.pop("default", None)
+        if node.get("type") == "object":
+            node["additionalProperties"] = False
+            node["required"] = list(node.get("properties", {}))
+        for key, value in node.items():
+            if key in ("properties", "$defs"):
+                for sub in value.values():
+                    walk(sub)
+            elif isinstance(value, (dict, list)):
                 walk(value)
 
     walk(schema)
@@ -178,7 +189,9 @@ def write_script(topic: str, seconds: int = 35) -> ShortScript:
         "First brainstorm 3 hooks and put the strongest first in hook_candidates; "
         "scene 1 narration must be that hook. Make sure the last line loops into the hook."
     )
-    return ask_json(prompt, ShortScript)
+    from .learn import playbook_prompt  # local import: learn.py uses ask_json from this module
+
+    return ask_json(prompt + playbook_prompt(), ShortScript)
 
 
 def suggest_topics(niche: str = "", count: int = 8, trending: list[str] | None = None) -> list[TopicIdea]:
@@ -194,7 +207,9 @@ def suggest_topics(niche: str = "", count: int = 8, trending: list[str] | None =
             "(views far above subscriber count). Find the patterns and suggest fresh angles on them, "
             "don't copy them:\n- " + "\n- ".join(trending)
         )
-    return ask_json(prompt, TopicIdeas, effort="medium").ideas
+    from .learn import playbook_prompt
+
+    return ask_json(prompt + playbook_prompt(), TopicIdeas, effort="medium").ideas
 
 
 def fact_check(script: ShortScript) -> CheckedScript:

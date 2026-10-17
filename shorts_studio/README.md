@@ -25,6 +25,13 @@ Oddiy "rasm + robot ovoz" videolaridan farqi: har bir video ko'rishni ushlab qol
 | **Seriya** | "Ocean Facts #3" kabi belgi video boshida va sarlavhada chiqadi. |
 | **Sifat** | Yakuniy eksport: x264 high, CRF 18. YouTube qayta siqqandan keyin ham tiniq qoladi. |
 | **Metadata** | Sarlavha, tavsif, heshteglar va pin qilinadigan izoh tayyor bo'ladi. |
+| **Maskot ifodalari** | Fakti sahnaga qarab xursand, hayron, qo'rqqan bo'ladi yoki "qarang!" deb ko'rsatadi. |
+| **Jonli chizmalar** | Chizmalarda zoom, chapga yoki o'ngga surilish, pastdan yuqoriga ko'tarilish va yengil titrash bor. |
+| **A/B hook** | Bitta videoning ikkinchi hook bilan varianti ham yasaladi (`video_b.mp4`). Qo'shimcha chizma xarajati yo'q. |
+| **Ommaviy rejim** | Mavzular ro'yxatini berasiz, panel ularni navbat bilan o'zi tayyorlaydi va kerak bo'lsa rejalashtiradi. |
+| **YouTube'ga yuklash** | Panel videoni kanalga o'zi yuklaydi yoki belgilangan vaqtga rejalashtiradi. |
+| **Natijalardan o'rganish** | YouTube statistikasi (o'tkazib yubormay ko'rganlar ulushi, ko'rilganlik foizi, ko'rishlar) yig'iladi. Claude qaysi hook va mavzular ishlaganini tahlil qilib, kanal uchun qo'llanma yozadi. Keyingi ssenariylar shu qo'llanmaga tayanib yoziladi. |
+| **Ishonchlilik** | Barcha ishlar bazada saqlanadi, server qayta ishga tushsa navbat davom etadi. Tarmoq xatolarida avtomatik qayta urinish bor. "Tizim" bo'limida har bir kalitni bitta tugma bilan tekshirasiz. |
 
 ## O'rnatish
 
@@ -47,16 +54,18 @@ cp .env.example .env             # keyin .env ichiga kalitlarni yozing
 | `YOUTUBE_API_KEY` | yo'q | https://console.cloud.google.com, "YouTube Data API v3" (bepul). "Trenddagi Shorts" tugmasi uchun kerak. |
 
 Fon musiqasi kerak bo'lsa, `assets/music/` papkasiga mualliflik huquqisiz `.mp3` fayllarni tashlang (kayfiyat bo'yicha papkalar: [assets/music/README.md](assets/music/README.md)).
-O'z personajingizni ishlatmoqchi bo'lsangiz, `assets/mascot/` ichidagi PNG'larni xuddi shu nomlar bilan almashtiring: `closed`, `half`, `open`, `blink`, `surprised_closed`, `surprised_open`. Rasmlar kvadrat va shaffof fonli bo'lsin.
+O'z personajingizni ishlatmoqchi bo'lsangiz, `assets/mascot/` ichidagi PNG'larni xuddi shu nomlar bilan almashtiring: `<ifoda>_<closed|half|open>.png` (ifodalar: `neutral`, `excited`, `surprised`, `scared`, `pointing`) va ixtiyoriy `<ifoda>_blink.png`. Rasmlar kvadrat va shaffof fonli bo'lsin. Biror ifoda bo'lmasa, uning o'rniga `neutral` ishlatiladi.
 Haqiqiy ovoz effektlari kerak bo'lsa, ularni `assets/sfx/` papkasiga tashlang: [assets/sfx/README.md](assets/sfx/README.md).
 
 ## Ishga tushirish
 
 ```bash
-uvicorn app:app --reload
+uvicorn app:app
 ```
 
-Brauzerda http://127.0.0.1:8000 manzilini oching. Keyin:
+Brauzerda http://127.0.0.1:8000 manzilini oching. **Birinchi ish:** "Tizim" bo'limida **Tekshirish** tugmasini bosing. Har bir kalit ishlayaptimi, ko'rsatiladi.
+
+Keyin "Yaratish" bo'limida:
 
 1. **Trenddagi Shorts** tugmasi nishangizda hozir nima ko'rilayotganini ko'rsatadi. **Viral g'oyalar topish** tugmasi shularga asoslanib mavzu taklif qiladi. Mavzuni o'zingiz ham yozishingiz mumkin.
 2. **Ssenariy yozish**: faktlar tekshiruvi natijasini ko'rib chiqing, hookni tanlang, kerak bo'lsa matnni, video qidiruv so'zlarini, sarlavhalarni va twist sahnasini tahrirlang.
@@ -69,7 +78,38 @@ python cli.py "the deepest point of the ocean" --series "Ocean Facts #1"
 python cli.py --offline          # kalitsiz sinov: namuna ssenariy, ovozsiz
 ```
 
-Tayyor videolar `output/` papkasiga saqlanadi.
+Tayyor videolar `output/` papkasiga saqlanadi. Chizmalar va stok videolar `output/.cache/` papkasida keshlanadi: qayta urinishda yoki A/B variantda ular qayta chizilmaydi va qayta yuklanmaydi.
+
+## Ommaviy rejim va rejalashtirish
+
+"Ommaviy" bo'limida har qatorga bitta mavzu yozing (yoki **G'oyalardan to'ldirish** tugmasini bosing) va **Navbatga qo'shish** tugmasini bosing. Panel har bir mavzu uchun ssenariy yozadi, faktlarni tekshiradi va video yasaydi. "YouTube'ga yuklash" yoqilgan bo'lsa, videoni kanalga ham yuklaydi. **Rejalashtirib joylash** yoqilsa, videolar kuniga belgilangan soatlarga taqsimlanadi.
+
+## YouTube kanalini ulash
+
+1. https://console.cloud.google.com saytida loyiha oching.
+2. **APIs & Services → Library** bo'limida **YouTube Data API v3** va **YouTube Analytics API**ni yoqing.
+3. **OAuth consent screen**: turini "External" qiling va o'z emailingizni "Test users" ro'yxatiga qo'shing.
+4. **Credentials → Create credentials → OAuth client ID → Desktop app**. JSON faylni yuklab olib, `shorts_studio/client_secret.json` nomi bilan saqlang.
+5. Panelda "Videolar va kanal" bo'limida **Kanalni ulash** tugmasini bosing va brauzerda ruxsat bering. Panelni o'z kompyuteringizda ishga tushirgan bo'lishingiz kerak.
+
+**Muhim:** YouTube'ning bepul API auditidan o'tmagan loyihalarda API orqali yuklangan videolar **"private" bo'lib qoladi**. Yuklash ishlaydi, lekin videoni YouTube Studio'da o'zingiz ochiq qilasiz. Avtomatik rejalashtirish esa faqat auditdan keyin ishlaydi. Audit uchun ariza: https://support.google.com/youtube/contact/yt_api_form
+
+Qo'lda yuklagan videolaringizni ham kuzatish mumkin: video kartasidagi **Havola qo'shish** tugmasini bosib, Shorts havolasini kiriting.
+
+## Natijalardan o'rganish
+
+1. Videolar chiqqandan 2–3 kun o'tgach (YouTube statistikasi kechikib keladi) **Statistikani yangilash** tugmasini bosing.
+2. Kamida 3 ta video statistikasi yig'ilgach, **Natijalardan o'rganish** tugmasini bosing. Claude qaysi hook, mavzu va uzunlik yaxshi ishlaganini tahlil qilib, kanal qo'llanmasini yozadi.
+3. Shundan keyin har bir yangi ssenariy va g'oya shu qo'llanmaga tayanib yoziladi. Har hafta yangilab turing.
+
+A/B uchun: A va B videolarini turli kunlarda joylang. Qo'llanma qaysi hook yutganini ham ko'rsatadi.
+
+## Testlar
+
+```bash
+python -m pytest -q                 # hamma testlar (taxminan 1.5 daqiqa)
+python -m pytest -q -m "not slow"   # tezkor testlar (10 soniya)
+```
 
 ## Ko'proq ko'rish uchun maslahatlar
 

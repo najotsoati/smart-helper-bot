@@ -1,6 +1,7 @@
 """Custom illustrations (OpenAI image API) and Claude's picture-vs-narration match check."""
 
 import base64
+import hashlib
 import io
 from pathlib import Path
 
@@ -10,8 +11,14 @@ from pydantic import BaseModel, Field
 from . import config, net
 
 
-def draw(prompt: str, out: Path) -> Path:
-    """Draw one vertical illustration in the channel's fixed style."""
+def draw(prompt: str) -> Path:
+    """Draw one vertical illustration in the channel's fixed style. Cached by prompt + style."""
+    full = f"{prompt}\n\nStyle: {config.ILLUSTRATION_STYLE}"
+    key = hashlib.sha1(f"{config.IMAGE_MODEL}|{config.IMAGE_QUALITY}|{full}".encode()).hexdigest()[:20]
+    out = config.CACHE_DIR / "draw" / f"{key}.png"
+    if out.exists():
+        return out
+    out.parent.mkdir(parents=True, exist_ok=True)
     if not config.OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY is not set")
     r = net.request(
@@ -20,14 +27,16 @@ def draw(prompt: str, out: Path) -> Path:
         headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}"},
         json={
             "model": config.IMAGE_MODEL,
-            "prompt": f"{prompt}\n\nStyle: {config.ILLUSTRATION_STYLE}",
+            "prompt": full,
             "size": "1024x1536",
             "quality": config.IMAGE_QUALITY,
             "n": 1,
         },
         timeout=180,
     )
-    out.write_bytes(base64.b64decode(r.json()["data"][0]["b64_json"]))
+    tmp = out.with_suffix(".part")
+    tmp.write_bytes(base64.b64decode(r.json()["data"][0]["b64_json"]))
+    tmp.replace(out)
     return out
 
 

@@ -6,3 +6,6 @@ assets/music/**/*.mp3
 assets/music/**/*.wav
 assets/sfx/*.wav
 assets/sfx/*.mp3
+client_secret.json
+youtube_token.json
+.pytest_cache/

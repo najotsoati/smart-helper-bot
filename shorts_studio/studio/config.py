@@ -14,6 +14,7 @@ MUSIC_DIR = ASSETS / "music"
 MASCOT_DIR = ASSETS / "mascot"
 OUTPUT_DIR = ROOT / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
+CACHE_DIR = OUTPUT_DIR / ".cache"  # drawings and stock clips, reused by retries and A/B variants
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")

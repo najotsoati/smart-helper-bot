@@ -16,17 +16,22 @@
   header h1 span { background: var(--accent); color: var(--accent-ink); padding: 0 8px; border-radius: 6px; }
   .status { color: var(--muted); font-size: 13px; }
   .status b.ok { color: var(--green); } .status b.no { color: var(--red); }
-  main { max-width: 1100px; margin: 0 auto; padding: 8px 16px 60px; display: grid; gap: 16px; }
+  nav { max-width: 1100px; margin: 0 auto; padding: 6px 16px 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  nav button { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  nav button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  main { max-width: 1100px; margin: 0 auto; padding: 12px 16px 60px; display: grid; gap: 16px; }
   section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
   h2 { margin: 0 0 12px; font-size: 17px; display: flex; gap: 10px; align-items: center; }
   h2 .n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: inline-grid; place-items: center; font-size: 14px; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; }
+  input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; max-width: 100%; }
   input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  input[type=checkbox] { accent-color: var(--accent); }
   #topic { flex: 1 1 320px; font-size: 16px; }
   textarea { width: 100%; resize: vertical; min-height: 44px; }
   button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 10px 16px; font: 600 15px/1.2 inherit; cursor: pointer; }
   button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button.small { padding: 5px 10px; font-size: 13px; }
   button:disabled { opacity: .5; cursor: wait; }
   .ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
   .idea { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; cursor: pointer; }
@@ -35,11 +40,12 @@
   .idea i { color: var(--accent); font-style: normal; display: block; margin-bottom: 4px; }
   .idea small { color: var(--muted); }
   .hooks label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
-  .hooks input { margin-top: 4px; accent-color: var(--accent); }
+  .hooks input { margin-top: 4px; }
   .scenes { display: grid; gap: 8px; }
   .scene { display: grid; grid-template-columns: 28px 1fr 150px 130px 96px 104px; gap: 8px; align-items: start; }
   .scene .idx { color: var(--muted); padding-top: 10px; text-align: right; }
   .scene input { width: 100%; }
+  .scene .meta { grid-column: 2 / -1; font-size: 12px; color: var(--muted); margin-top: -4px; }
   .head { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
   @media (max-width: 760px) { .scene { grid-template-columns: 22px 1fr; } .scene input, .scene select { grid-column: 2; } }
   .muted { color: var(--muted); font-size: 13px; }
@@ -50,9 +56,6 @@
   video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 9/16; }
   .copy { position: relative; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
   .copy button { position: absolute; top: 6px; right: 6px; padding: 4px 10px; font-size: 12px; }
-  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-  .gallery a { color: var(--text); text-decoration: none; font-size: 13px; }
-  .gallery img { width: 100%; aspect-ratio: 9/16; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; margin-bottom: 6px; }
   .trends { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-top: 12px; }
   .trend { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; color: var(--text); text-decoration: none; font-size: 13px; }
   .trend img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
@@ -63,12 +66,29 @@
   .checks a { color: var(--muted); word-break: break-all; }
   .tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; margin-right: 6px; font-weight: 700; }
   .tag.ok { background: #1d3b27; color: var(--green); } .tag.fix { background: #3b331d; color: var(--accent); } .tag.del { background: #3b1d24; color: var(--red); }
-  .scene .meta { grid-column: 2 / -1; font-size: 12px; color: var(--muted); margin-top: -4px; }
   .match { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; margin: 4px 0 12px; font-size: 13px; }
   .match div { background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
-  .match b.good { color: var(--green); } .match b.bad { color: var(--red); }
+  b.good { color: var(--green); } b.bad { color: var(--red); }
   .big { font-size: 22px; font-weight: 800; }
-  .hidden { display: none; }
+  .settings { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+  .settings label.check { display: flex; gap: 8px; align-items: center; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; }
+  .jobs { display: grid; gap: 6px; margin-top: 12px; }
+  .job { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 14px; }
+  .job .bar { margin: 2px 0 0; height: 6px; grid-column: 1 / -1; }
+  .st-done { color: var(--green); } .st-error { color: var(--red); } .st-running { color: var(--accent); } .st-queued { color: var(--muted); }
+  .vids { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .vid { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: 13px; display: flex; flex-direction: column; }
+  .vid img { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; max-height: 300px; }
+  .vid .body { padding: 10px; display: grid; gap: 6px; }
+  .vid .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; text-align: center; }
+  .vid .stats div { background: var(--panel); border-radius: 8px; padding: 4px; }
+  .vid .stats b { display: block; font-size: 15px; }
+  .vid input { padding: 6px 8px; font-size: 13px; width: 100%; }
+  .ab { background: var(--accent); color: var(--accent-ink); font-weight: 800; border-radius: 6px; padding: 0 6px; margin-right: 4px; }
+  .playbook li { margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .hidden { display: none !important; }
   .err { color: var(--red); white-space: pre-wrap; }
 </style>
 </head>
@@ -77,17 +97,48 @@
   <h1>Shorts <span>Studio</span></h1>
   <div class="status" id="status">Yuklanmoqda...</div>
 </header>
+<nav>
+  <button data-tab="create" class="on">Yaratish</button>
+  <button data-tab="batch">Ommaviy</button>
+  <button data-tab="channel">Videolar va kanal</button>
+  <button data-tab="system">Tizim</button>
+</nav>
 <main>
-  <section>
-    <h2><span class="n">1</span> Mavzu</h2>
-    <div class="row">
-      <input id="topic" placeholder="Masalan: the deepest point of the ocean">
+  <!-- shared render settings (Yaratish + Ommaviy) -->
+  <section id="secSettings" data-tabs="create batch">
+    <h2>Sozlamalar</h2>
+    <div class="settings">
+      <select id="voice" title="Ovoz"></select>
+      <select id="rate" title="Ovoz tezligi (faqat Microsoft ovozlari)">
+        <option value="+0%">Oddiy tezlik</option>
+        <option value="+12%" selected>Tez (tavsiya)</option>
+        <option value="+20%">Juda tez</option>
+      </select>
+      <select id="visualMode" title="Faktlar qanday ko'rsatilsin">
+        <option value="mixed" selected>Kadrlar: aralash (tavsiya)</option>
+        <option value="illustration">Kadrlar: faqat AI chizmalar</option>
+        <option value="stock">Kadrlar: faqat stok video</option>
+      </select>
       <select id="seconds">
         <option value="30">30 soniya</option>
         <option value="35" selected>35 soniya (tavsiya)</option>
         <option value="45">45 soniya</option>
         <option value="58">58 soniya</option>
       </select>
+      <input id="series" placeholder="Seriya: Ocean Facts #3 (ixtiyoriy)">
+      <label class="check"><input type="checkbox" id="host" checked> Maskot (Fakti)</label>
+      <label class="check"><input type="checkbox" id="music" checked> Fon musiqasi</label>
+      <label class="check"><input type="checkbox" id="factcheck" checked> Faktlarni tekshirish</label>
+      <label class="check" title="Ikkinchi hook bilan video_b ham yasaladi (qo'shimcha chizma xarajatisiz)"><input type="checkbox" id="ab"> A/B: 2 xil hook</label>
+      <label class="check"><input type="checkbox" id="upload"> YouTube'ga yuklash</label>
+    </div>
+  </section>
+
+  <!-- ============ YARATISH ============ -->
+  <section data-tabs="create">
+    <h2><span class="n">1</span> Mavzu</h2>
+    <div class="row">
+      <input id="topic" placeholder="Masalan: the deepest point of the ocean">
       <button id="btnScript">Ssenariy yozish</button>
     </div>
     <div class="row" style="margin-top:10px">
@@ -95,13 +146,12 @@
       <button class="ghost" id="btnTrends">Trenddagi Shorts</button>
       <button class="ghost" id="btnIdeas">Viral g'oyalar topish</button>
     </div>
-    <label class="row muted" style="gap:6px;margin-top:10px"><input type="checkbox" id="factcheck" checked> Faktlarni internetdan tekshirish (+~40 soniya, xato faktlar to'g'rilanadi)</label>
     <div class="trends" id="trends"></div>
     <div class="ideas" id="ideas"></div>
     <div class="err" id="err1"></div>
   </section>
 
-  <section id="secScript" class="hidden">
+  <section id="secScript" class="hidden" data-tabs="create">
     <h2><span class="n">2</span> Ssenariy: tekshiring va tahrirlang</h2>
     <div class="head">Hook: eng muhim birinchi 3 soniya. Eng kuchlisini tanlang.</div>
     <div class="hooks" id="hooks" style="margin:8px 0 16px"></div>
@@ -116,32 +166,22 @@
     </div>
   </section>
 
-  <section id="secRender" class="hidden">
+  <section id="secRender" class="hidden" data-tabs="create">
     <h2><span class="n">3</span> Video yasash</h2>
-    <div class="row">
-      <select id="voice"></select>
-      <select id="rate" title="Ovoz tezligi (faqat Microsoft ovozlari)">
-        <option value="+0%">Oddiy tezlik</option>
-        <option value="+12%" selected>Tez (tavsiya)</option>
-        <option value="+20%">Juda tez</option>
-      </select>
-      <input id="series" placeholder="Seriya: Ocean Facts #3 (ixtiyoriy)" style="flex:1 1 200px">
-      <select id="visualMode" title="Faktlar qanday ko'rsatilsin">
-        <option value="mixed" selected>Kadrlar: aralash (tavsiya)</option>
-        <option value="illustration">Kadrlar: faqat AI chizmalar</option>
-        <option value="stock">Kadrlar: faqat stok video</option>
-      </select>
-      <label class="row" style="gap:6px"><input type="checkbox" id="host" checked> Maskot (Fakti)</label>
-      <label class="row" style="gap:6px"><input type="checkbox" id="music" checked> Fon musiqasi</label>
-      <button id="btnRender">Video yasash</button>
-    </div>
+    <button id="btnRender">Video yasash</button>
     <div id="progressBox" class="hidden">
       <div class="bar"><div id="bar"></div></div>
       <div class="muted" id="step"></div>
     </div>
     <div class="err" id="err3"></div>
     <div class="result hidden" id="result">
-      <video id="player" controls playsinline></video>
+      <div>
+        <video id="player" controls playsinline></video>
+        <div id="playerB" class="hidden" style="margin-top:10px">
+          <div class="head">B variant (boshqa hook)</div>
+          <video id="playerBvid" controls playsinline></video>
+        </div>
+      </div>
       <div>
         <div id="matchBox" class="hidden">
           <div class="head">Kadr va matn mosligi</div>
@@ -156,15 +196,64 @@
     </div>
   </section>
 
-  <section>
-    <h2>Oldingi videolar</h2>
-    <div class="gallery" id="gallery"><span class="muted">Hali video yo'q.</span></div>
+  <!-- ============ OMMAVIY ============ -->
+  <section data-tabs="batch" class="hidden">
+    <h2>Ommaviy rejim</h2>
+    <p class="muted">Har qatorga bitta mavzu yozing. Panel ularni navbat bilan qiladi: ssenariy, faktlarni tekshirish, video, kerak bo'lsa yuklash. Kompyuter yoqiq tursa, kechasi ishlab qo'yadi.</p>
+    <textarea id="batchTopics" rows="8" placeholder="the deepest point of the ocean&#10;why octopuses have three hearts&#10;the loudest sound ever recorded"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="ghost" id="btnBatchIdeas">G'oyalardan to'ldirish</button>
+      <label class="row" style="gap:6px"><input type="checkbox" id="schedule"> Rejalashtirib joylash</label>
+    </div>
+    <div id="scheduleBox" class="row hidden" style="margin-top:10px">
+      <span class="muted">Boshlanish:</span><input type="date" id="schStart">
+      <span class="muted">Kuniga:</span><select id="schPerDay"><option>1</option><option selected>2</option><option>3</option></select>
+      <span class="muted">Soatlar:</span><input id="schTimes" value="10:00, 18:00, 21:00" style="width:190px">
+    </div>
+    <p class="muted hidden" id="scheduleNote">Rejalashtirish uchun "YouTube'ga yuklash" yoqilgan va kanal ulangan bo'lishi kerak. Diqqat: YouTube API auditidan o'tmagan loyihada videolar "private" bo'lib qoladi (README'ga qarang).</p>
+    <div class="row" style="margin-top:12px"><button id="btnBatch">Navbatga qo'shish</button></div>
+    <div class="err" id="errBatch"></div>
+  </section>
+
+  <section data-tabs="batch create" class="hidden">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Navbat</h2><button class="ghost small" id="btnJobs">Yangilash</button></div>
+    <div class="jobs" id="jobs"><span class="muted">Hali ish yo'q.</span></div>
+  </section>
+
+  <!-- ============ KANAL ============ -->
+  <section data-tabs="channel" class="hidden">
+    <h2>YouTube kanali</h2>
+    <div class="row">
+      <span id="channelStatus" class="muted"></span>
+      <button class="ghost" id="btnConnect">Kanalni ulash</button>
+      <button class="ghost" id="btnRefresh">Statistikani yangilash</button>
+      <button id="btnLearn">Natijalardan o'rganish</button>
+    </div>
+    <div class="err" id="errChannel"></div>
+    <div id="playbook" class="playbook hidden" style="margin-top:14px"></div>
+  </section>
+
+  <section data-tabs="channel" class="hidden">
+    <h2>Videolar</h2>
+    <p class="muted">"Qoldi %" — videoni o'tkazib yubormay ko'rganlar ulushi, eng muhim ko'rsatkich. "Ko'rildi %" 100 dan oshsa, odamlar videoni qayta-qayta ko'rgan (loop ishlayapti).</p>
+    <div class="vids" id="vids"><span class="muted">Hali video yo'q.</span></div>
+  </section>
+
+  <!-- ============ TIZIM ============ -->
+  <section data-tabs="system" class="hidden">
+    <h2>Tizimni tekshirish</h2>
+    <p class="muted">Har bir kalit va dastur juda kichik so'rov bilan tekshiriladi. Yangi kalit qo'shganda yoki xato chiqqanda shu yerdan boshlang.</p>
+    <button id="btnCheck">Tekshirish</button>
+    <table id="checkTable" style="margin-top:12px"></table>
   </section>
 </main>
 
 <script>
 const $ = (id) => document.getElementById(id);
 let script = null;
+let threshold = 80;
+let trending = [];
+const fmt = (n) => Intl.NumberFormat("en", { notation: "compact" }).format(n);
 
 async function api(path, body) {
   const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
@@ -178,70 +267,87 @@ function busy(btn, on, label) {
   if (on) { btn.dataset.label = btn.textContent; btn.textContent = label; } else if (btn.dataset.label) btn.textContent = btn.dataset.label;
 }
 
+async function run(btn, label, errEl, fn) {
+  busy(btn, true, label); if (errEl) errEl.textContent = "";
+  try { await fn(); } catch (e) { if (errEl) errEl.textContent = e.message; }
+  busy(btn, false);
+}
+
+/* ---------- tabs ---------- */
+function showTab(name) {
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
+  document.querySelectorAll("main > section").forEach((s) => {
+    const tabs = (s.dataset.tabs || "").split(" ");
+    const keepHidden = (s.id === "secScript" || s.id === "secRender") && !script;
+    s.classList.toggle("hidden", !tabs.includes(name) || keepHidden);
+  });
+  try { localStorage.setItem("tab", name); } catch (e) {}
+  if (name === "channel") loadChannel();
+  if (name === "batch" || name === "create") loadJobs();
+}
+document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
+
+function settings() {
+  return {
+    voice: $("voice").value, rate: $("rate").value, visual_mode: $("visualMode").value,
+    seconds: +$("seconds").value, series: $("series").value, host: $("host").checked,
+    music: $("music").checked, factcheck: $("factcheck").checked, ab: $("ab").checked, upload: $("upload").checked,
+  };
+}
+
 async function loadConfig() {
   const c = await api("/api/config");
   const mark = (ok) => `<b class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</b>`;
-  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · YouTube ${mark(c.youtube)} · ElevenLabs ${mark(c.elevenlabs)} · Chizmalar (OpenAI) ${mark(c.openai)} · Musiqa: ${c.music_tracks} ta`;
+  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · Chizmalar ${mark(c.openai)} · ElevenLabs ${mark(c.elevenlabs)} · Trendlar ${mark(c.youtube)} · Kanal ${mark(c.channel)} · Musiqa: ${c.music_tracks}`;
   threshold = c.match_threshold;
   $("voice").innerHTML = Object.entries(c.voices).map(([k, v]) => `<option value="${v}">${k}</option>`).join("");
+  $("channelStatus").textContent = c.channel ? "Kanal ulangan ✓" : c.client_secret ? "Kanal ulanmagan" : "client_secret.json yo'q (README'ga qarang)";
 }
 
-let trending = [];
-const fmt = (n) => Intl.NumberFormat("en", { notation: "compact" }).format(n);
+/* ---------- create ---------- */
+$("btnTrends").onclick = () => run($("btnTrends"), "Qidirilmoqda...", $("err1"), async () => {
+  const rows = await api("/api/trends", { niche: $("niche").value });
+  trending = rows.map((r) => r.title);
+  $("trends").innerHTML = rows.length ? "" : `<span class="muted">Hech narsa topilmadi.</span>`;
+  for (const r of rows) {
+    const a = document.createElement("a");
+    a.className = "trend"; a.href = r.url; a.target = "_blank";
+    a.innerHTML = `<img loading="lazy" alt=""><div><b></b><br><span class="score"></span> <span class="muted"></span></div>`;
+    a.querySelector("img").src = r.thumbnail;
+    a.querySelector("b").textContent = r.title;
+    a.querySelector(".score").textContent = r.score + "x";
+    a.querySelector(".muted").textContent = `${fmt(r.views)} ko'rish · ${fmt(r.subscribers)} obunachi`;
+    $("trends").append(a);
+  }
+});
 
-$("btnTrends").onclick = async () => {
-  const btn = $("btnTrends"); busy(btn, true, "Qidirilmoqda..."); $("err1").textContent = "";
-  try {
-    const rows = await api("/api/trends", { niche: $("niche").value });
-    trending = rows.map((r) => r.title);
-    $("trends").innerHTML = "";
-    for (const r of rows) {
-      const a = document.createElement("a");
-      a.className = "trend"; a.href = r.url; a.target = "_blank";
-      a.innerHTML = `<img loading="lazy" alt=""><div><b></b><br><span class="score"></span> <span class="muted"></span></div>`;
-      a.querySelector("img").src = r.thumbnail;
-      a.querySelector("b").textContent = r.title;
-      a.querySelector(".score").textContent = r.score + "x";
-      a.querySelector(".muted").textContent = `${fmt(r.views)} ko'rish · ${fmt(r.subscribers)} obunachi`;
-      $("trends").append(a);
-    }
-    if (!rows.length) $("trends").innerHTML = `<span class="muted">Hech narsa topilmadi.</span>`;
-  } catch (e) { $("err1").textContent = e.message; }
-  busy(btn, false);
-};
+async function fetchIdeas() { return api("/api/ideas", { niche: $("niche").value, trending }); }
 
-$("btnIdeas").onclick = async () => {
-  const btn = $("btnIdeas"); busy(btn, true, "Qidirilmoqda..."); $("err1").textContent = "";
-  try {
-    const ideas = await api("/api/ideas", { niche: $("niche").value, trending });
-    $("ideas").innerHTML = "";
-    for (const i of ideas) {
-      const el = document.createElement("div");
-      el.className = "idea";
-      el.innerHTML = `<b></b><i></i><small></small>`;
-      el.querySelector("b").textContent = i.topic;
-      el.querySelector("i").textContent = "“" + i.hook + "”";
-      el.querySelector("small").textContent = i.why_it_works;
-      el.onclick = () => { $("topic").value = i.topic; $("topic").focus(); };
-      $("ideas").append(el);
-    }
-  } catch (e) { $("err1").textContent = e.message; }
-  busy(btn, false);
-};
+$("btnIdeas").onclick = () => run($("btnIdeas"), "Qidirilmoqda...", $("err1"), async () => {
+  const ideas = await fetchIdeas();
+  $("ideas").innerHTML = "";
+  for (const i of ideas) {
+    const el = document.createElement("div");
+    el.className = "idea";
+    el.innerHTML = `<b></b><i></i><small></small>`;
+    el.querySelector("b").textContent = i.topic;
+    el.querySelector("i").textContent = "“" + i.hook + "”";
+    el.querySelector("small").textContent = i.why_it_works;
+    el.onclick = () => { $("topic").value = i.topic; $("topic").focus(); };
+    $("ideas").append(el);
+  }
+});
 
-$("btnScript").onclick = async () => {
+$("btnScript").onclick = () => {
   const topic = $("topic").value.trim();
   if (!topic) return $("topic").focus();
   const fc = $("factcheck").checked;
-  const btn = $("btnScript"); busy(btn, true, fc ? "Yozilmoqda va tekshirilmoqda... (~1 daq)" : "Yozilmoqda... (~30 s)");
-  $("err1").textContent = "";
-  try {
+  run($("btnScript"), fc ? "Yozilmoqda va tekshirilmoqda... (~1 daq)" : "Yozilmoqda... (~30 s)", $("err1"), async () => {
     const res = await api("/api/script", { topic, seconds: +$("seconds").value, factcheck: fc });
     script = res.script;
     showChecks(res.checks);
     showScript();
-  } catch (e) { $("err1").textContent = e.message; }
-  busy(btn, false);
+  });
 };
 
 function showChecks(checks) {
@@ -285,55 +391,60 @@ function renderScenes() {
       <select><option value="normal">oddiy</option><option value="twist">twist</option><option value="payoff">payoff</option></select>
       <select><option value="mascot">maskot</option><option value="illustration">chizma</option><option value="stock">video</option></select>`;
     const [ta, q, t, beat, kind] = row.querySelectorAll("textarea, input, select");
-    kind.value = s.visual_type || "stock";
-    kind.onchange = () => (s.visual_type = kind.value);
     ta.value = s.narration; q.value = s.visual_query; t.value = s.on_screen_text; beat.value = s.beat || "normal";
+    kind.value = s.visual_type || "stock";
     ta.oninput = () => (s.narration = ta.value);
     q.oninput = () => (s.visual_query = q.value);
     t.oninput = () => (s.on_screen_text = t.value);
     beat.onchange = () => (s.beat = beat.value);
+    kind.onchange = () => (s.visual_type = kind.value);
     const g = s.graphic_type === "counter"
       ? `📊 Sanaladigan raqam: ${s.counter_prefix}${s.counter_value}${s.counter_suffix} ${s.graphic_label}`
       : s.graphic_type === "compare"
       ? `📊 Taqqoslash: ${s.compare_a_label} ${s.compare_a_value} vs ${s.compare_b_label} ${s.compare_b_value} ${s.graphic_label}`
       : "";
-    const lines = [g, s.image_prompt && s.visual_type !== "mascot" ? "🎨 " + s.image_prompt : ""].filter(Boolean);
+    const lines = [g, s.image_prompt && s.visual_type !== "mascot" ? "🎨 " + s.image_prompt : "", s.host_emotion && s.host_emotion !== "neutral" ? "🙂 Fakti: " + s.host_emotion : ""].filter(Boolean);
     if (lines.length) { const m = document.createElement("div"); m.className = "meta"; m.textContent = lines.join("  ·  "); row.append(m); }
     $("scenes").append(row);
   });
 }
 
-$("btnRender").onclick = async () => {
+async function waitJob(jobId, onProgress) {
+  while (true) {
+    await new Promise((r) => setTimeout(r, 1500));
+    const j = await api("/api/jobs/" + jobId);
+    onProgress(j);
+    if (j.status === "error") throw new Error(j.step);
+    if (j.status === "done") return j;
+  }
+}
+
+$("btnRender").onclick = () => {
   script.title = $("title").value;
   script.mood = $("mood").value;
-  const btn = $("btnRender"); busy(btn, true, "Yasalmoqda...");
-  $("err3").textContent = ""; $("result").classList.add("hidden"); $("progressBox").classList.remove("hidden");
-  try {
-    const { job_id } = await api("/api/render", { script, voice: $("voice").value, rate: $("rate").value, music: $("music").checked, series: $("series").value,
-      visual_mode: $("visualMode").value, host: $("host").checked });
-    while (true) {
-      await new Promise((r) => setTimeout(r, 1500));
-      const j = await api("/api/jobs/" + job_id);
-      $("bar").style.width = Math.round(j.progress * 100) + "%";
-      $("step").textContent = j.step;
-      if (j.status === "error") throw new Error(j.step);
-      if (j.status === "done") { await showResult(j.dir); break; }
-    }
-  } catch (e) { $("err3").textContent = e.message; }
-  busy(btn, false);
-  loadGallery();
+  $("result").classList.add("hidden"); $("progressBox").classList.remove("hidden");
+  run($("btnRender"), "Yasalmoqda...", $("err3"), async () => {
+    const { job_id } = await api("/api/render", { script, settings: settings() });
+    loadJobs();
+    const j = await waitJob(job_id, (j) => { $("bar").style.width = Math.round(j.progress * 100) + "%"; $("step").textContent = j.step; });
+    await showResult(j.dir);
+    loadJobs();
+  });
 };
 
 async function showResult(dir) {
-  const meta = await (await fetch(`/output/${dir}/meta.json`)).json();
-  const src = `/output/${dir}/video.mp4`;
-  $("player").src = src; $("download").href = src;
-  showMatch(meta);
-  setCopy("rTitle", meta.title); setCopy("rDesc", meta.description); setCopy("rPin", meta.pinned_comment);
+  const all = await api("/api/videos");
+  const a = all.find((v) => v.dir === dir && v.variant === "a");
+  const b = all.find((v) => v.dir === dir && v.variant === "b");
+  if (!a) return;
+  $("player").src = a.video; $("download").href = a.video;
+  $("playerB").classList.toggle("hidden", !b);
+  if (b) $("playerBvid").src = b.video;
+  showMatch(a);
+  setCopy("rTitle", a.title); setCopy("rDesc", a.description); setCopy("rPin", a.pinned_comment);
   $("result").classList.remove("hidden");
 }
 
-let threshold = 80;
 function showMatch(meta) {
   const rows = (meta.match || []).filter((m) => m.score !== null);
   $("matchBox").classList.toggle("hidden", !rows.length);
@@ -343,10 +454,9 @@ function showMatch(meta) {
   const names = { mascot: "maskot", illustration: "chizma", stock: "video", gradient: "fon" };
   for (const m of meta.match) {
     const d = document.createElement("div");
-    const score = m.score === null ? "—" : m.score + "%";
     d.innerHTML = `#${m.scene} ${names[m.visual] || m.visual}: <b></b>`;
     const b = d.querySelector("b");
-    b.textContent = score;
+    b.textContent = m.score === null ? "—" : m.score + "%";
     if (m.score !== null) b.className = m.score >= threshold ? "good" : "bad";
     if (m.issue) d.title = m.issue;
     $("match").append(d);
@@ -362,22 +472,144 @@ function setCopy(id, text) {
   el.append(b);
 }
 
-async function loadGallery() {
-  const vids = await api("/api/videos");
-  if (!vids.length) return;
-  $("gallery").innerHTML = "";
-  for (const v of vids) {
-    const a = document.createElement("a");
-    a.href = `/output/${v.dir}/video.mp4`; a.target = "_blank";
-    a.innerHTML = `<img loading="lazy" alt=""><span></span>`;
-    a.querySelector("img").src = `/output/${v.dir}/cover.jpg`;
-    a.querySelector("span").textContent = `${v.title} · ${v.duration}s`;
-    $("gallery").append(a);
+/* ---------- jobs / batch ---------- */
+let jobsTimer = null;
+async function loadJobs() {
+  const rows = await api("/api/jobs").catch(() => []);
+  if (!rows.length) return;
+  $("jobs").innerHTML = "";
+  const names = { queued: "navbatda", running: "ishlayapti", done: "tayyor", error: "xato" };
+  for (const j of rows) {
+    const d = document.createElement("div");
+    d.className = "job";
+    d.innerHTML = `<b></b><span class="st-${j.status}">${names[j.status] || j.status}</span><span class="muted"></span><span class="muted"></span>`;
+    d.querySelector("b").textContent = j.topic;
+    const [step, when] = d.querySelectorAll(".muted");
+    step.textContent = j.step;
+    when.textContent = j.publish_at ? "📅 " + new Date(j.publish_at).toLocaleString() : "";
+    if (j.status === "running") { const bar = document.createElement("div"); bar.className = "bar"; bar.innerHTML = `<div style="width:${Math.round(j.progress * 100)}%"></div>`; d.append(bar); }
+    $("jobs").append(d);
   }
+  clearTimeout(jobsTimer);
+  if (rows.some((j) => j.status === "queued" || j.status === "running")) jobsTimer = setTimeout(loadJobs, 3000);
+}
+$("btnJobs").onclick = loadJobs;
+
+$("schedule").onchange = () => {
+  $("scheduleBox").classList.toggle("hidden", !$("schedule").checked);
+  $("scheduleNote").classList.toggle("hidden", !$("schedule").checked);
+  if ($("schedule").checked) $("upload").checked = true;
+};
+$("schStart").value = new Date().toISOString().slice(0, 10);
+
+$("btnBatchIdeas").onclick = () => run($("btnBatchIdeas"), "Qidirilmoqda...", $("errBatch"), async () => {
+  const ideas = await fetchIdeas();
+  const current = $("batchTopics").value.trim();
+  $("batchTopics").value = (current ? current + "\n" : "") + ideas.map((i) => i.topic).join("\n");
+});
+
+$("btnBatch").onclick = () => run($("btnBatch"), "Qo'shilmoqda...", $("errBatch"), async () => {
+  const topics = $("batchTopics").value.split("\n").map((t) => t.trim()).filter(Boolean);
+  const schedule = $("schedule").checked ? {
+    start: $("schStart").value, per_day: +$("schPerDay").value,
+    times: $("schTimes").value.split(",").map((t) => t.trim()).filter(Boolean),
+  } : null;
+  await api("/api/batch", { topics, settings: settings(), schedule });
+  $("batchTopics").value = "";
+  loadJobs();
+});
+
+/* ---------- channel ---------- */
+async function loadChannel() {
+  loadConfig();
+  const vids = await api("/api/videos").catch(() => []);
+  $("vids").innerHTML = vids.length ? "" : `<span class="muted">Hali video yo'q.</span>`;
+  for (const v of vids) $("vids").append(videoCard(v));
+  const pb = await api("/api/playbook").catch(() => ({}));
+  showPlaybook(pb);
 }
 
+function videoCard(v) {
+  const d = document.createElement("div");
+  d.className = "vid";
+  d.innerHTML = `<a target="_blank"><img loading="lazy" alt=""></a><div class="body">
+    <div><span class="ab"></span><b class="t"></b></div><div class="muted info"></div><div class="stats hidden"></div><div class="yt"></div></div>`;
+  d.querySelector("a").href = v.video;
+  d.querySelector("img").src = v.cover;
+  d.querySelector(".ab").textContent = v.variant.toUpperCase();
+  d.querySelector(".t").textContent = v.title;
+  d.querySelector(".info").textContent = `${v.duration}s` + (v.match_average ? ` · moslik ${v.match_average}%` : "") + ` · ${v.dir.slice(0, 13)}`;
+  if (v.metrics) {
+    const m = v.metrics, st = d.querySelector(".stats");
+    st.classList.remove("hidden");
+    st.innerHTML = `<div><b>${fmt(m.views || 0)}</b>ko'rish</div><div><b>${m.stayedToWatch ?? "—"}${m.stayedToWatch != null ? "%" : ""}</b>qoldi</div><div><b>${m.averageViewPercentage != null ? Math.round(m.averageViewPercentage) + "%" : "—"}</b>ko'rildi</div>`;
+  }
+  const yt = d.querySelector(".yt");
+  if (v.youtube_id) {
+    yt.innerHTML = `<a target="_blank" class="muted"></a>`;
+    yt.querySelector("a").href = "https://youtube.com/shorts/" + v.youtube_id;
+    yt.querySelector("a").textContent = "▶ YouTube" + (v.publish_at ? " · 📅 " + new Date(v.publish_at).toLocaleString() : "");
+  } else {
+    yt.innerHTML = `<input type="datetime-local" title="Bo'sh qoldirsangiz, hozir private bo'lib yuklanadi">
+      <div class="row" style="gap:6px;margin-top:6px"><button class="small up">Yuklash</button><button class="small ghost link">Havola qo'shish</button></div><div class="err"></div>`;
+    const [when] = yt.querySelectorAll("input"), err = yt.querySelector(".err");
+    yt.querySelector(".up").onclick = (e) => run(e.target, "...", err, async () => {
+      await api("/api/youtube/upload", { dir: v.dir, variant: v.variant, publish_at: when.value ? new Date(when.value).toISOString() : "" });
+      loadChannel();
+    });
+    yt.querySelector(".link").onclick = (e) => {
+      const url = prompt("Qo'lda yuklangan Shorts havolasi:");
+      if (url) run(e.target, "...", err, async () => { await api("/api/youtube/link", { dir: v.dir, variant: v.variant, url }); loadChannel(); });
+    };
+  }
+  return d;
+}
+
+function showPlaybook(p) {
+  const box = $("playbook");
+  if (!p || !p.summary) { box.classList.add("hidden"); return; }
+  box.classList.remove("hidden");
+  const list = (title, items) => items && items.length ? `<div class="head" style="margin-top:10px">${title}</div><ul>${items.map((x) => `<li></li>`).join("")}</ul>` : "";
+  box.innerHTML = `<div class="head">Kanal qo'llanmasi (${new Date(p.created * 1000).toLocaleDateString()})</div><p class="sum"></p>` +
+    list("Ishlayapti", p.winning_patterns) + list("Ishlamayapti", p.losing_patterns) + list("Hook qoidalari", p.hook_rules) +
+    list("A/B natijalari", p.ab_findings) + list("Keyingi mavzular", p.next_topics);
+  box.querySelector(".sum").textContent = p.summary;
+  const items = [...(p.winning_patterns || []), ...(p.losing_patterns || []), ...(p.hook_rules || []), ...(p.ab_findings || []), ...(p.next_topics || [])];
+  box.querySelectorAll("li").forEach((li, i) => (li.textContent = items[i]));
+}
+
+$("btnConnect").onclick = () => run($("btnConnect"), "Brauzerda ruxsat bering...", $("errChannel"), async () => {
+  const r = await api("/api/youtube/connect", {});
+  $("channelStatus").textContent = "Ulandi: " + r.channel;
+  loadConfig();
+});
+$("btnRefresh").onclick = () => run($("btnRefresh"), "Yangilanmoqda...", $("errChannel"), async () => {
+  const r = await api("/api/youtube/refresh", {});
+  $("channelStatus").textContent = `${r.updated} ta video statistikasi yangilandi`;
+  loadChannel();
+});
+$("btnLearn").onclick = () => run($("btnLearn"), "Claude tahlil qilyapti...", $("errChannel"), async () => {
+  showPlaybook(await api("/api/learn", {}));
+});
+
+/* ---------- system ---------- */
+$("btnCheck").onclick = () => run($("btnCheck"), "Tekshirilmoqda...", null, async () => {
+  const rows = await api("/api/check", {});
+  $("checkTable").innerHTML = "";
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><b class="${r.ok ? "good" : "bad"}">${r.ok ? "✓" : "✗"}</b></td><td></td><td class="muted"></td>`;
+    const [, name, detail] = tr.querySelectorAll("td");
+    name.textContent = r.name + (r.required ? " (majburiy)" : "");
+    detail.textContent = r.detail;
+    $("checkTable").append(tr);
+  }
+});
+
 loadConfig().catch((e) => ($("status").textContent = e.message));
-loadGallery();
+let startTab = "create";
+try { startTab = localStorage.getItem("tab") || "create"; } catch (e) {}
+showTab(startTab);
 </script>
 </body>
 </html>

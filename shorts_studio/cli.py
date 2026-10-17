@@ -25,6 +25,7 @@ def main() -> None:
     parser.add_argument("--series", default="", help='e.g. "Ocean Facts #3"')
     parser.add_argument("--visuals", default="mixed", choices=["mixed", "illustration", "stock"])
     parser.add_argument("--no-host", action="store_true", help="no cartoon host")
+    parser.add_argument("--ab", action="store_true", help="also render the runner-up hook as video_b.mp4")
     parser.add_argument("--no-music", action="store_true")
     parser.add_argument("--no-factcheck", action="store_true")
     parser.add_argument("--offline", action="store_true", help="no API calls: sample script, silent voice")
@@ -47,11 +48,15 @@ def main() -> None:
         print(f"Hook: {script.scenes[0].narration}")
 
     job = pipeline.new_job_dir(script.topic)
-    video = pipeline.make_video(
-        script, job, voice=args.voice, rate=args.rate, music=not args.no_music, series=args.series,
-        visual_mode=args.visuals, host=not args.no_host, offline=args.offline,
-        progress=lambda step, pct: print(f"[{pct:4.0%}] {step}"),
-    )
+    render_args = dict(voice=args.voice, rate=args.rate, music=not args.no_music, series=args.series,
+                       visual_mode=args.visuals, host=not args.no_host, offline=args.offline)
+    video = pipeline.make_video(script, job, progress=lambda step, pct: print(f"[{pct:4.0%}] {step}"), **render_args)
+    variant = pipeline.hook_variant(script) if args.ab else None
+    if variant:
+        print("A/B: ikkinchi hook bilan variant yasalmoqda...")
+        plan = json.loads((job / "plan.json").read_text())
+        pipeline.make_video(variant, job, plan=plan, variant="b", **render_args)
+        print(f"B variant: {job / 'video_b.mp4'}")
     meta = json.loads((job / "meta.json").read_text())
     print(f"\nVideo: {video}\nSarlavha: {meta['title']}")
     if meta["match_average"] is not None:

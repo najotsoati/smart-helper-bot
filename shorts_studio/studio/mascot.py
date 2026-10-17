@@ -1,7 +1,8 @@
 """Fakti, the cartoon host: lip-synced from the voice track, rendered as two transparent videos
 (a big full-body version for host scenes and a small round badge for the rest of the video).
 
-Replace the PNGs in assets/mascot/ (same file names, square, transparent) to use your own character."""
+Poses are assets/mascot/<emotion>_<closed|half|open>.png (+ optional <emotion>_blink.png). Replace them
+(same names, square, transparent) to use your own character; a missing emotion falls back to "neutral"."""
 
 import random
 import wave
@@ -15,7 +16,8 @@ from .ffmpeg import run
 
 BIG = 860
 BADGE = 230
-POSES = ["closed", "half", "open", "blink", "surprised_closed", "surprised_open"]
+EMOTIONS = ["neutral", "excited", "surprised", "scared", "pointing"]
+SHAPES = ["closed", "half", "open", "blink"]
 
 
 def _levels(voice_wav: Path, fps: int) -> list[float]:
@@ -34,27 +36,46 @@ def _levels(voice_wav: Path, fps: int) -> list[float]:
     return [min(v / (peak or 1), 1.0) for v in levels]
 
 
-def timeline(voice_wav: Path, surprised: list[tuple[float, float]], fps: int = config.FPS) -> list[str]:
-    """One pose name per frame."""
-    poses = []
-    for v in _levels(voice_wav, fps):
-        poses.append("closed" if v < 0.12 else "half" if v < 0.45 else "open")
-    # hold each mouth shape >= 2 frames so it doesn't flicker
-    for i in range(1, len(poses) - 1):
-        if poses[i] != poses[i - 1] and poses[i] != poses[i + 1]:
-            poses[i] = poses[i - 1]
-    for i in range(len(poses)):
-        t = i / fps
-        if any(a <= t < b for a, b in surprised):
-            poses[i] = "surprised_closed" if poses[i] == "closed" else "surprised_open"
-    # blink for 4 frames every 2.5-4.5 s
-    i = int(fps * random.uniform(1.5, 3))
-    while i < len(poses) - 4:
-        for k in range(4):
-            if not poses[i + k].startswith("surprised"):
-                poses[i + k] = "blink"
-        i += int(fps * random.uniform(2.5, 4.5))
+def available() -> dict[str, Path]:
+    """pose name -> file, with missing emotions mapped onto neutral."""
+    poses = {}
+    for emotion in EMOTIONS:
+        for shape in SHAPES:
+            own = config.MASCOT_DIR / f"{emotion}_{shape}.png"
+            fallback = config.MASCOT_DIR / f"neutral_{shape}.png"
+            if own.exists():
+                poses[f"{emotion}_{shape}"] = own
+            elif shape != "blink" and fallback.exists():
+                poses[f"{emotion}_{shape}"] = fallback
     return poses
+
+
+def timeline(voice_wav: Path, emotions: list[tuple[float, float, str]], fps: int = config.FPS) -> list[str]:
+    """One pose name per frame: the scene's emotion + a mouth shape from the voice loudness + blinks."""
+    poses = available()
+    shapes = []
+    for v in _levels(voice_wav, fps):
+        shapes.append("closed" if v < 0.12 else "half" if v < 0.45 else "open")
+    # hold each mouth shape >= 2 frames so it doesn't flicker
+    for i in range(1, len(shapes) - 1):
+        if shapes[i] != shapes[i - 1] and shapes[i] != shapes[i + 1]:
+            shapes[i] = shapes[i - 1]
+    # blink for 4 frames every 2.5-4.5 s (only emotions that have a blink pose)
+    i = int(fps * random.uniform(1.5, 3))
+    while i < len(shapes) - 4:
+        for k in range(4):
+            shapes[i + k] = "blink"
+        i += int(fps * random.uniform(2.5, 4.5))
+
+    frames = []
+    for i, shape in enumerate(shapes):
+        t = i / fps
+        emotion = next((e for a, b, e in emotions if a <= t < b), "neutral")
+        name = f"{emotion}_{shape}"
+        if name not in poses:  # e.g. no blink for this emotion
+            name = f"{emotion}_closed" if f"{emotion}_closed" in poses else "neutral_closed"
+        frames.append(name)
+    return frames
 
 
 def _badge(pose: Image.Image) -> Image.Image:
@@ -89,11 +110,13 @@ def _encode(frames: list[str], images: dict[str, Path], out: Path, fps: int) -> 
     return out
 
 
-def build(voice_wav: Path, surprised: list[tuple[float, float]], work: Path) -> tuple[Path, Path]:
-    frames = timeline(voice_wav, surprised)
+def build(voice_wav: Path, emotions: list[tuple[float, float, str]], work: Path) -> tuple[Path, Path]:
+    frames = timeline(voice_wav, emotions)
     big, badge = {}, {}
-    for pose in POSES:
-        src = Image.open(config.MASCOT_DIR / f"{pose}.png").convert("RGBA").resize((1000, 1000), Image.LANCZOS)
+    for pose, path in available().items():
+        if pose not in frames:
+            continue
+        src = Image.open(path).convert("RGBA").resize((1000, 1000), Image.LANCZOS)
         big[pose] = work / f"mascot_big_{pose}.png"
         src.resize((BIG, BIG), Image.LANCZOS).save(big[pose])
         badge[pose] = work / f"mascot_badge_{pose}.png"

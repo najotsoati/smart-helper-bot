@@ -122,5 +122,8 @@ def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> tuple[list[list[Ca
     return chosen, scores
 
 
-def download(url: str, out: Path) -> Path:
-    return net.download(url, out)
+def download(c: Candidate) -> Path:
+    """Stock clip, cached across videos by Pexels id."""
+    out = config.CACHE_DIR / "stock" / f"{c.id}.mp4"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    return net.download(c.url, out)
