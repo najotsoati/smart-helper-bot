@@ -94,8 +94,14 @@ CHECKS = [
 ]
 
 
-def _explain(e: Exception) -> str:
+def explain(e: Exception) -> str:
     """Plain-language reason for the usual failures."""
+    text = str(e).lower()
+    if "credit balance is too low" in text:
+        return ("Anthropic API balansi tugagan. console.anthropic.com → Settings → Billing'da kredit sotib oling "
+                "(Claude ilovasi obunasi API'ga kirmaydi).")
+    if "insufficient_quota" in text or "billing_hard_limit" in text:
+        return "OpenAI balansi tugagan. platform.openai.com → Billing'da balansni to'ldiring."
     status = getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
     if status == 401:
         return "Kalit noto'g'ri (401). Nusxa olishda xato bo'lmaganini tekshiring yoki yangi kalit yarating."
@@ -104,7 +110,7 @@ def _explain(e: Exception) -> str:
                 "siz turgan hududda ishlamaydi.")
     if status == 429:
         return "Limit tugagan (429): balansni yoki tarif limitini tekshiring."
-    return str(e)[:300]
+    return f"{type(e).__name__}: {e}"[:400]
 
 
 def _check(name: str, required: bool, key: str | None, fn) -> dict:
@@ -113,7 +119,7 @@ def _check(name: str, required: bool, key: str | None, fn) -> dict:
     try:
         return {"name": name, "ok": True, "required": required, "detail": fn()}
     except Exception as e:
-        return {"name": name, "ok": False, "required": required, "detail": _explain(e)}
+        return {"name": name, "ok": False, "required": required, "detail": explain(e)}
 
 
 def run_all() -> list[dict]:

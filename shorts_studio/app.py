@@ -96,7 +96,7 @@ def _guard(fn, *args, **kwargs):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, f"{type(e).__name__}: {e}")
+        raise HTTPException(500, health.explain(e))
 
 
 @app.get("/")

@@ -91,6 +91,7 @@
   .keys { display: grid; gap: 8px; }
   .key { display: grid; grid-template-columns: 44px 220px 1fr auto; gap: 10px; align-items: center; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
   .key input { width: 100%; padding: 8px 10px; }
+  .key input.secret { -webkit-text-security: disc; }  /* hidden like a password, without the browser's "save password" prompt */
   .key a { color: var(--muted); font-size: 12px; }
   .key .res { grid-column: 2 / -1; font-size: 13px; }
   .key .res.good { color: var(--green); }
@@ -631,7 +632,7 @@ async function loadKeys() {
     d.className = "key";
     d.innerHTML = `<span class="tag ${k.set ? "fix" : "del"}" title="${k.set ? "kiritilgan" : "kiritilmagan"}">${k.set ? "bor" : "yo'q"}</span>
       <div><div class="lbl"></div><a target="_blank">kalitni olish ↗</a></div>
-      <input type="password" autocomplete="off" spellcheck="false">
+      <input type="text" class="secret" autocomplete="off" spellcheck="false" data-lpignore="true">
       <button class="small act">Saqlash</button><div class="res muted"></div>`;
     d.querySelector(".lbl").textContent = k.label;
     d.querySelector("a").href = k.help;

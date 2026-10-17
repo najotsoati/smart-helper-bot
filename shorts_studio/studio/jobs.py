@@ -112,4 +112,6 @@ def _run(job_id: str) -> None:
         db.update_job(job_id, status="done", step=f"Tayyor! {warning}".strip(), progress=1.0)
     except Exception as e:
         traceback.print_exc()
-        db.update_job(job_id, status="error", step=f"{type(e).__name__}: {e}"[:600])
+        from .health import explain  # local import: health imports youtube, which imports db
+
+        db.update_job(job_id, status="error", step=explain(e)[:600])
