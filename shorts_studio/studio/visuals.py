@@ -1,4 +1,4 @@
-"""Stock footage from Pexels (free API key: https://www.pexels.com/api/), picked by Claude's eyes."""
+"""Stock footage from Pexels or Pixabay (both free API keys), picked by Claude's eyes."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field
 from . import config, net
 
 API = "https://api.pexels.com/videos/search"
+PIXABAY_API = "https://pixabay.com/api/videos/"
+PIXABAY_ID_OFFSET = 10**12  # keeps Pixabay ids apart from Pexels ids in the clip cache
 
 
 @dataclass
@@ -29,7 +31,41 @@ def _pick_file(video: dict) -> dict | None:
     return min(good, key=lambda f: (f["width"] > f["height"], abs(max(f["width"], f["height"]) - 1920)))
 
 
+def available() -> bool:
+    return bool(config.PEXELS_API_KEY or config.PIXABAY_API_KEY)
+
+
 def search(query: str, limit: int, exclude: set[int]) -> list[Candidate]:
+    """Pexels when its key is set (more portrait clips), otherwise Pixabay."""
+    if config.PEXELS_API_KEY:
+        return _search_pexels(query, limit, exclude)
+    return _search_pixabay(query, limit, exclude)
+
+
+def _search_pixabay(query: str, limit: int, exclude: set[int]) -> list[Candidate]:
+    params = {"key": config.PIXABAY_API_KEY, "q": query[:100], "video_type": "film", "safesearch": "true",
+              "per_page": 20}
+    r = net.request("GET", PIXABAY_API, params=params, timeout=30)
+    results: list[Candidate] = []
+    for hit in r.json().get("hits", []):
+        vid = PIXABAY_ID_OFFSET + int(hit["id"])
+        if vid in exclude or hit.get("duration", 0) < 3:
+            continue
+        renditions = hit.get("videos", {})
+        f = next((renditions[k] for k in ("medium", "large", "small") if renditions.get(k, {}).get("url")), None)
+        if not f:
+            continue
+        thumb = f.get("thumbnail") or (
+            f"https://i.vimeocdn.com/video/{hit['picture_id']}_640x360.jpg" if hit.get("picture_id") else "")
+        if not thumb:
+            continue
+        results.append(Candidate(vid, f["url"], float(hit["duration"]), thumb))
+        if len(results) >= limit:
+            break
+    return results
+
+
+def _search_pexels(query: str, limit: int, exclude: set[int]) -> list[Candidate]:
     results: list[Candidate] = []
     seen = set(exclude)
     for orientation in ("portrait", None):

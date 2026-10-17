@@ -55,7 +55,7 @@ def _graphic_events(scene: Scene, start: float, end: float) -> list[str]:
 def plan_visuals(scenes: list[Scene], mode: str, host: bool, offline: bool) -> list[str]:
     """Decide per scene: "mascot", "illustration", "stock" or "gradient" (nothing available)."""
     can_draw = bool(config.OPENAI_API_KEY) and not offline
-    can_film = bool(config.PEXELS_API_KEY) and not offline
+    can_film = visuals.available() and not offline
     kinds = []
     for s in scenes:
         if s.visual_type == "mascot" and host and s.graphic_type == "none":
@@ -113,9 +113,9 @@ def choose_visuals(scenes: list[Scene], durations: list[float], visual_mode: str
                      0.2 + 0.12 * n / len(stock_idx))
             try:
                 cands = visuals.candidates_for(scenes[i].visual_query, min(shots[i] + 3, 6), used)
-            except Exception as e:  # bad key or Pexels down: the scene falls back to a drawing / background
+            except Exception as e:  # bad key or stock site down: the scene falls back to a drawing / background
                 cands = []
-                issues[i] = f"Pexels: {e}"[:200]
+                issues[i] = f"Stok video: {e}"[:200]
             used |= {c.id for c in cands}
             pool.append((scenes[i].narration, shots[i], cands))
         progress("Claude stok videolarni ko'rib, eng moslarini tanlayapti...", 0.33)

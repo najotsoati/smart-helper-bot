@@ -11,7 +11,7 @@ Har bir saytda ro'yxatdan o'tib, kalitni (API key) nusxalab, bloknotga saqlab qo
 | Xizmat | Kerakmi | Qayerdan | Narxi |
 |---|---|---|---|
 | **Claude (Anthropic)** | **majburiy** | https://console.anthropic.com/settings/keys | Balansga pul qo'yasiz. Bitta video (ssenariy, faktlarni tekshirish, kadrlarni baholash) taxminan $0.2–0.5 |
-| **Pexels** | tavsiya | https://www.pexels.com/api/ | bepul |
+| **Pixabay** | tavsiya (stok videolar) | https://pixabay.com/api/docs/ (ro'yxatdan o'tib kirsangiz, kalit sahifaning "Parameters" qismida ko'rinadi) | bepul |
 | **OpenAI** | tavsiya (AI chizmalar) | https://platform.openai.com/api-keys | Balansga pul qo'yasiz. Bir video taxminan $0.3–0.7 |
 | **YouTube API kaliti** | ixtiyoriy (trendlar) | https://console.cloud.google.com, "YouTube Data API v3" | bepul |
 | **ElevenLabs** | ixtiyoriy (eng jonli ovoz) | https://elevenlabs.io/app/settings/api-keys | bepul tarif bor |
@@ -112,7 +112,7 @@ Bitta video taxminan 3–6 daqiqada tayyor bo'ladi. Demak, 10 ta mavzu taxminan 
 | `start.bat` "Python topilmadi" deydi | Python'ni qayta o'rnating, **"Add python.exe to PATH"** belgisini qo'ying |
 | "ffmpeg topilmadi" | 1-qadamdagi ffmpeg o'rnatishni bajaring va oynani qayta oching. Yordam bermasa, kompyuterni qayta yoqing (Windows yangi PATH'ni ba'zan shundan keyin ko'radi) |
 | Ssenariy ostida "⚠ Faktlarni tekshirib bo'lmadi" | Ssenariy saqlanib qoladi, faqat tekshirilmagan bo'ladi. Odatda sabab: Anthropic hisobingizda veb-qidiruv (web search) o'chiq. Uni console.anthropic.com sozlamalarida yoqing yoki "Faktlarni tekshirish" belgisini olib qo'ying |
-| Moslik hisobotida "Pexels: ..." | Pexels kaliti noto'g'ri yoki xizmat javob bermadi. Video baribir yasaladi: bu sahnalar AI chizma yoki rangli fon bilan almashtiriladi |
+| Moslik hisobotida "Stok video: ..." | Pixabay (yoki Pexels) kaliti noto'g'ri yoki xizmat javob bermadi. Video baribir yasaladi: bu sahnalar AI chizma yoki rangli fon bilan almashtiriladi |
 | Kalit ostida "Kalit noto'g'ri (401)" | Kalitni qaytadan nusxalang (boshida yoki oxirida bo'sh joy qolmasin) |
 | "Ruxsat yo'q (403)" | Hisobda pul bormi yoki xizmat hududingizda ishlaydimi, tekshiring |
 | "Limit tugagan (429)" | Balansni to'ldiring yoki biroz kuting |

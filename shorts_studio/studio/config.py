@@ -19,6 +19,7 @@ CACHE_DIR = OUTPUT_DIR / ".cache"  # drawings and stock clips, reused by retries
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")  # only used for drawing illustrations
@@ -38,7 +39,8 @@ CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-opus-5-5")
 # Keys the panel can edit (Tizim tab): name -> (label, where to get it)
 EDITABLE_KEYS = {
     "ANTHROPIC_API_KEY": ("Claude (Anthropic)", "https://console.anthropic.com/settings/keys"),
-    "PEXELS_API_KEY": ("Pexels (stok video)", "https://www.pexels.com/api/"),
+    "PIXABAY_API_KEY": ("Pixabay (stok video)", "https://pixabay.com/api/docs/"),
+    "PEXELS_API_KEY": ("Pexels (stok video, ixtiyoriy)", "https://www.pexels.com/api/"),
     "OPENAI_API_KEY": ("OpenAI (AI chizmalar)", "https://platform.openai.com/api-keys"),
     "ELEVENLABS_API_KEY": ("ElevenLabs (ovoz)", "https://elevenlabs.io/app/settings/api-keys"),
     "ELEVENLABS_VOICE_ID": ("ElevenLabs ovoz ID (ixtiyoriy)", "https://elevenlabs.io/app/voice-library"),

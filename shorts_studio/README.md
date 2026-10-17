@@ -51,7 +51,8 @@ Kalitlarni panelning o'zida kiritasiz: **Tizim → API kalitlari** bo'limida kal
 | Kalit | Majburiymi | Qayerdan olinadi |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | ha | https://console.anthropic.com |
-| `PEXELS_API_KEY` | ha (bo'lmasa fon rangli gradient bo'ladi) | https://www.pexels.com/api/ (bepul) |
+| `PIXABAY_API_KEY` | tavsiya (bo'lmasa faqat AI chizmalar yoki rangli fon) | https://pixabay.com/api/docs/ (bepul) |
+| `PEXELS_API_KEY` | ixtiyoriy (Pexels yangi kalit berishni vaqtincha to'xtatgan) | https://www.pexels.com/api/ (bepul) |
 | `ELEVENLABS_API_KEY` | yo'q | https://elevenlabs.io. Eng jonli ovoz shu. Microsoft ovozlari har doim ro'yxatda qoladi. |
 | `OPENAI_API_KEY` | tavsiya | https://platform.openai.com. AI chizmalar uchun (bir video ~$0.3–0.7). Bo'lmasa faqat stok video ishlatiladi. |
 | `YOUTUBE_API_KEY` | yo'q | https://console.cloud.google.com, "YouTube Data API v3" (bepul). "Trenddagi Shorts" tugmasi uchun kerak. |

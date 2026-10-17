@@ -192,7 +192,7 @@ def test_pexels_failure_falls_back_instead_of_failing(monkeypatch):
     plan = pipeline.choose_visuals(SAMPLE.scenes, durations, "stock", True, False, lambda *_: None)
     stock_scenes = [i for i, s in enumerate(SAMPLE.scenes) if s.visual_type != "mascot" or s.graphic_type != "none"]
     assert all(plan["kinds"][i] == "gradient" for i in stock_scenes if plan["kinds"][i] != "mascot")
-    assert any("Pexels: 401 Unauthorized" in issue for issue in plan["issues"])
+    assert any("Stok video: 401 Unauthorized" in issue for issue in plan["issues"])
 
 
 def test_claude_requests_against_a_fake_api(monkeypatch):
@@ -255,3 +255,31 @@ def test_claude_requests_against_a_fake_api(monkeypatch):
     assert len(searches) == 2  # paused once, then resumed
     assert searches[1]["messages"][-1]["role"] == "assistant"  # resume = same turn sent back, no extra user message
     assert searches[0]["tools"][0]["type"] == "web_search_20260209"
+
+
+def test_pixabay_search_parses_hits(monkeypatch):
+    from studio import net, visuals
+
+    monkeypatch.setattr(config, "PEXELS_API_KEY", "")
+    monkeypatch.setattr(config, "PIXABAY_API_KEY", "pk")
+    calls = []
+
+    class Resp:
+        def json(self):
+            return {"hits": [
+                {"id": 1, "duration": 2, "videos": {"medium": {"url": "https://v/1.mp4", "thumbnail": "https://t/1.jpg"}}},
+                {"id": 2, "duration": 12, "picture_id": "555",
+                 "videos": {"medium": {"url": ""}, "small": {"url": "https://v/2.mp4"}}},
+                {"id": 3, "duration": 9, "videos": {"medium": {"url": "https://v/3.mp4", "thumbnail": "https://t/3.jpg"}}},
+            ]}
+
+    def fake_request(method, url, **kw):
+        calls.append((url, kw["params"]))
+        return Resp()
+
+    monkeypatch.setattr(net, "request", fake_request)
+    assert visuals.available()
+    found = visuals.search("deep ocean dark", 5, exclude={visuals.PIXABAY_ID_OFFSET + 3})
+    assert calls[0][0] == visuals.PIXABAY_API and calls[0][1]["key"] == "pk"
+    assert [c.url for c in found] == ["https://v/2.mp4"]  # 1 too short, 3 excluded
+    assert found[0].thumb == "https://i.vimeocdn.com/video/555_640x360.jpg"

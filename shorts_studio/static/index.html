@@ -316,7 +316,7 @@ function settings() {
 async function loadConfig() {
   const c = await api("/api/config");
   const mark = (ok) => `<b class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</b>`;
-  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · Chizmalar ${mark(c.openai)} · ElevenLabs ${mark(c.elevenlabs)} · Trendlar ${mark(c.youtube)} · Kanal ${mark(c.channel)} · Musiqa: ${c.music_tracks}`;
+  $("status").innerHTML = `Claude ${mark(c.claude)} · Stok video ${mark(c.pexels)} · Chizmalar ${mark(c.openai)} · ElevenLabs ${mark(c.elevenlabs)} · Trendlar ${mark(c.youtube)} · Kanal ${mark(c.channel)} · Musiqa: ${c.music_tracks}`;
   threshold = c.match_threshold;
   $("voice").innerHTML = Object.entries(c.voices).map(([k, v]) => `<option value="${v}">${k}</option>`).join("");
   const channelText = { connected: "Kanal ulangan ✓", expired: "Ulanish muddati tugagan, kanalni qayta ulang", missing: "Kanal ulanmagan" };

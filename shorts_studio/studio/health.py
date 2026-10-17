@@ -37,6 +37,12 @@ def _pexels() -> str:
     return f"{r.json().get('total_results', 0)} ta 'ocean' videosi"
 
 
+def _pixabay() -> str:
+    r = net.request("GET", "https://pixabay.com/api/videos/", params={"key": config.PIXABAY_API_KEY, "q": "ocean",
+                    "per_page": 3}, attempts=1, timeout=15)
+    return f"{r.json().get('totalHits', 0)} ta 'ocean' videosi"
+
+
 def _openai() -> str:
     net.request("GET", f"https://api.openai.com/v1/models/{config.IMAGE_MODEL}",
                 headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}"}, attempts=1, timeout=15)
@@ -79,6 +85,7 @@ CHECKS = [
     ("ffmpeg", True, None, _ffmpeg),
     ("Claude (Anthropic)", True, "ANTHROPIC_API_KEY", _claude),
     ("Microsoft ovozlari (edge-tts)", True, None, _edge),
+    ("Pixabay (stok video)", False, "PIXABAY_API_KEY", _pixabay),
     ("Pexels (stok video)", False, "PEXELS_API_KEY", _pexels),
     ("OpenAI (AI chizmalar)", False, "OPENAI_API_KEY", _openai),
     ("ElevenLabs (ovoz)", False, "ELEVENLABS_API_KEY", _elevenlabs),

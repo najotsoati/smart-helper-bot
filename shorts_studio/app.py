@@ -113,7 +113,7 @@ def get_config():
     return {
         "voices": voices,
         "claude": bool(config.ANTHROPIC_API_KEY),
-        "pexels": bool(config.PEXELS_API_KEY),
+        "pexels": bool(config.PEXELS_API_KEY or config.PIXABAY_API_KEY),
         "youtube": bool(config.YOUTUBE_API_KEY),
         "elevenlabs": bool(config.ELEVENLABS_API_KEY),
         "openai": bool(config.OPENAI_API_KEY),
