@@ -109,15 +109,30 @@ def explain(e: Exception) -> str:
                 "(Claude ilovasi obunasi API'ga kirmaydi).")
     if "insufficient_quota" in text or "billing_hard_limit" in text:
         return "OpenAI balansi tugagan. platform.openai.com → Billing'da balansni to'ldiring."
-    status = getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
-    if status == 401:
-        return "Kalit noto'g'ri (401). Nusxa olishda xato bo'lmaganini tekshiring yoki yangi kalit yarating."
-    if status == 403:
-        return ("Ruxsat yo'q (403): kalit noto'g'ri, hisobda pul yoki ruxsat yo'q, yoki xizmat "
-                "siz turgan hududda ishlamaydi.")
-    if status == 429:
-        return "Limit tugagan (429): balansni yoki tarif limitini tekshiring."
-    return f"{type(e).__name__}: {e}"[:400]
+    response = getattr(e, "response", None)
+    status = getattr(e, "status_code", None) or getattr(response, "status_code", None)
+    hint = {
+        401: "Kalit noto'g'ri (401). Nusxa olishda xato bo'lmaganini tekshiring yoki yangi kalit yarating.",
+        403: "Ruxsat yo'q (403): kalit, balans, model yoki hudud cheklovi.",
+        429: "Limit tugagan (429): biroz kuting yoki balansni / tarif limitini tekshiring.",
+    }.get(status)
+    if not hint:
+        return f"{type(e).__name__}: {e}"[:400]
+    return f"{hint} Xizmat javobi: {_service_message(response)}"[:500]
+
+
+def _service_message(response) -> str:
+    """The provider's own error text, e.g. OpenRouter's reason for a 403."""
+    if response is None:
+        return "-"
+    try:
+        err = response.json().get("error", {})
+        if isinstance(err, dict):
+            meta = err.get("metadata") or {}
+            return " ".join(str(x) for x in (err.get("message"), meta.get("raw"), meta.get("reasons")) if x)
+        return str(err)
+    except Exception:
+        return response.text[:300]
 
 
 def _check(name: str, required: bool, key: str | None, fn) -> dict:
