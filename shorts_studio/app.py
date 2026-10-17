@@ -240,7 +240,8 @@ def yt_upload(ref: VideoRef):
     if not (folder / f"video{suffix}.mp4").exists():
         raise HTTPException(404, "video topilmadi")
     meta = json.loads((folder / f"meta{suffix}.json").read_text())
-    publish_at = datetime.fromisoformat(ref.publish_at).astimezone() if ref.publish_at else None
+    # browsers send "...Z", which datetime.fromisoformat only accepts from Python 3.11
+    publish_at = datetime.fromisoformat(ref.publish_at.replace("Z", "+00:00")).astimezone() if ref.publish_at else None
     vid = _guard(youtube.upload, folder / f"video{suffix}.mp4", meta, publish_at)
     db.save_video(ref.dir, ref.variant, youtube_id=vid, publish_at=ref.publish_at or None,
                   uploaded=datetime.now().timestamp())

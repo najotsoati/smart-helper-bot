@@ -101,7 +101,8 @@ def _run(job_id: str) -> None:
 
         if settings.get("upload"):
             progress("YouTube'ga yuklanmoqda...", 0.95)
-            publish_at = datetime.fromisoformat(params["publish_at"]) if params.get("publish_at") else None
+            publish_at = (datetime.fromisoformat(params["publish_at"].replace("Z", "+00:00"))
+                          if params.get("publish_at") else None)
             meta = json.loads((job_dir / "meta.json").read_text())
             vid = youtube.upload(video, meta, publish_at)
             db.save_video(job_dir.name, "a", youtube_id=vid, publish_at=params.get("publish_at"),

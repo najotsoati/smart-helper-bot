@@ -2,6 +2,8 @@
 
 Qiziqarli faktlar haqida inglizcha **YouTube Shorts / Reels / TikTok** videolarini avtomatik yasaydigan panel.
 
+> **Birinchi marta ishga tushiryapsizmi?** [BOSHLASH.md](BOSHLASH.md) qo'llanmasini oching: noutbukda qadam-baqadam o'rnatish.
+
 Oddiy "rasm + robot ovoz" videolaridan farqi: har bir video ko'rishni ushlab qolish qoidalari bo'yicha quriladi.
 
 | Nima | Qanday |
@@ -60,11 +62,10 @@ Haqiqiy ovoz effektlari kerak bo'lsa, ularni `assets/sfx/` papkasiga tashlang: [
 
 ## Ishga tushirish
 
-```bash
-uvicorn app:app
-```
+- **Windows:** `start.bat` faylini ikki marta bosing.
+- **macOS / Linux:** `./start.sh`
 
-Brauzerda http://127.0.0.1:8000 manzilini oching. **Birinchi ish:** "Tizim" bo'limida **Tekshirish** tugmasini bosing. Har bir kalit ishlayaptimi, ko'rsatiladi.
+Birinchi safar kutubxonalar o'zi o'rnatiladi, keyin brauzerda panel ochiladi. Qo'lda ishga tushirish uchun: `python run.py` yoki `uvicorn app:app`. **Birinchi ish:** "Tizim" bo'limida **Tekshirish** tugmasini bosing. Har bir kalit ishlayaptimi, ko'rsatiladi.
 
 Keyin "Yaratish" bo'limida:
 
