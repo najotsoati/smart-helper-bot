@@ -31,6 +31,12 @@ def _claude() -> str:
     return model.display_name
 
 
+def _openrouter() -> str:
+    from . import openrouter
+
+    return openrouter.key_info()
+
+
 def _pexels() -> str:
     r = net.request("GET", "https://api.pexels.com/videos/search", params={"query": "ocean", "per_page": 1},
                     headers={"Authorization": config.PEXELS_API_KEY}, attempts=1, timeout=15)
@@ -83,7 +89,8 @@ def _channel() -> str:
 CHECKS = [
     # name, required, config key it needs (None = always run), function
     ("ffmpeg", True, None, _ffmpeg),
-    ("Claude (Anthropic)", True, "ANTHROPIC_API_KEY", _claude),
+    ("Claude (Anthropic) — yoki OpenRouter", False, "ANTHROPIC_API_KEY", _claude),
+    ("OpenRouter (bepul AI) — yoki Claude", False, "OPENROUTER_API_KEY", _openrouter),
     ("Microsoft ovozlari (edge-tts)", True, None, _edge),
     ("Pixabay (stok video)", False, "PIXABAY_API_KEY", _pixabay),
     ("Pexels (stok video)", False, "PEXELS_API_KEY", _pexels),
@@ -128,5 +135,5 @@ def run_all() -> list[dict]:
 
 def run_for_key(key: str) -> dict | None:
     """Re-test just the service a freshly saved key belongs to."""
-    lookup = "ELEVENLABS_API_KEY" if key == "ELEVENLABS_VOICE_ID" else key
+    lookup = {"ELEVENLABS_VOICE_ID": "ELEVENLABS_API_KEY", "OPENROUTER_MODEL": "OPENROUTER_API_KEY"}.get(key, key)
     return next((_check(*c) for c in CHECKS if c[2] == lookup), None)

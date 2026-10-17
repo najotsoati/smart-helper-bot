@@ -283,3 +283,74 @@ def test_pixabay_search_parses_hits(monkeypatch):
     assert calls[0][0] == visuals.PIXABAY_API and calls[0][1]["key"] == "pk"
     assert [c.url for c in found] == ["https://v/2.mp4"]  # 1 too short, 3 excluded
     assert found[0].thumb == "https://i.vimeocdn.com/video/555_640x360.jpg"
+
+
+def test_openrouter_free_model_and_json_retry(monkeypatch):
+    """Runs the OpenRouter path against a local fake API: free-model pick, image parts, invalid-JSON retry."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    from studio import openrouter
+    from studio import script as script_mod
+    from studio.visuals import Picks
+
+    chats: list[dict] = []
+    models = {"data": [
+        {"id": "anthropic/claude-x", "pricing": {"prompt": "0.000003", "completion": "0.000015"},
+         "context_length": 200000, "architecture": {"input_modalities": ["text", "image"]}},
+        {"id": "mistralai/small:free", "pricing": {"prompt": "0", "completion": "0"}, "context_length": 32000,
+         "architecture": {"input_modalities": ["text"]}},
+        {"id": "deepseek/chat:free", "pricing": {"prompt": "0", "completion": "0"}, "context_length": 128000,
+         "architecture": {"input_modalities": ["text"]}},
+        {"id": "google/gemma-vision:free", "pricing": {"prompt": "0", "completion": "0"}, "context_length": 96000,
+         "architecture": {"input_modalities": ["text", "image"]}},
+    ]}
+
+    class Fake(BaseHTTPRequestHandler):
+        def _send(self, payload):
+            data = json.dumps(payload).encode()
+            self.send_response(200)
+            self.send_header("content-type", "application/json")
+            self.send_header("content-length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def do_GET(self):
+            self._send(models)
+
+        def do_POST(self):
+            body = json.loads(self.rfile.read(int(self.headers["content-length"])))
+            chats.append(body)
+            if body["model"] == "deepseek/chat:free" and len(chats) == 1:
+                text = "<think>hmm</think>```json\n{\"topic\": \"x\"}\n```"  # incomplete -> must be retried
+            elif body["model"] == "deepseek/chat:free":
+                text = "Sure! " + SAMPLE.model_dump_json()
+            else:
+                text = json.dumps({"scenes": [{"scene": 1, "picks": [2], "match": 88}]})
+            self._send({"choices": [{"message": {"content": text}}]})
+
+        def log_message(self, *_):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), Fake)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    monkeypatch.setattr(config, "OPENROUTER_BASE_URL", f"http://127.0.0.1:{server.server_port}")
+    monkeypatch.setattr(config, "OPENROUTER_API_KEY", "or-key")
+    monkeypatch.setattr(config, "ANTHROPIC_API_KEY", "")
+    monkeypatch.setattr(openrouter, "_models_cache", (0.0, []))
+    try:
+        assert config.llm_provider() == "openrouter"
+        draft = script_mod.write_script("venus", 35)
+        picks = script_mod.ask_json([{"type": "text", "text": "pick"},
+                                     {"type": "image", "source": {"type": "url", "url": "https://t/1.jpg"}}],
+                                    Picks, system="s")
+        _, checks, warning = script_mod.try_fact_check(draft)
+    finally:
+        server.shutdown()
+
+    assert draft.title == SAMPLE.title
+    assert [c["model"] for c in chats] == ["deepseek/chat:free", "deepseek/chat:free", "google/gemma-vision:free"]
+    assert chats[1]["messages"][-1]["role"] == "user" and "invalid" in chats[1]["messages"][-1]["content"]
+    assert chats[2]["messages"][1]["content"][1] == {"type": "image_url", "image_url": {"url": "https://t/1.jpg"}}
+    assert picks.scenes[0].match == 88
+    assert checks == [] and "veb-qidiruv" in warning

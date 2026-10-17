@@ -10,7 +10,8 @@ Har bir saytda ro'yxatdan o'tib, kalitni (API key) nusxalab, bloknotga saqlab qo
 
 | Xizmat | Kerakmi | Qayerdan | Narxi |
 |---|---|---|---|
-| **Claude (Anthropic)** | **majburiy** | https://console.anthropic.com/settings/keys | Balansga pul qo'yasiz. Bitta video (ssenariy, faktlarni tekshirish, kadrlarni baholash) taxminan $0.2–0.5 |
+| **Claude (Anthropic)** | **bittasi majburiy** (eng sifatli) | https://console.anthropic.com/settings/keys | Balansga pul qo'yasiz. Bitta video (ssenariy, faktlarni tekshirish, kadrlarni baholash) taxminan $0.2–0.5 |
+| **yoki OpenRouter** | **bittasi majburiy** (bepul boshlash uchun) | https://openrouter.ai/settings/keys | Bepul modellar bor (kunlik limit bilan). Faktlar internetdan tekshirilmaydi, ssenariy sifati Claude'dan pastroq |
 | **Pixabay** | tavsiya (stok videolar) | https://pixabay.com/api/docs/ (ro'yxatdan o'tib kirsangiz, kalit sahifaning "Parameters" qismida ko'rinadi) | bepul |
 | **OpenAI** | tavsiya (AI chizmalar) | https://platform.openai.com/api-keys | Balansga pul qo'yasiz. Bir video taxminan $0.3–0.7 |
 | **YouTube API kaliti** | ixtiyoriy (trendlar) | https://console.cloud.google.com, "YouTube Data API v3" | bepul |

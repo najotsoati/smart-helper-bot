@@ -120,7 +120,7 @@ class CheckedScript(BaseModel):
 
 def _client() -> anthropic.Anthropic:
     if not config.ANTHROPIC_API_KEY:
-        raise RuntimeError("ANTHROPIC_API_KEY is not set (add it to shorts_studio/.env)")
+        raise RuntimeError("AI kaliti yo'q: Tizim bo'limida Claude yoki OpenRouter kalitini kiriting")
     return anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY, max_retries=4)
 
 
@@ -133,6 +133,10 @@ def _check_stop(response) -> None:
 
 def ask_json(content, schema: type[BaseModel], effort: str = "high", system: str = SYSTEM_PROMPT) -> BaseModel:
     """One structured-output call. `content` is a prompt string or a list of content blocks."""
+    if config.llm_provider() == "openrouter":
+        from . import openrouter
+
+        return openrouter.ask_json(content, schema, _strict_schema(schema), system)
     response = _client().beta.messages.create(
         model=config.CLAUDE_MODEL,
         max_tokens=16000,
@@ -216,6 +220,9 @@ def suggest_topics(niche: str = "", count: int = 8, trending: list[str] | None =
 
 def fact_check(script: ShortScript) -> CheckedScript:
     """Verify every claim on the web, then return a corrected script plus a per-scene report."""
+    if config.llm_provider() == "openrouter":
+        raise RuntimeError("OpenRouter bepul modellarida veb-qidiruv yo'q, shuning uchun faktlar internetdan "
+                           "tekshirilmadi. Muhim raqamlarni o'zingiz tekshirib qo'ying")
     client = _client()
     numbered = "\n".join(f"{i + 1}. {s.narration}" for i, s in enumerate(script.scenes))
     question = (

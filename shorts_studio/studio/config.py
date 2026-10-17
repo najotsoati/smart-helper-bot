@@ -18,6 +18,11 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 CACHE_DIR = OUTPUT_DIR / ".cache"  # drawings and stock clips, reused by retries and A/B variants
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "")  # empty = pick the best free model automatically
+OPENROUTER_VISION_MODEL = os.getenv("OPENROUTER_VISION_MODEL", "")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "")  # anthropic | openrouter | empty = whichever key is set
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
 PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
@@ -39,6 +44,8 @@ CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-opus-5-5")
 # Keys the panel can edit (Tizim tab): name -> (label, where to get it)
 EDITABLE_KEYS = {
     "ANTHROPIC_API_KEY": ("Claude (Anthropic)", "https://console.anthropic.com/settings/keys"),
+    "OPENROUTER_API_KEY": ("OpenRouter (bepul AI, Claude o'rniga)", "https://openrouter.ai/settings/keys"),
+    "OPENROUTER_MODEL": ("OpenRouter modeli (ixtiyoriy, bo'sh = avtomatik bepul)", "https://openrouter.ai/models?max_price=0"),
     "PIXABAY_API_KEY": ("Pixabay (stok video)", "https://pixabay.com/api/docs/"),
     "PEXELS_API_KEY": ("Pexels (stok video, ixtiyoriy)", "https://www.pexels.com/api/"),
     "OPENAI_API_KEY": ("OpenAI (AI chizmalar)", "https://platform.openai.com/api-keys"),
@@ -62,6 +69,14 @@ def save_key(name: str, value: str) -> None:
         os.environ.pop(name, None)
     defaults = {"ELEVENLABS_VOICE_ID": "pNInz6obpgDQGcFmaJgB"}
     globals()[name] = value or defaults.get(name, "")
+
+
+def llm_provider() -> str:
+    """Which AI writes scripts and checks pictures: "anthropic", "openrouter" or "" (no key yet)."""
+    keys = {"anthropic": globals()["ANTHROPIC_API_KEY"], "openrouter": globals()["OPENROUTER_API_KEY"]}
+    if LLM_PROVIDER in keys and keys[LLM_PROVIDER]:
+        return LLM_PROVIDER
+    return next((name for name, key in keys.items() if key), "")
 
 
 def masked(name: str) -> str:

@@ -112,7 +112,8 @@ def get_config():
     music = [p for p in config.MUSIC_DIR.rglob("*") if p.suffix.lower() in pipeline.AUDIO_EXT]
     return {
         "voices": voices,
-        "claude": bool(config.ANTHROPIC_API_KEY),
+        "claude": bool(config.llm_provider()),
+        "llm": config.llm_provider(),
         "pexels": bool(config.PEXELS_API_KEY or config.PIXABAY_API_KEY),
         "youtube": bool(config.YOUTUBE_API_KEY),
         "elevenlabs": bool(config.ELEVENLABS_API_KEY),

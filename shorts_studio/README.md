@@ -50,7 +50,8 @@ Kalitlarni panelning o'zida kiritasiz: **Tizim → API kalitlari** bo'limida kal
 
 | Kalit | Majburiymi | Qayerdan olinadi |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | ha | https://console.anthropic.com |
+| `ANTHROPIC_API_KEY` | ha (yoki OpenRouter) | https://console.anthropic.com |
+| `OPENROUTER_API_KEY` | Claude o'rniga | https://openrouter.ai/settings/keys. Bepul modellar avtomatik tanlanadi; faktlarni internetdan tekshirish ishlamaydi |
 | `PIXABAY_API_KEY` | tavsiya (bo'lmasa faqat AI chizmalar yoki rangli fon) | https://pixabay.com/api/docs/ (bepul) |
 | `PEXELS_API_KEY` | ixtiyoriy (Pexels yangi kalit berishni vaqtincha to'xtatgan) | https://www.pexels.com/api/ (bepul) |
 | `ELEVENLABS_API_KEY` | yo'q | https://elevenlabs.io. Eng jonli ovoz shu. Microsoft ovozlari har doim ro'yxatda qoladi. |

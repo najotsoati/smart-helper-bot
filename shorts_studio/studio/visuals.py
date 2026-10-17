@@ -114,7 +114,7 @@ def choose(scenes: list[tuple[str, int, list[Candidate]]]) -> tuple[list[list[Ca
 
     fallback = [cands[:n] for _, n, cands in scenes]
     unknown: list[int | None] = [None] * len(scenes)
-    if not config.ANTHROPIC_API_KEY or not any(c for _, _, c in scenes):
+    if not config.llm_provider() or not any(c for _, _, c in scenes):
         return fallback, unknown
 
     content: list[dict] = [{
