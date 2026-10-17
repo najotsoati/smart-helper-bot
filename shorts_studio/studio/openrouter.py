@@ -12,8 +12,10 @@ from pydantic import BaseModel, ValidationError
 
 from . import config, net
 
-# preferred families, best first, when picking a free model automatically
-PREFERENCE = ["deepseek", "qwen", "llama", "gemini", "gemma", "mistral", "glm", "kimi"]
+# preferred families, best first, when picking a free model automatically (free catalog changes often;
+# gpt-oss-120b follows long instructions and JSON formats most reliably among free models in 2026 tests)
+PREFERENCE = ["gpt-oss-120b", "deepseek", "qwen3", "nemotron", "gemma", "llama", "qwen", "gemini", "mistral", "glm"]
+VISION_PREFERENCE = ["gemma", "qwen", "llama", "gemini", "mistral", "nemotron"]
 _models_cache: tuple[float, list[dict]] = (0.0, [])
 
 
@@ -50,9 +52,11 @@ def pick_model(vision: bool = False) -> str:
     if not free:
         raise RuntimeError("OpenRouter'da hozir mos bepul model topilmadi" + (" (rasmni tushunadigan)" if vision else ""))
 
+    order = VISION_PREFERENCE if vision else PREFERENCE
+
     def rank(m: dict):
         mid = m["id"].lower()
-        family = next((i for i, name in enumerate(PREFERENCE) if name in mid), len(PREFERENCE))
+        family = next((i for i, name in enumerate(order) if name in mid), len(order))
         return family, -int(m.get("context_length") or 0)
 
     return min(free, key=rank)["id"]
