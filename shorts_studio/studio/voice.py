@@ -61,7 +61,7 @@ def _elevenlabs(text: str, out: Path) -> list[Word]:
 
     align = data["alignment"]
     words: list[Word] = []
-    current, start = "", None
+    current, start, end = "", None, 0.0
     for ch, s, e in zip(
         align["characters"], align["character_start_times_seconds"], align["character_end_times_seconds"]
     ):

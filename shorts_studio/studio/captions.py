@@ -21,8 +21,9 @@ ScaledBorderAndShadow: yes
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Caption,Anton,138,&H00FFFFFF,&H00FFFFFF,&H00000000,&H96000000,0,0,0,0,100,100,1,0,1,9,5,5,60,60,0,1
-Style: Title,Anton,104,&H00000000,&H00000000,&H0000E5FF,&H00000000,0,0,0,0,100,100,2,-3,3,24,0,8,60,60,260,1
-
+Style: Title,Anton,104,&H00000000,&H00000000,&H0000E5FF,&H00000000,0,0,0,0,100,100,2,-3,3,24,0,8,60,60,300,1
+Style: Series,Anton,58,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,2,0,3,14,0,8,60,60,150,1
+{extra_styles}
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
@@ -33,7 +34,7 @@ class TimedWord(Word):
     emphasis: bool = False
 
 
-def _ts(t: float) -> str:
+def ts(t: float) -> str:
     t = max(t, 0)
     h, rem = divmod(t, 3600)
     m, s = divmod(rem, 60)
@@ -68,8 +69,16 @@ def _clean(text: str) -> str:
     return text.upper().replace("{", "(").replace("}", ")").strip(",;:")
 
 
-def build_ass(words: list[TimedWord], titles: list[tuple[float, float, str]], total: float) -> str:
-    lines = [HEADER]
+def build_ass(
+    words: list[TimedWord],
+    titles: list[tuple[float, float, str]],
+    total: float,
+    extra_events: list[str] = (),
+    series: str = "",
+) -> str:
+    from .graphics import STYLES
+
+    lines = [HEADER.replace("{extra_styles}", STYLES)]
     groups = _groups(words)
     for gi, group in enumerate(groups):
         group_end = groups[gi + 1][0].start if gi + 1 < len(groups) else total
@@ -89,9 +98,12 @@ def build_ass(words: list[TimedWord], titles: list[tuple[float, float, str]], to
                     parts.append(f"{{\\c{GREEN if other.emphasis else WHITE}}}{text}{{\\c{WHITE}}}")
             # first word of a group slides up slightly to sell the "new line"
             intro = "{\\move(540,1215,540,1180,0,80)}" if i == 0 else "{\\pos(540,1180)}"
-            lines.append(f"Dialogue: 0,{_ts(start)},{_ts(end)},Caption,,0,0,0,,{intro}{' '.join(parts)}\n")
+            lines.append(f"Dialogue: 0,{ts(start)},{ts(end)},Caption,,0,0,0,,{intro}{' '.join(parts)}\n")
 
     for start, end, text in titles:
         slam = "{\\fscx160\\fscy160\\alpha&HFF&\\t(0,140,\\fscx100\\fscy100\\alpha&H00&)}"
-        lines.append(f"Dialogue: 1,{_ts(start)},{_ts(end)},Title,,0,0,0,,{slam}{_clean(text)}\n")
+        lines.append(f"Dialogue: 1,{ts(start)},{ts(end)},Title,,0,0,0,,{slam}{_clean(text)}\n")
+    if series:
+        lines.append(f"Dialogue: 1,{ts(0)},{ts(min(3.0, total))},Series,,0,0,0,,{_clean(series)}\n")
+    lines += [e + "\n" for e in extra_events]
     return "".join(lines)

@@ -1,6 +1,7 @@
-"""Viral fact-Shorts script writer powered by Claude."""
+"""Viral fact-Shorts script writer powered by Claude (plus web fact-checking)."""
 
 import json
+from typing import Literal
 
 import anthropic
 from pydantic import BaseModel, Field
@@ -22,11 +23,11 @@ escalation (each fact crazier than the last) and concrete numbers, comparisons a
 3. Short, punchy spoken English. 4-14 words per sentence. Contractions. No lists read aloud, \
 no filler, no "interesting", "amazing", "incredible".
 4. One sentence per scene. A new scene every 2-3 seconds so the picture changes constantly.
-5. Payoff near the end, then the LAST sentence must flow naturally back into the hook, \
-so when the video loops the viewer doesn't notice the restart \
-(e.g. last line "...and that's exactly why" + hook "your body glows in the dark").
-6. Only true, verifiable facts. If a popular "fact" is a myth, either skip it or use the myth \
-as the twist ("Goldfish don't have 3-second memories. They remember for months.").
+5. Exactly one TWIST scene about two thirds in (the most surprising turn), then a payoff. \
+The LAST sentence must flow naturally back into the hook, so when the video loops the viewer \
+doesn't notice the restart (e.g. last line "...and that's exactly why" + hook "your body glows in the dark").
+6. Only true, verifiable facts with correct numbers. If a popular "fact" is a myth, either skip it \
+or use the myth as the twist ("Goldfish don't have 3-second memories. They remember for months.").
 7. No call to action like "subscribe" or "like" in the narration.
 
 For each scene also give:
@@ -36,8 +37,17 @@ the sentence (things that exist on Pexels: "deep ocean dark", "human heart beati
 - emphasis: 1-2 words copied exactly from the narration that should pop on screen \
 (numbers and the most surprising word).
 - on_screen_text: a 1-4 word big title for the scene (like "8 MINUTES" or "NOT A MYTH"), \
-or empty string when the captions are enough. Use it on at most half the scenes.
+or empty string. Use it on at most a third of the scenes, never on a graphic scene.
+- beat: "twist" for the single twist scene, "payoff" for the scene right after it, else "normal".
+- graphic: animated infographics beat stock footage for numbers. Use them on 1-2 scenes:
+  * "counter": one big number counting up (counter_value, counter_prefix like "$", \
+counter_suffix like " KM" or "x", graphic_label: 1-4 words under the number).
+  * "compare": two bars side by side (compare_a_label/value vs compare_b_label/value, \
+same unit, graphic_label names the unit, e.g. "METERS"). Perfect for "X is bigger than Y".
+  * "none" for every other scene (set numeric fields to 0 and texts to "").
 """
+
+Mood = Literal["mysterious", "epic", "scary", "uplifting", "funny"]
 
 
 class Scene(BaseModel):
@@ -45,10 +55,21 @@ class Scene(BaseModel):
     visual_query: str
     emphasis: list[str]
     on_screen_text: str
+    beat: Literal["normal", "twist", "payoff"] = "normal"
+    graphic_type: Literal["none", "counter", "compare"] = "none"
+    graphic_label: str = ""
+    counter_value: float = 0
+    counter_prefix: str = ""
+    counter_suffix: str = ""
+    compare_a_label: str = ""
+    compare_a_value: float = 0
+    compare_b_label: str = ""
+    compare_b_value: float = 0
 
 
 class ShortScript(BaseModel):
     topic: str
+    mood: Mood = Field("mysterious", description="Background music mood that fits the story")
     hook_candidates: list[str] = Field(description="3 different hook ideas, best first")
     scenes: list[Scene] = Field(description="Scene 1 narration is the chosen hook")
     title: str = Field(description="YouTube Shorts title, under 60 characters, curiosity gap, 1 emoji max")
@@ -67,17 +88,37 @@ class TopicIdeas(BaseModel):
     ideas: list[TopicIdea]
 
 
+class FactCheck(BaseModel):
+    scene: int = Field(description="1-based scene number")
+    verdict: Literal["correct", "fixed", "removed"]
+    note: str = Field(description="What was wrong and the corrected fact, in one short line")
+    source: str = Field(description="URL of the best source, or empty")
+
+
+class CheckedScript(BaseModel):
+    script: ShortScript
+    checks: list[FactCheck] = Field(description="Only scenes that contain a factual claim")
+
+
 def _client() -> anthropic.Anthropic:
     if not config.ANTHROPIC_API_KEY:
         raise RuntimeError("ANTHROPIC_API_KEY is not set (add it to shorts_studio/.env)")
     return anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
 
 
-def _ask(prompt: str, schema: type[BaseModel], effort: str = "high") -> BaseModel:
+def _check_stop(response) -> None:
+    if response.stop_reason == "refusal":
+        raise RuntimeError("Claude declined this request, try another topic")
+    if response.stop_reason == "max_tokens":
+        raise RuntimeError("Claude's answer was cut off, try again")
+
+
+def ask_json(content, schema: type[BaseModel], effort: str = "high", system: str = SYSTEM_PROMPT) -> BaseModel:
+    """One structured-output call. `content` is a prompt string or a list of content blocks."""
     response = _client().beta.messages.create(
         model=config.CLAUDE_MODEL,
         max_tokens=16000,
-        system=SYSTEM_PROMPT,
+        system=system,
         thinking={"type": "adaptive"},
         output_config={
             "effort": effort,
@@ -86,12 +127,9 @@ def _ask(prompt: str, schema: type[BaseModel], effort: str = "high") -> BaseMode
         # On a safety decline, re-run on Anthropic's recommended fallback model.
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
-        messages=[{"role": "user", "content": prompt}],
+        messages=[{"role": "user", "content": content}],
     )
-    if response.stop_reason == "refusal":
-        raise RuntimeError("Claude declined this topic, try another one")
-    if response.stop_reason == "max_tokens":
-        raise RuntimeError("Script was cut off, try again")
+    _check_stop(response)
     text = next(b.text for b in response.content if b.type == "text")
     return schema.model_validate(json.loads(text))
 
@@ -106,6 +144,7 @@ def _strict_schema(model: type[BaseModel]) -> dict:
                 node["additionalProperties"] = False
                 node["required"] = list(node.get("properties", {}))
             node.pop("title", None)
+            node.pop("default", None)
             for value in node.values():
                 walk(value)
         elif isinstance(node, list):
@@ -116,7 +155,7 @@ def _strict_schema(model: type[BaseModel]) -> dict:
     return schema
 
 
-def write_script(topic: str, seconds: int = 45) -> ShortScript:
+def write_script(topic: str, seconds: int = 35) -> ShortScript:
     words = int(seconds * 2.7)  # ~2.7 spoken words per second at a slightly fast pace
     scenes = max(8, seconds // 3)
     prompt = (
@@ -125,14 +164,58 @@ def write_script(topic: str, seconds: int = 45) -> ShortScript:
         "First brainstorm 3 hooks and put the strongest first in hook_candidates; "
         "scene 1 narration must be that hook. Make sure the last line loops into the hook."
     )
-    return _ask(prompt, ShortScript)
+    return ask_json(prompt, ShortScript)
 
 
-def suggest_topics(niche: str = "", count: int = 8) -> list[TopicIdea]:
+def suggest_topics(niche: str = "", count: int = 8, trending: list[str] | None = None) -> list[TopicIdea]:
     prompt = (
         f"Give {count} fact-Short topics that are proven to go viral right now"
         + (f" in the niche: {niche}" if niche else " (mix space, human body, animals, history, psychology, ocean)")
         + ". Prefer topics with a shocking, visual, easy-to-film core fact. "
         "For each: the topic, the hook you would open with, and one line on why it works."
     )
-    return _ask(prompt, TopicIdeas, effort="medium").ideas
+    if trending:
+        prompt += (
+            "\n\nThese Shorts are outperforming their channels in this niche right now "
+            "(views far above subscriber count). Find the patterns and suggest fresh angles on them, "
+            "don't copy them:\n- " + "\n- ".join(trending)
+        )
+    return ask_json(prompt, TopicIdeas, effort="medium").ideas
+
+
+def fact_check(script: ShortScript) -> CheckedScript:
+    """Verify every claim on the web, then return a corrected script plus a per-scene report."""
+    client = _client()
+    numbered = "\n".join(f"{i + 1}. {s.narration}" for i, s in enumerate(script.scenes))
+    question = (
+        "Fact-check this Short's narration with web searches. For every scene with a factual claim, "
+        "say whether it's correct, and if not give the corrected fact with numbers and a source URL. "
+        "Be strict about numbers and popular myths.\n\n" + numbered
+    )
+    tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 8}]
+    messages = [{"role": "user", "content": question}]
+    for _ in range(5):  # resume if the server-side search loop pauses
+        response = client.beta.messages.create(
+            model=config.CLAUDE_MODEL,
+            max_tokens=16000,
+            thinking={"type": "adaptive"},
+            output_config={"effort": "medium"},
+            betas=["server-side-fallback-2026-07-01"],
+            fallbacks="default",
+            tools=tools,
+            messages=messages,
+        )
+        _check_stop(response)
+        if response.stop_reason != "pause_turn":
+            break
+        messages = [messages[0], {"role": "assistant", "content": response.content}]
+    report = "\n".join(b.text for b in response.content if b.type == "text")
+
+    prompt = (
+        "Here is a Short script as JSON and a web fact-check report. Return the script with every "
+        "wrong fact corrected (keep the style, length, hook and loop; rewrite or drop a scene only "
+        "if the claim is false and can't be fixed; keep emphasis/graphic numbers consistent with "
+        "the narration) and the per-scene check list.\n\n"
+        f"SCRIPT:\n{script.model_dump_json()}\n\nFACT-CHECK REPORT:\n{report}"
+    )
+    return ask_json(prompt, CheckedScript, effort="low")

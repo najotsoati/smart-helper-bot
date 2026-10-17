@@ -6,20 +6,120 @@
     "The pressure down here would crush you like a soda can."
   ],
   "scenes": [
-    {"narration": "Drop Mount Everest here and it would still be underwater.", "visual_query": "mount everest snow", "emphasis": ["Everest", "underwater"], "on_screen_text": "11 KM DEEP"},
-    {"narration": "This is the Challenger Deep, at the bottom of the Mariana Trench.", "visual_query": "deep ocean dark", "emphasis": ["Challenger"], "on_screen_text": ""},
-    {"narration": "It's almost eleven kilometers straight down.", "visual_query": "underwater sinking light", "emphasis": ["eleven"], "on_screen_text": ""},
-    {"narration": "The water pushes on you with over 1,000 times the air pressure.", "visual_query": "crushed can", "emphasis": ["1,000"], "on_screen_text": "1000x PRESSURE"},
-    {"narration": "That's like an elephant standing on your thumbnail.", "visual_query": "elephant walking", "emphasis": ["elephant"], "on_screen_text": ""},
-    {"narration": "Sunlight dies after a few hundred meters, so it's pitch black.", "visual_query": "sunlight underwater rays", "emphasis": ["pitch", "black"], "on_screen_text": ""},
-    {"narration": "But something still lives down there.", "visual_query": "deep sea creature", "emphasis": ["lives"], "on_screen_text": "SOMETHING LIVES"},
-    {"narration": "Tiny shrimp-like amphipods, and fish made of almost jelly.", "visual_query": "jellyfish dark water", "emphasis": ["jelly"], "on_screen_text": ""},
-    {"narration": "Fewer people have reached this spot than have walked on the Moon.", "visual_query": "astronaut moon", "emphasis": ["Moon"], "on_screen_text": "RARER THAN THE MOON"},
-    {"narration": "And here's the scary part: scientists found plastic bags there too.", "visual_query": "plastic bag ocean", "emphasis": ["plastic"], "on_screen_text": ""},
-    {"narration": "We've mapped Mars better than our own seafloor, which is why if you", "visual_query": "mars surface", "emphasis": ["Mars"], "on_screen_text": ""}
+    {
+      "narration": "Drop Mount Everest here and it would still be underwater.",
+      "visual_query": "mount everest snow",
+      "emphasis": [
+        "Everest",
+        "underwater"
+      ],
+      "on_screen_text": "11 KM DEEP"
+    },
+    {
+      "narration": "This is the Challenger Deep, at the bottom of the Mariana Trench.",
+      "visual_query": "deep ocean dark",
+      "emphasis": [
+        "Challenger"
+      ],
+      "on_screen_text": ""
+    },
+    {
+      "narration": "It's almost eleven kilometers down, deeper than Everest is tall.",
+      "visual_query": "underwater sinking light",
+      "emphasis": [
+        "eleven"
+      ],
+      "on_screen_text": "",
+      "graphic_type": "compare",
+      "graphic_label": "meters",
+      "compare_a_label": "Everest",
+      "compare_a_value": 8849,
+      "compare_b_label": "Trench",
+      "compare_b_value": 10935
+    },
+    {
+      "narration": "The water pushes on you with over 1,000 times the air pressure.",
+      "visual_query": "crushed can",
+      "emphasis": [
+        "1,000"
+      ],
+      "on_screen_text": "",
+      "graphic_type": "counter",
+      "counter_value": 1086,
+      "counter_prefix": "",
+      "counter_suffix": " BAR",
+      "graphic_label": "water pressure"
+    },
+    {
+      "narration": "That's like an elephant standing on your thumbnail.",
+      "visual_query": "elephant walking",
+      "emphasis": [
+        "elephant"
+      ],
+      "on_screen_text": ""
+    },
+    {
+      "narration": "Sunlight dies after a few hundred meters, so it's pitch black.",
+      "visual_query": "sunlight underwater rays",
+      "emphasis": [
+        "pitch",
+        "black"
+      ],
+      "on_screen_text": ""
+    },
+    {
+      "narration": "But something still lives down there.",
+      "visual_query": "deep sea creature",
+      "emphasis": [
+        "lives"
+      ],
+      "on_screen_text": "SOMETHING LIVES"
+    },
+    {
+      "narration": "Tiny shrimp-like amphipods, and fish made of almost jelly.",
+      "visual_query": "jellyfish dark water",
+      "emphasis": [
+        "jelly"
+      ],
+      "on_screen_text": ""
+    },
+    {
+      "narration": "Fewer people have reached this spot than have walked on the Moon.",
+      "visual_query": "astronaut moon",
+      "emphasis": [
+        "Moon"
+      ],
+      "on_screen_text": "RARER THAN THE MOON"
+    },
+    {
+      "narration": "And here's the scary part: scientists found plastic bags there too.",
+      "visual_query": "plastic bag ocean",
+      "emphasis": [
+        "plastic"
+      ],
+      "on_screen_text": "",
+      "beat": "twist"
+    },
+    {
+      "narration": "We've mapped Mars better than our own seafloor, which is why if you",
+      "visual_query": "mars surface",
+      "emphasis": [
+        "Mars"
+      ],
+      "on_screen_text": "",
+      "beat": "payoff"
+    }
   ],
   "title": "Everest would DISAPPEAR down here 🌊",
   "description": "The Challenger Deep is the deepest place on Earth.\nAnd humans still left trash there.",
-  "hashtags": ["facts", "ocean", "marianatrench", "science", "shorts", "didyouknow"],
-  "pinned_comment": "Would you go down there in a submarine for $1M? 👇"
+  "hashtags": [
+    "facts",
+    "ocean",
+    "marianatrench",
+    "science",
+    "shorts",
+    "didyouknow"
+  ],
+  "pinned_comment": "Would you go down there in a submarine for $1M? 👇",
+  "mood": "mysterious"
 }
