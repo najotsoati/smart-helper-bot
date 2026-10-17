@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shorts Studio</title>
+<style>
+  :root {
+    --bg: #0d0e12; --panel: #16181f; --panel2: #1d2029; --line: #2a2e3a;
+    --text: #eef0f6; --muted: #9aa0b2; --accent: #ffe500; --accent-ink: #111; --green: #3dff7a; --red: #ff4d6d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1100px; margin: 0 auto; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: -0.5px; }
+  header h1 span { background: var(--accent); color: var(--accent-ink); padding: 0 8px; border-radius: 6px; }
+  .status { color: var(--muted); font-size: 13px; }
+  .status b.ok { color: var(--green); } .status b.no { color: var(--red); }
+  main { max-width: 1100px; margin: 0 auto; padding: 8px 16px 60px; display: grid; gap: 16px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  h2 { margin: 0 0 12px; font-size: 17px; display: flex; gap: 10px; align-items: center; }
+  h2 .n { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: inline-grid; place-items: center; font-size: 14px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  #topic { flex: 1 1 320px; font-size: 16px; }
+  textarea { width: 100%; resize: vertical; min-height: 44px; }
+  button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 10px 16px; font: 600 15px/1.2 inherit; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button:disabled { opacity: .5; cursor: wait; }
+  .ideas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
+  .idea { background: var(--panel2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; cursor: pointer; }
+  .idea:hover { border-color: var(--accent); }
+  .idea b { display: block; margin-bottom: 4px; }
+  .idea i { color: var(--accent); font-style: normal; display: block; margin-bottom: 4px; }
+  .idea small { color: var(--muted); }
+  .hooks label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+  .hooks input { margin-top: 4px; accent-color: var(--accent); }
+  .scenes { display: grid; gap: 8px; }
+  .scene { display: grid; grid-template-columns: 28px 1fr 180px 150px; gap: 8px; align-items: start; }
+  .scene .idx { color: var(--muted); padding-top: 10px; text-align: right; }
+  .scene input { width: 100%; }
+  .head { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  @media (max-width: 760px) { .scene { grid-template-columns: 22px 1fr; } .scene input { grid-column: 2; } }
+  .muted { color: var(--muted); font-size: 13px; }
+  .bar { height: 10px; background: var(--panel2); border-radius: 99px; overflow: hidden; margin: 12px 0 6px; }
+  .bar div { height: 100%; width: 0; background: var(--accent); transition: width .4s; }
+  .result { display: grid; grid-template-columns: 300px 1fr; gap: 18px; margin-top: 14px; }
+  @media (max-width: 760px) { .result { grid-template-columns: 1fr; } }
+  video { width: 100%; border-radius: 12px; background: #000; aspect-ratio: 9/16; }
+  .copy { position: relative; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; white-space: pre-wrap; }
+  .copy button { position: absolute; top: 6px; right: 6px; padding: 4px 10px; font-size: 12px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .gallery a { color: var(--text); text-decoration: none; font-size: 13px; }
+  .gallery img { width: 100%; aspect-ratio: 9/16; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; margin-bottom: 6px; }
+  .hidden { display: none; }
+  .err { color: var(--red); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Shorts <span>Studio</span></h1>
+  <div class="status" id="status">Yuklanmoqda...</div>
+</header>
+<main>
+  <section>
+    <h2><span class="n">1</span> Mavzu</h2>
+    <div class="row">
+      <input id="topic" placeholder="Masalan: the deepest point of the ocean">
+      <select id="seconds">
+        <option value="30">30 soniya</option>
+        <option value="45" selected>45 soniya</option>
+        <option value="58">58 soniya</option>
+      </select>
+      <button id="btnScript">Ssenariy yozish</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <input id="niche" placeholder="Yo'nalish (ixtiyoriy): space, animals, history..." style="flex:1 1 260px">
+      <button class="ghost" id="btnIdeas">Viral g'oyalar topish</button>
+    </div>
+    <div class="ideas" id="ideas"></div>
+    <div class="err" id="err1"></div>
+  </section>
+
+  <section id="secScript" class="hidden">
+    <h2><span class="n">2</span> Ssenariy: tekshiring va tahrirlang</h2>
+    <div class="head">Hook: eng muhim birinchi 3 soniya. Eng kuchlisini tanlang.</div>
+    <div class="hooks" id="hooks" style="margin:8px 0 16px"></div>
+    <div class="scene head"><span></span><span>Matn (ovoz)</span><span>Video qidiruv</span><span>Ekrandagi sarlavha</span></div>
+    <div class="scenes" id="scenes"></div>
+    <div style="margin-top:14px" class="head">YouTube sarlavhasi</div>
+    <input id="title" style="width:100%;margin-top:6px">
+  </section>
+
+  <section id="secRender" class="hidden">
+    <h2><span class="n">3</span> Video yasash</h2>
+    <div class="row">
+      <select id="voice"></select>
+      <label class="row" style="gap:6px"><input type="checkbox" id="music" checked> Fon musiqasi</label>
+      <button id="btnRender">Video yasash</button>
+    </div>
+    <div id="progressBox" class="hidden">
+      <div class="bar"><div id="bar"></div></div>
+      <div class="muted" id="step"></div>
+    </div>
+    <div class="err" id="err3"></div>
+    <div class="result hidden" id="result">
+      <video id="player" controls playsinline></video>
+      <div>
+        <div class="head">Sarlavha</div><div class="copy" id="rTitle"></div>
+        <div class="head">Tavsif + heshteglar</div><div class="copy" id="rDesc"></div>
+        <div class="head">Pin qilinadigan izoh</div><div class="copy" id="rPin"></div>
+        <a id="download" download><button>Yuklab olish (MP4)</button></a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Oldingi videolar</h2>
+    <div class="gallery" id="gallery"><span class="muted">Hali video yo'q.</span></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let script = null;
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || res.statusText);
+  return data;
+}
+
+function busy(btn, on, label) {
+  btn.disabled = on;
+  if (on) { btn.dataset.label = btn.textContent; btn.textContent = label; } else if (btn.dataset.label) btn.textContent = btn.dataset.label;
+}
+
+async function loadConfig() {
+  const c = await api("/api/config");
+  const mark = (ok) => `<b class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"}</b>`;
+  $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · Musiqa: ${c.music_tracks} ta`;
+  $("voice").innerHTML = Object.entries(c.voices).map(([k, v]) => `<option value="${v}">${k}</option>`).join("");
+}
+
+$("btnIdeas").onclick = async () => {
+  const btn = $("btnIdeas"); busy(btn, true, "Qidirilmoqda..."); $("err1").textContent = "";
+  try {
+    const ideas = await api("/api/ideas", { niche: $("niche").value });
+    $("ideas").innerHTML = "";
+    for (const i of ideas) {
+      const el = document.createElement("div");
+      el.className = "idea";
+      el.innerHTML = `<b></b><i></i><small></small>`;
+      el.querySelector("b").textContent = i.topic;
+      el.querySelector("i").textContent = "“" + i.hook + "”";
+      el.querySelector("small").textContent = i.why_it_works;
+      el.onclick = () => { $("topic").value = i.topic; $("topic").focus(); };
+      $("ideas").append(el);
+    }
+  } catch (e) { $("err1").textContent = e.message; }
+  busy(btn, false);
+};
+
+$("btnScript").onclick = async () => {
+  const topic = $("topic").value.trim();
+  if (!topic) return $("topic").focus();
+  const btn = $("btnScript"); busy(btn, true, "Yozilmoqda... (~30 s)"); $("err1").textContent = "";
+  try {
+    script = await api("/api/script", { topic, seconds: +$("seconds").value });
+    showScript();
+  } catch (e) { $("err1").textContent = e.message; }
+  busy(btn, false);
+};
+
+function showScript() {
+  const hooks = [...new Set([script.scenes[0].narration, ...script.hook_candidates])];
+  $("hooks").innerHTML = "";
+  hooks.forEach((h, i) => {
+    const l = document.createElement("label");
+    l.innerHTML = `<input type="radio" name="hook" ${i === 0 ? "checked" : ""}><span></span>`;
+    l.querySelector("span").textContent = h;
+    l.querySelector("input").onchange = () => { script.scenes[0].narration = h; renderScenes(); };
+    $("hooks").append(l);
+  });
+  renderScenes();
+  $("title").value = script.title;
+  $("secScript").classList.remove("hidden");
+  $("secRender").classList.remove("hidden");
+  $("secScript").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderScenes() {
+  $("scenes").innerHTML = "";
+  script.scenes.forEach((s, i) => {
+    const row = document.createElement("div");
+    row.className = "scene";
+    row.innerHTML = `<span class="idx">${i + 1}</span><textarea rows="1"></textarea><input><input>`;
+    const [ta, q, t] = row.querySelectorAll("textarea, input");
+    ta.value = s.narration; q.value = s.visual_query; t.value = s.on_screen_text;
+    ta.oninput = () => (s.narration = ta.value);
+    q.oninput = () => (s.visual_query = q.value);
+    t.oninput = () => (s.on_screen_text = t.value);
+    $("scenes").append(row);
+  });
+}
+
+$("btnRender").onclick = async () => {
+  script.title = $("title").value;
+  const btn = $("btnRender"); busy(btn, true, "Yasalmoqda...");
+  $("err3").textContent = ""; $("result").classList.add("hidden"); $("progressBox").classList.remove("hidden");
+  try {
+    const { job_id } = await api("/api/render", { script, voice: $("voice").value, music: $("music").checked });
+    while (true) {
+      await new Promise((r) => setTimeout(r, 1500));
+      const j = await api("/api/jobs/" + job_id);
+      $("bar").style.width = Math.round(j.progress * 100) + "%";
+      $("step").textContent = j.step;
+      if (j.status === "error") throw new Error(j.step);
+      if (j.status === "done") { await showResult(j.dir); break; }
+    }
+  } catch (e) { $("err3").textContent = e.message; }
+  busy(btn, false);
+  loadGallery();
+};
+
+async function showResult(dir) {
+  const meta = await (await fetch(`/output/${dir}/meta.json`)).json();
+  const src = `/output/${dir}/video.mp4`;
+  $("player").src = src; $("download").href = src;
+  setCopy("rTitle", meta.title); setCopy("rDesc", meta.description); setCopy("rPin", meta.pinned_comment);
+  $("result").classList.remove("hidden");
+}
+
+function setCopy(id, text) {
+  const el = $(id);
+  el.textContent = text;
+  const b = document.createElement("button");
+  b.textContent = "Nusxa";
+  b.onclick = () => { navigator.clipboard.writeText(text); b.textContent = "✓"; setTimeout(() => (b.textContent = "Nusxa"), 1200); };
+  el.append(b);
+}
+
+async function loadGallery() {
+  const vids = await api("/api/videos");
+  if (!vids.length) return;
+  $("gallery").innerHTML = "";
+  for (const v of vids) {
+    const a = document.createElement("a");
+    a.href = `/output/${v.dir}/video.mp4`; a.target = "_blank";
+    a.innerHTML = `<img loading="lazy" alt=""><span></span>`;
+    a.querySelector("img").src = `/output/${v.dir}/cover.jpg`;
+    a.querySelector("span").textContent = `${v.title} · ${v.duration}s`;
+    $("gallery").append(a);
+  }
+}
+
+loadConfig().catch((e) => ($("status").textContent = e.message));
+loadGallery();
+</script>
+</body>
+</html>
