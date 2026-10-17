@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -66,6 +66,22 @@ class BatchRequest(BaseModel):
     schedule: Schedule | None = None
 
 
+class KeyUpdate(BaseModel):
+    name: str
+    value: str = ""
+
+
+class ClientSecret(BaseModel):
+    content: str
+
+
+def local_only(request: Request) -> None:
+    """Secrets can only be changed from the computer the panel runs on."""
+    host = request.client.host if request.client else ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(403, "Kalitlarni faqat panel ishlayotgan kompyuterning o'zidan o'zgartirish mumkin")
+
+
 class VideoRef(BaseModel):
     dir: str
     variant: str = "a"
@@ -102,6 +118,7 @@ def get_config():
         "elevenlabs": bool(config.ELEVENLABS_API_KEY),
         "openai": bool(config.OPENAI_API_KEY),
         "channel": youtube.connected(),
+        "channel_status": youtube.status(),
         "client_secret": youtube.CLIENT_SECRET.exists(),
         "match_threshold": config.MATCH_THRESHOLD,
         "music_tracks": len(music),
@@ -111,6 +128,28 @@ def get_config():
 @app.post("/api/check")
 def check():
     return health.run_all()
+
+
+@app.get("/api/keys")
+def keys():
+    return [
+        {"name": k, "label": label, "help": url, "set": bool(getattr(config, k)), "masked": config.masked(k)}
+        for k, (label, url) in config.EDITABLE_KEYS.items()
+    ]
+
+
+@app.post("/api/keys", dependencies=[Depends(local_only)])
+def save_key(req: KeyUpdate):
+    if req.name not in config.EDITABLE_KEYS:
+        raise HTTPException(400, "Noma'lum kalit")
+    config.save_key(req.name, req.value)
+    return {"saved": True, "check": health.run_for_key(req.name) if req.value.strip() else None}
+
+
+@app.post("/api/youtube/client_secret", dependencies=[Depends(local_only)])
+def upload_client_secret(req: ClientSecret):
+    _guard(youtube.save_client_secret, req.content.encode())
+    return {"saved": True}
 
 
 @app.post("/api/trends")
@@ -189,7 +228,7 @@ def videos():
     return out
 
 
-@app.post("/api/youtube/connect")
+@app.post("/api/youtube/connect", dependencies=[Depends(local_only)])
 def yt_connect():
     return {"channel": _guard(youtube.connect)}
 

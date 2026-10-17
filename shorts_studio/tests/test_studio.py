@@ -138,3 +138,28 @@ def test_youtube_video_id_parsing():
     assert parse_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
     with pytest.raises(ValueError):
         parse_video_id("not a link")
+
+
+def test_save_key_writes_env_and_applies(tmp_path, monkeypatch):
+    env = tmp_path / ".env"
+    monkeypatch.setattr(config, "ENV_FILE", env)
+    monkeypatch.setattr(config, "PEXELS_API_KEY", "")
+    config.save_key("PEXELS_API_KEY", "  abcd1234efgh5678 ")
+    assert config.PEXELS_API_KEY == "abcd1234efgh5678"
+    assert "PEXELS_API_KEY='abcd1234efgh5678'" in env.read_text()
+    assert config.masked("PEXELS_API_KEY") == "abcd…5678"
+    config.save_key("PEXELS_API_KEY", "")
+    assert config.PEXELS_API_KEY == "" and "PEXELS" not in env.read_text()
+    with pytest.raises(ValueError):
+        config.save_key("PATH", "x")
+
+
+def test_secrets_cannot_be_changed_remotely():
+    from fastapi.testclient import TestClient
+
+    import app as panel
+
+    client = TestClient(panel.app)  # its requests come from host "testclient", i.e. not this machine
+    assert client.post("/api/keys", json={"name": "PEXELS_API_KEY", "value": "x"}).status_code == 403
+    assert client.post("/api/youtube/client_secret", json={"content": "{}"}).status_code == 403
+    assert client.get("/api/keys").status_code == 200

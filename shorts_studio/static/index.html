@@ -88,6 +88,13 @@
   .playbook li { margin-bottom: 4px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .keys { display: grid; gap: 8px; }
+  .key { display: grid; grid-template-columns: 44px 220px 1fr auto; gap: 10px; align-items: center; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+  .key input { width: 100%; padding: 8px 10px; }
+  .key a { color: var(--muted); font-size: 12px; }
+  .key .res { grid-column: 2 / -1; font-size: 13px; }
+  .key .res.good { color: var(--green); }
+  @media (max-width: 760px) { .key { grid-template-columns: 44px 1fr; } .key input, .key .act { grid-column: 2; } }
   .hidden { display: none !important; }
   .err { color: var(--red); white-space: pre-wrap; }
 </style>
@@ -229,6 +236,10 @@
       <button class="ghost" id="btnRefresh">Statistikani yangilash</button>
       <button id="btnLearn">Natijalardan o'rganish</button>
     </div>
+    <div id="secretBox" class="hidden" style="margin-top:12px">
+      <div class="muted">Kanalni ulash uchun Google'dan olingan <code>client_secret.json</code> faylini tanlang (README'da 5 qadamda ko'rsatilgan):</div>
+      <input type="file" id="secretFile" accept=".json,application/json" style="margin-top:6px">
+    </div>
     <div class="err" id="errChannel"></div>
     <div id="playbook" class="playbook hidden" style="margin-top:14px"></div>
   </section>
@@ -240,6 +251,12 @@
   </section>
 
   <!-- ============ TIZIM ============ -->
+  <section data-tabs="system" class="hidden">
+    <h2>API kalitlari</h2>
+    <p class="muted">Kalitni qo'yib <b>Saqlash</b> tugmasini bosing: u <code>.env</code> fayliga yoziladi, darhol ishlay boshlaydi va avtomatik tekshiriladi. Kalitlar faqat sizning kompyuteringizda saqlanadi. O'chirish uchun maydonni bo'sh qoldirib, Saqlash tugmasini bosing.</p>
+    <div class="keys" id="keys"></div>
+  </section>
+
   <section data-tabs="system" class="hidden">
     <h2>Tizimni tekshirish</h2>
     <p class="muted">Har bir kalit va dastur juda kichik so'rov bilan tekshiriladi. Yangi kalit qo'shganda yoki xato chiqqanda shu yerdan boshlang.</p>
@@ -283,6 +300,7 @@ function showTab(name) {
   });
   try { localStorage.setItem("tab", name); } catch (e) {}
   if (name === "channel") loadChannel();
+  if (name === "system") loadKeys();
   if (name === "batch" || name === "create") loadJobs();
 }
 document.querySelectorAll("nav button").forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
@@ -301,7 +319,9 @@ async function loadConfig() {
   $("status").innerHTML = `Claude ${mark(c.claude)} · Pexels ${mark(c.pexels)} · Chizmalar ${mark(c.openai)} · ElevenLabs ${mark(c.elevenlabs)} · Trendlar ${mark(c.youtube)} · Kanal ${mark(c.channel)} · Musiqa: ${c.music_tracks}`;
   threshold = c.match_threshold;
   $("voice").innerHTML = Object.entries(c.voices).map(([k, v]) => `<option value="${v}">${k}</option>`).join("");
-  $("channelStatus").textContent = c.channel ? "Kanal ulangan ✓" : c.client_secret ? "Kanal ulanmagan" : "client_secret.json yo'q (README'ga qarang)";
+  const channelText = { connected: "Kanal ulangan ✓", expired: "Ulanish muddati tugagan, kanalni qayta ulang", missing: "Kanal ulanmagan" };
+  $("channelStatus").textContent = c.client_secret ? channelText[c.channel_status] : "Avval client_secret.json faylini yuklang";
+  $("secretBox").classList.toggle("hidden", c.client_secret);
 }
 
 /* ---------- create ---------- */
@@ -592,7 +612,42 @@ $("btnLearn").onclick = () => run($("btnLearn"), "Claude tahlil qilyapti...", $(
   showPlaybook(await api("/api/learn", {}));
 });
 
+$("secretFile").onchange = () => {
+  const f = $("secretFile").files[0];
+  if (!f) return;
+  run($("btnConnect"), "Saqlanmoqda...", $("errChannel"), async () => {
+    await api("/api/youtube/client_secret", { content: await f.text() });
+    await loadConfig();
+  });
+};
+
 /* ---------- system ---------- */
+async function loadKeys() {
+  const rows = await api("/api/keys");
+  $("keys").innerHTML = "";
+  for (const k of rows) {
+    const d = document.createElement("div");
+    d.className = "key";
+    d.innerHTML = `<span class="tag ${k.set ? "fix" : "del"}" title="${k.set ? "kiritilgan" : "kiritilmagan"}">${k.set ? "bor" : "yo'q"}</span>
+      <div><div class="lbl"></div><a target="_blank">kalitni olish ↗</a></div>
+      <input type="password" autocomplete="off" spellcheck="false">
+      <button class="small act">Saqlash</button><div class="res muted"></div>`;
+    d.querySelector(".lbl").textContent = k.label;
+    d.querySelector("a").href = k.help;
+    const input = d.querySelector("input"), res = d.querySelector(".res");
+    input.placeholder = k.set ? `saqlangan: ${k.masked}` : "kalitni shu yerga qo'ying";
+    d.querySelector("button").onclick = (e) => run(e.target, "...", res, async () => {
+      const r = await api("/api/keys", { name: k.name, value: input.value });
+      input.value = "";
+      await loadKeys(); loadConfig();
+      const out = $("keys").children[rows.indexOf(k)].querySelector(".res");
+      if (r.check) { out.className = "res " + (r.check.ok ? "good" : "err"); out.textContent = (r.check.ok ? "✓ ishlayapti: " : "✗ ") + r.check.detail; }
+      else out.textContent = "O'chirildi";
+    });
+    $("keys").append(d);
+  }
+}
+
 $("btnCheck").onclick = () => run($("btnCheck"), "Tekshirilmoqda...", null, async () => {
   const rows = await api("/api/check", {});
   $("checkTable").innerHTML = "";

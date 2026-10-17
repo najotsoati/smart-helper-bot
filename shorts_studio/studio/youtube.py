@@ -51,17 +51,31 @@ def connect() -> str:
     return channel()["title"]
 
 
-def connected() -> bool:
+def status() -> str:
+    """"connected", "expired" (Google revoked the token, e.g. after 7 days in testing mode) or "missing"."""
+    if not TOKEN.exists():
+        return "missing"
     try:
-        return _credentials() is not None
+        return "connected" if _credentials() else "expired"
     except Exception:
-        return False
+        return "expired"
+
+
+def connected() -> bool:
+    return status() == "connected"
+
+
+def save_client_secret(raw: bytes) -> None:
+    data = json.loads(raw)
+    if "installed" not in data:
+        raise ValueError("Bu 'Desktop app' turidagi OAuth client JSON emas (ichida 'installed' bo'lishi kerak)")
+    CLIENT_SECRET.write_text(json.dumps(data))
 
 
 def _youtube():
     creds = _credentials()
     if not creds:
-        raise RuntimeError("YouTube kanali ulanmagan")
+        raise RuntimeError("YouTube ulanishi yo'q yoki muddati tugagan: 'Kanalni ulash' tugmasini bosing")
     return build("youtube", "v3", credentials=creds, cache_discovery=False)
 
 

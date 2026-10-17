@@ -42,8 +42,9 @@ cd shorts_studio
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env             # keyin .env ichiga kalitlarni yozing
 ```
+
+Kalitlarni panelning o'zida kiritasiz: **Tizim → API kalitlari** bo'limida kalitni qo'yib, **Saqlash** tugmasini bosing. Kalit darhol ishlay boshlaydi va avtomatik tekshiriladi. Xohlasangiz, `.env.example` faylidan nusxa olib, `.env` faylini qo'lda ham to'ldirishingiz mumkin.
 
 | Kalit | Majburiymi | Qayerdan olinadi |
 |---|---|---|
@@ -89,8 +90,20 @@ Tayyor videolar `output/` papkasiga saqlanadi. Chizmalar va stok videolar `outpu
 1. https://console.cloud.google.com saytida loyiha oching.
 2. **APIs & Services → Library** bo'limida **YouTube Data API v3** va **YouTube Analytics API**ni yoqing.
 3. **OAuth consent screen**: turini "External" qiling va o'z emailingizni "Test users" ro'yxatiga qo'shing.
-4. **Credentials → Create credentials → OAuth client ID → Desktop app**. JSON faylni yuklab olib, `shorts_studio/client_secret.json` nomi bilan saqlang.
+4. **Credentials → Create credentials → OAuth client ID → Desktop app**. JSON faylni yuklab oling va panelda "Videolar va kanal" bo'limida tanlang (yoki `shorts_studio/client_secret.json` nomi bilan saqlang).
 5. Panelda "Videolar va kanal" bo'limida **Kanalni ulash** tugmasini bosing va brauzerda ruxsat bering. Panelni o'z kompyuteringizda ishga tushirgan bo'lishingiz kerak.
+
+### Bu xavfsizmi?
+
+- Panelga Google parolingiz berilmaydi. Ruxsatni Google'ning o'z sahifasida berasiz, panel faqat cheklangan token oladi.
+- Panel faqat **video yuklay oladi** hamda **kanal ma'lumotlari va statistikani o'qiy oladi**. Videolarni o'chira olmaydi, kanal sozlamalarini o'zgartira olmaydi, izoh yoza olmaydi.
+- Token faqat sizning kompyuteringizda (`youtube_token.json`) saqlanadi va GitHub'ga tushmaydi. Ruxsatni istalgan payt bekor qilish mumkin: https://myaccount.google.com/permissions
+- Kalitlarni va kanal ulanishini faqat panel ishlayotgan kompyuterning o'zidan o'zgartirish mumkin. Panelni `--host 0.0.0.0` bilan internetga ochmang.
+- Google ilovasi "test" rejimida bo'lgani uchun ulanish odatda **7 kunda bir** tugaydi. Bunda panel "Ulanish muddati tugagan" deb ko'rsatadi, siz **Kanalni ulash** tugmasini qayta bosasiz.
+
+### Video qanday yuklanadi
+
+Video kompyuteringizdan to'g'ridan-to'g'ri YouTube'ga yuklanadi. Sarlavha, tavsif va heshteglar avtomatik qo'yiladi, kategoriya Education, "bolalar uchun emas". Video **private** bo'lib yuklanadi yoki belgilangan vaqtga rejalashtiriladi. Pin qilinadigan izohni o'zingiz qo'shasiz. YouTube'ning standart kunlik kvotasi odatda kuniga taxminan 6 ta yuklashga yetadi.
 
 **Muhim:** YouTube'ning bepul API auditidan o'tmagan loyihalarda API orqali yuklangan videolar **"private" bo'lib qoladi**. Yuklash ishlaydi, lekin videoni YouTube Studio'da o'zingiz ochiq qilasiz. Avtomatik rejalashtirish esa faqat auditdan keyin ishlaydi. Audit uchun ariza: https://support.google.com/youtube/contact/yt_api_form
 

@@ -66,33 +66,54 @@ def _edge() -> str:
 
 def _channel() -> str:
     if not youtube.CLIENT_SECRET.exists():
-        raise RuntimeError("client_secret.json yo'q")
-    if not youtube.connected():
-        raise RuntimeError("kanal hali ulanmagan")
+        raise RuntimeError("client_secret.json yuklanmagan")
+    state = youtube.status()
+    if state != "connected":
+        raise RuntimeError({"expired": "ulanish muddati tugagan, 'Kanalni ulash' tugmasini qayta bosing",
+                            "missing": "kanal hali ulanmagan"}[state])
     return youtube.channel()["title"]
 
 
 CHECKS = [
-    # name, required, needs key, function
-    ("ffmpeg", True, True, _ffmpeg),
-    ("Claude (Anthropic)", True, bool(config.ANTHROPIC_API_KEY), _claude),
-    ("Microsoft ovozlari (edge-tts)", True, True, _edge),
-    ("Pexels (stok video)", False, bool(config.PEXELS_API_KEY), _pexels),
-    ("OpenAI (AI chizmalar)", False, bool(config.OPENAI_API_KEY), _openai),
-    ("ElevenLabs (ovoz)", False, bool(config.ELEVENLABS_API_KEY), _elevenlabs),
-    ("YouTube API kaliti (trendlar)", False, bool(config.YOUTUBE_API_KEY), _youtube_key),
-    ("YouTube kanali (yuklash, analitika)", False, True, _channel),
+    # name, required, config key it needs (None = always run), function
+    ("ffmpeg", True, None, _ffmpeg),
+    ("Claude (Anthropic)", True, "ANTHROPIC_API_KEY", _claude),
+    ("Microsoft ovozlari (edge-tts)", True, None, _edge),
+    ("Pexels (stok video)", False, "PEXELS_API_KEY", _pexels),
+    ("OpenAI (AI chizmalar)", False, "OPENAI_API_KEY", _openai),
+    ("ElevenLabs (ovoz)", False, "ELEVENLABS_API_KEY", _elevenlabs),
+    ("YouTube API kaliti (trendlar)", False, "YOUTUBE_API_KEY", _youtube_key),
+    ("YouTube kanali (yuklash, analitika)", False, None, _channel),
 ]
 
 
+def _explain(e: Exception) -> str:
+    """Plain-language reason for the usual failures."""
+    status = getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
+    if status == 401:
+        return "Kalit noto'g'ri (401). Nusxa olishda xato bo'lmaganini tekshiring yoki yangi kalit yarating."
+    if status == 403:
+        return ("Ruxsat yo'q (403): kalit noto'g'ri, hisobda pul yoki ruxsat yo'q, yoki xizmat "
+                "siz turgan hududda ishlamaydi.")
+    if status == 429:
+        return "Limit tugagan (429): balansni yoki tarif limitini tekshiring."
+    return str(e)[:300]
+
+
+def _check(name: str, required: bool, key: str | None, fn) -> dict:
+    if key and not getattr(config, key):
+        return {"name": name, "ok": False, "required": required, "detail": "kalit kiritilmagan"}
+    try:
+        return {"name": name, "ok": True, "required": required, "detail": fn()}
+    except Exception as e:
+        return {"name": name, "ok": False, "required": required, "detail": _explain(e)}
+
+
 def run_all() -> list[dict]:
-    results = []
-    for name, required, has_key, fn in CHECKS:
-        if not has_key:
-            results.append({"name": name, "ok": False, "required": required, "detail": ".env faylida kalit yo'q"})
-            continue
-        try:
-            results.append({"name": name, "ok": True, "required": required, "detail": fn()})
-        except Exception as e:
-            results.append({"name": name, "ok": False, "required": required, "detail": str(e)[:300]})
-    return results
+    return [_check(*c) for c in CHECKS]
+
+
+def run_for_key(key: str) -> dict | None:
+    """Re-test just the service a freshly saved key belongs to."""
+    lookup = "ELEVENLABS_API_KEY" if key == "ELEVENLABS_VOICE_ID" else key
+    return next((_check(*c) for c in CHECKS if c[2] == lookup), None)
